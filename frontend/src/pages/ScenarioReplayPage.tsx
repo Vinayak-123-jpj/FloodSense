@@ -98,7 +98,9 @@ export const ScenarioReplayPage: React.FC = () => {
       <div className="border-b border-survey-border dark:border-night-border pb-3">
         <span className="font-mono text-xs text-survey-teal dark:text-night-teal uppercase tracking-wider block">DISASTER REPLAY & DIGITAL TWIN SIMULATOR</span>
         <h1 className="font-serif text-2xl font-bold text-survey-ink dark:text-night-text">Historical Event Scrubber</h1>
-        <p className="font-sans text-xs text-survey-slate dark:text-night-slate">Replay the August 2018 Kerala floods or Assam monsoon events. Test what-if rainfall scenarios live.</p>
+        <p className="font-sans text-xs text-survey-slate dark:text-night-slate">
+          Replay the August 2018 Kerala floods or Assam monsoon events. Evaluated using the genuinely out-of-sample model (<code className="font-mono text-survey-teal dark:text-night-teal">heldout_2018_model.joblib</code>), trained strictly on non-2018 data. Test what-if rainfall scenarios live.
+        </p>
       </div>
 
       {/* Scrubber Controls */}

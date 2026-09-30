@@ -5,7 +5,7 @@ import { Station, RiskLevel } from '../../types';
 import { useTheme } from '../../theme/ThemeContext';
 import { RiskBadge } from '../common/Badge';
 import { KERALA_BOUNDARY_GEOJSON, ASSAM_BOUNDARY_GEOJSON } from '../../data/regionOutlines';
-import { Layers, MapPin } from 'lucide-react';
+import { Layers } from 'lucide-react';
 
 interface FloodMapProps {
   stations: Station[];
@@ -16,8 +16,8 @@ interface FloodMapProps {
   onRegionChange?: (region: string) => void;
 }
 
-// Custom SVG icon generator for station markers with label & dual shape icon
-const createCustomMarkerIcon = (station: Station, risk: RiskLevel = 'Green', isSelected = false) => {
+// Custom SVG marker icon with decluttered labels (label visible at zoom >= 9 or if selected)
+const createCustomMarkerIcon = (station: Station, risk: RiskLevel = 'Green', isSelected = false, showLabel = false) => {
   const colorMap: Record<RiskLevel, string> = {
     Green: '#2E7D32',
     Yellow: '#D97706',
@@ -35,10 +35,10 @@ const createCustomMarkerIcon = (station: Station, risk: RiskLevel = 'Green', isS
   const color = colorMap[risk] || '#2E7D32';
   const shape = shapeMap[risk] || '●';
   const isHighRisk = risk === 'Orange' || risk === 'Red';
-  const size = isSelected ? 36 : 28;
+  const size = isSelected ? 34 : 26;
 
   const svg = `
-    <div style="display: flex; flex-direction: column; items-center; justify-content: center; text-align: center;">
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
       <svg width="${size}" height="${size}" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="margin: 0 auto;">
         ${isHighRisk ? `
           <circle cx="16" cy="16" r="14" fill="${color}" opacity="0.3">
@@ -49,21 +49,23 @@ const createCustomMarkerIcon = (station: Station, risk: RiskLevel = 'Green', isS
         <circle cx="16" cy="16" r="${isSelected ? 11 : 9}" fill="${color}" stroke="#FFFFFF" stroke-width="2.5" />
         <text x="16" y="20" font-size="10" font-weight="bold" fill="#FFFFFF" text-anchor="middle">${shape}</text>
       </svg>
-      <div style="
-        font-family: monospace;
-        font-size: 9px;
-        font-weight: 700;
-        color: ${color};
-        background-color: rgba(255, 255, 255, 0.92);
-        padding: 1px 4px;
-        border-radius: 3px;
-        border: 1px solid ${color};
-        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        white-space: nowrap;
-        margin-top: 1px;
-      ">
-        ${station.name} (${risk.toUpperCase()})
-      </div>
+      ${(showLabel || isSelected) ? `
+        <div style="
+          font-family: monospace;
+          font-size: 9px;
+          font-weight: 700;
+          color: ${color};
+          background-color: rgba(255, 255, 255, 0.95);
+          padding: 1px 4px;
+          border-radius: 3px;
+          border: 1px solid ${color};
+          box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+          white-space: nowrap;
+          margin-top: 1px;
+        ">
+          ${station.name} (${risk.toUpperCase()})
+        </div>
+      ` : ''}
     </div>
   `;
 
@@ -76,31 +78,32 @@ const createCustomMarkerIcon = (station: Station, risk: RiskLevel = 'Green', isS
   });
 };
 
-// Component to handle map view bounds fitting on region changes
-const MapBoundsController: React.FC<{ stations: Station[]; selectedRegion?: string }> = ({ stations, selectedRegion }) => {
+// Component to control fitBounds centering & track zoom level for decluttering
+const MapViewController: React.FC<{
+  stations: Station[];
+  selectedRegion?: string;
+  onZoomChange: (zoom: number) => void;
+  onCursorMove: (coords: { lat: number; lng: number }) => void;
+}> = ({ stations, selectedRegion, onZoomChange, onCursorMove }) => {
   const map = useMap();
 
+  useMapEvents({
+    zoomend: () => onZoomChange(map.getZoom()),
+    mousemove: (e) => onCursorMove({ lat: e.latlng.lat, lng: e.latlng.lng })
+  });
+
   useEffect(() => {
+    onZoomChange(map.getZoom());
     const filtered = selectedRegion && selectedRegion !== 'All'
       ? stations.filter(s => s.region === selectedRegion)
       : stations;
 
     if (filtered.length > 0) {
       const bounds = L.latLngBounds(filtered.map(s => [s.latitude, s.longitude]));
-      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 11 });
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
     }
   }, [stations, selectedRegion, map]);
 
-  return null;
-};
-
-// Component to track cursor coordinates
-const CursorTracker: React.FC<{ onMove: (coords: { lat: number; lng: number }) => void }> = ({ onMove }) => {
-  useMapEvents({
-    mousemove: (e) => {
-      onMove({ lat: e.latlng.lat, lng: e.latlng.lng });
-    }
-  });
   return null;
 };
 
@@ -115,25 +118,46 @@ export const FloodMap: React.FC<FloodMapProps> = ({
   const { theme } = useTheme();
   const [cursorCoords, setCursorCoords] = useState<{ lat: number; lng: number }>({ lat: 10.1416, lng: 76.5781 });
   const [activeRegionFilter, setActiveRegionFilter] = useState<string>(selectedRegion);
-  const [tileError, setTileError] = useState<boolean>(false);
+  const [currentZoom, setCurrentZoom] = useState<number>(8);
+  const [useOfflineFallback, setUseOfflineFallback] = useState<boolean>(!navigator.onLine);
 
   useEffect(() => {
     setActiveRegionFilter(selectedRegion);
   }, [selectedRegion]);
+
+  // 4-second timeout to check tile loading and activate offline fallback if network is unreachable
+  useEffect(() => {
+    const handleOnline = () => setUseOfflineFallback(false);
+    const handleOffline = () => setUseOfflineFallback(true);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    const timer = setTimeout(() => {
+      if (!navigator.onLine) setUseOfflineFallback(true);
+    }, 4000);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+      clearTimeout(timer);
+    };
+  }, []);
 
   const handleRegionClick = (reg: string) => {
     setActiveRegionFilter(reg);
     if (onRegionChange) onRegionChange(reg);
   };
 
-  // Keyless Carto tile URLs
-  const primaryTileUrl = theme === 'dark'
-    ? 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png';
-
-  const osmFallbackTileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-
-  const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>';
+  // OpenTopoMap for light theme (survey atlas concept) and desaturated OSM for dark theme
+  const lightTileUrl = 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png';
+  const darkTileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  
+  const tileUrl = theme === 'dark' ? darkTileUrl : lightTileUrl;
+  const tileSubdomains = theme === 'dark' ? 'abc' : 'abc';
+  const tileAttribution = theme === 'dark'
+    ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    : 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, SRTM | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)';
 
   return (
     <div className="relative w-full overflow-hidden border border-survey-border dark:border-night-border rounded shadow-xs" style={{ height }}>
@@ -164,31 +188,36 @@ export const FloodMap: React.FC<FloodMapProps> = ({
         style={{ height: '100%', width: '100%', backgroundColor: theme === 'dark' ? '#0C141B' : '#F2EEE4' }}
         zoomControl={true}
       >
-        <MapBoundsController stations={stations} selectedRegion={activeRegionFilter} />
-        
-        {/* Tile Layer with Fallback */}
-        <TileLayer
-          url={tileError ? osmFallbackTileUrl : primaryTileUrl}
-          subdomains="abcd"
-          attribution={attribution}
-          maxZoom={18}
-          eventHandlers={{
-            tileerror: () => setTileError(true)
-          }}
-          className={tileError ? (theme === 'dark' ? 'dark-tile-filter' : 'light-tile-filter') : ''}
+        <MapViewController
+          stations={stations}
+          selectedRegion={activeRegionFilter}
+          onZoomChange={setCurrentZoom}
+          onCursorMove={setCursorCoords}
         />
 
-        <CursorTracker onMove={setCursorCoords} />
+        {/* Tile Layer with 4s / offline fallback */}
+        {!useOfflineFallback && (
+          <TileLayer
+            url={tileUrl}
+            subdomains={tileSubdomains}
+            attribution={tileAttribution}
+            maxZoom={17}
+            className={theme === 'dark' ? 'dark-tile-filter' : ''}
+            eventHandlers={{
+              tileerror: () => setUseOfflineFallback(true)
+            }}
+          />
+        )}
 
-        {/* Offline Vector Overlay Layers */}
+        {/* Bundled GeoJSON Vector Fallback Layers */}
         <GeoJSON
           data={KERALA_BOUNDARY_GEOJSON}
           style={{
             color: '#1F6B75',
-            weight: 1.5,
-            dashArray: '3, 3',
+            weight: 2.0,
+            dashArray: '4, 4',
             fillColor: '#1F6B75',
-            fillOpacity: 0.05
+            fillOpacity: useOfflineFallback ? 0.12 : 0.04
           }}
         />
 
@@ -196,17 +225,18 @@ export const FloodMap: React.FC<FloodMapProps> = ({
           data={ASSAM_BOUNDARY_GEOJSON}
           style={{
             color: '#C88A2E',
-            weight: 1.5,
-            dashArray: '3, 3',
+            weight: 2.0,
+            dashArray: '4, 4',
             fillColor: '#C88A2E',
-            fillOpacity: 0.05
+            fillOpacity: useOfflineFallback ? 0.12 : 0.04
           }}
         />
 
         {stations.map(st => {
           const risk = st.current_risk_level || 'Green';
           const isSelected = st.id === selectedStationId;
-          const icon = createCustomMarkerIcon(st, risk, isSelected);
+          const showTextLabel = currentZoom >= 9 || isSelected;
+          const icon = createCustomMarkerIcon(st, risk, isSelected, showTextLabel);
 
           // Low-lying zone contour polygon
           const delta = 0.035;
@@ -239,17 +269,15 @@ export const FloodMap: React.FC<FloodMapProps> = ({
                   click: () => onSelectStation(st)
                 }}
               >
-                {/* Hover Tooltip */}
                 <LeafletTooltip direction="top" offset={[0, -25]} opacity={0.95}>
                   <div className="font-mono text-xs">
                     <strong className="block text-slate-900">{st.name} ({st.river})</strong>
-                    <div>Risk: <span className="font-bold">{risk}</span></div>
+                    <div>Risk Level: <span className="font-bold">{risk}</span></div>
                     <div>Water Level: {(st.current_water_level_m || st.normal_level_m).toFixed(2)}m</div>
-                    <div className="text-[10px] text-slate-500">Updated: Just now</div>
+                    <div className="text-[10px] text-slate-500">Telemetry: Live Active</div>
                   </div>
                 </LeafletTooltip>
 
-                {/* Click Popup */}
                 <Popup className="custom-leaflet-popup">
                   <div className="p-1 font-sans text-xs">
                     <div className="font-serif text-sm font-bold text-slate-900 mb-1">{st.name}</div>
@@ -272,7 +300,7 @@ export const FloodMap: React.FC<FloodMapProps> = ({
 
       {/* Cursor Readout Micro-detail */}
       <div className="absolute bottom-3 left-3 z-[400] rounded bg-survey-paper/90 dark:bg-night-bg/90 px-2.5 py-1 border border-survey-border dark:border-night-border font-mono text-[11px] text-survey-ink dark:text-night-text backdrop-blur-xs shadow-xs">
-        <span className="text-survey-teal dark:text-night-teal font-medium">CURSOR:</span> {cursorCoords.lat.toFixed(4)}°N, {cursorCoords.lng.toFixed(4)}°E
+        <span className="text-survey-teal dark:text-night-teal font-medium">CURSOR:</span> {cursorCoords.lat.toFixed(4)}°N, {cursorCoords.lng.toFixed(4)}°E {useOfflineFallback && '(OFFLINE VECTOR MODE)'}
       </div>
     </div>
   );

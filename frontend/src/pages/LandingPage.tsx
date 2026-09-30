@@ -2,18 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FloodMap } from '../components/map/FloodMap';
 import { Station } from '../types';
-import { api, ModelMetrics } from '../services/api';
-import { Shield, ArrowRight, Play, Cpu, Layers } from 'lucide-react';
+import { api, FullMetricsSummary } from '../services/api';
+import { Shield, ArrowRight, Play } from 'lucide-react';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const [stations, setStations] = useState<Station[]>([]);
-  const [metrics, setMetrics] = useState<ModelMetrics | null>(null);
+  const [metrics, setMetrics] = useState<FullMetricsSummary | null>(null);
 
   useEffect(() => {
     api.getStations().then(setStations).catch(console.error);
-    api.getMetrics().then(setMetrics).catch(console.error);
+    api.getFullMetrics().then(setMetrics).catch(console.error);
   }, []);
+
+  const leadDays = metrics?.kerala_2018_median_lead_time_days ?? 2;
+  const leadHours = metrics?.kerala_2018_median_lead_time_hours ?? 48;
+  const accuracy = metrics?.heldout_2018_event_test?.lightgbm?.accuracy_pct ?? 90.63;
 
   return (
     <div className="space-y-8 pb-12">
@@ -55,7 +59,7 @@ export const LandingPage: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="font-serif text-xl font-bold text-survey-ink dark:text-night-text">Active River Gauging Atlas</h2>
-            <p className="font-sans text-xs text-survey-slate dark:text-night-slate">Desaturated map tiles, live station markers, low-lying zone contours, and keyless Carto tiles.</p>
+            <p className="font-sans text-xs text-survey-slate dark:text-night-slate">Desaturated OpenTopoMap tiles, live station markers, basin contours, and keyless tiles.</p>
           </div>
           <span className="font-mono text-xs text-survey-teal dark:text-night-teal">{stations.length} STATIONS ONLINE</span>
         </div>
@@ -67,27 +71,27 @@ export const LandingPage: React.FC = () => {
         />
       </section>
 
-      {/* Editorial Field-Report Figures (Restyled: 1px technical rules, no chunky cards) */}
+      {/* Editorial Field-Report Figures */}
       <section className="border-t border-b border-survey-border dark:border-night-border py-6 my-6">
         <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-survey-border dark:divide-night-border font-mono">
           
           <div className="px-4 py-3 md:py-0 space-y-1">
             <span className="text-[11px] text-survey-teal dark:text-night-teal uppercase tracking-wider block">FIGURE 1.1 • KERALA BACKTEST</span>
             <div className="text-3xl font-bold text-survey-ink dark:text-night-text">
-              {metrics ? `${metrics.kerala_2018_lead_time_hours} Hours` : '53 Hours'}
+              {leadDays} Days ({leadHours}h)
             </div>
             <p className="font-sans text-xs text-survey-slate dark:text-night-slate">
-              Corrected 24h future prediction model lead time on Kerala 2018 flood event.
+              Warning lead time prior to peak deluge on Kerala 2018 flood event.
             </p>
           </div>
 
           <div className="px-4 py-3 md:py-0 space-y-1">
-            <span className="text-[11px] text-survey-teal dark:text-night-teal uppercase tracking-wider block">FIGURE 1.2 • 24H MODEL ACCURACY</span>
+            <span className="text-[11px] text-survey-teal dark:text-night-teal uppercase tracking-wider block">FIGURE 1.2 • HELDOUT 2018 ACCURACY</span>
             <div className="text-3xl font-bold text-survey-ink dark:text-night-text">
-              {metrics ? `${metrics.accuracy_pct}%` : '95.96%'}
+              {accuracy}%
             </div>
             <p className="font-sans text-xs text-survey-slate dark:text-night-slate">
-              LightGBM accuracy predicting Y(t+24h) with strict 72h chronological split gap.
+              LightGBM classification accuracy on held-out 2018 dataset (84.71% Macro F1).
             </p>
           </div>
 

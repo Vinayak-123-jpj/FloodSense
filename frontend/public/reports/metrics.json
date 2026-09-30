@@ -1,25 +1,147 @@
 {
-  "model_name": "LightGBM Multi-class Classifier (24h Future Risk)",
-  "prediction_horizon_hours": 24,
-  "train_samples": 28012,
-  "test_samples": 6932,
-  "split_gap_hours": 72,
-  "accuracy_pct": 95.96,
-  "macro_f1_pct": 40.91,
-  "persistence_baseline_macro_f1_pct": 48.68,
-  "threshold_baseline_macro_f1_pct": 44.39,
-  "false_alarm_rate_pct": 0.07,
-  "missed_event_rate_pct": 98.08,
-  "kerala_2018_lead_time_hours": 53,
+  "dataset_resolution": "DAILY (1 row per station per day)",
+  "date_range": "1990-01-01 to 2025-12-31",
+  "total_daily_samples": 131490,
+  "station_count": 10,
+  "percentile_proxies_disclaimer": "Risk labels defined by station-specific training period discharge percentiles (p90=Yellow, p97=Orange, p99.5=Red), NOT official CWC meters.",
+  "modeled_discharge_disclaimer": "GloFAS river discharge is modelled m\u00b3/s data from Open-Meteo, not direct river gauge heights.",
+  "multi_horizon_time_split": {
+    "1d": {
+      "lightgbm": {
+        "accuracy_pct": 87.78,
+        "macro_f1_pct": 81.4,
+        "false_alarm_rate_pct": 4.68,
+        "missed_event_rate_pct": 13.96,
+        "orange_red_recall_pct": 86.04
+      },
+      "shallow_tree_baseline": {
+        "accuracy_pct": 86.12,
+        "macro_f1_pct": 78.96,
+        "false_alarm_rate_pct": 4.82,
+        "missed_event_rate_pct": 17.54,
+        "orange_red_recall_pct": 82.46
+      },
+      "persistence_baseline": {
+        "accuracy_pct": 90.0,
+        "macro_f1_pct": 84.08,
+        "false_alarm_rate_pct": 3.47,
+        "missed_event_rate_pct": 12.76,
+        "orange_red_recall_pct": 87.24
+      },
+      "threshold_baseline": {
+        "accuracy_pct": 63.08,
+        "macro_f1_pct": 51.8,
+        "false_alarm_rate_pct": 26.61,
+        "missed_event_rate_pct": 6.63,
+        "orange_red_recall_pct": 93.37
+      }
+    },
+    "2d": {
+      "lightgbm": {
+        "accuracy_pct": 81.64,
+        "macro_f1_pct": 72.87,
+        "false_alarm_rate_pct": 6.71,
+        "missed_event_rate_pct": 20.67,
+        "orange_red_recall_pct": 79.33
+      },
+      "shallow_tree_baseline": {
+        "accuracy_pct": 79.98,
+        "macro_f1_pct": 70.5,
+        "false_alarm_rate_pct": 7.4,
+        "missed_event_rate_pct": 21.48,
+        "orange_red_recall_pct": 78.52
+      },
+      "persistence_baseline": {
+        "accuracy_pct": 82.69,
+        "macro_f1_pct": 72.05,
+        "false_alarm_rate_pct": 5.98,
+        "missed_event_rate_pct": 22.92,
+        "orange_red_recall_pct": 77.08
+      },
+      "threshold_baseline": {
+        "accuracy_pct": 60.56,
+        "macro_f1_pct": 48.65,
+        "false_alarm_rate_pct": 27.56,
+        "missed_event_rate_pct": 12.19,
+        "orange_red_recall_pct": 87.81
+      }
+    },
+    "3d": {
+      "lightgbm": {
+        "accuracy_pct": 77.23,
+        "macro_f1_pct": 66.01,
+        "false_alarm_rate_pct": 8.32,
+        "missed_event_rate_pct": 26.72,
+        "orange_red_recall_pct": 73.28
+      },
+      "shallow_tree_baseline": {
+        "accuracy_pct": 75.72,
+        "macro_f1_pct": 64.53,
+        "false_alarm_rate_pct": 8.82,
+        "missed_event_rate_pct": 26.72,
+        "orange_red_recall_pct": 73.28
+      },
+      "persistence_baseline": {
+        "accuracy_pct": 77.25,
+        "macro_f1_pct": 63.19,
+        "false_alarm_rate_pct": 7.74,
+        "missed_event_rate_pct": 31.34,
+        "orange_red_recall_pct": 68.66
+      },
+      "threshold_baseline": {
+        "accuracy_pct": 57.94,
+        "macro_f1_pct": 45.38,
+        "false_alarm_rate_pct": 28.57,
+        "missed_event_rate_pct": 18.09,
+        "orange_red_recall_pct": 81.91
+      }
+    }
+  },
+  "heldout_2018_event_test": {
+    "lightgbm": {
+      "accuracy_pct": 90.63,
+      "macro_f1_pct": 84.71,
+      "false_alarm_rate_pct": 4.11,
+      "missed_event_rate_pct": 8.6,
+      "orange_red_recall_pct": 91.4
+    },
+    "persistence_baseline": {
+      "accuracy_pct": 91.62,
+      "macro_f1_pct": 85.58,
+      "false_alarm_rate_pct": 2.99,
+      "missed_event_rate_pct": 12.79,
+      "orange_red_recall_pct": 87.21
+    }
+  },
+  "loso_sample_test": {
+    "KL-PER-01": {
+      "accuracy_pct": 90.21,
+      "macro_f1_pct": 83.45,
+      "false_alarm_rate_pct": 3.98,
+      "missed_event_rate_pct": 9.18,
+      "orange_red_recall_pct": 90.82
+    }
+  },
+  "kerala_2018_station_lead_times_days": {
+    "KL-ACH-01": 2,
+    "KL-CHA-01": 2,
+    "KL-MUV-01": 7,
+    "KL-PAM-01": 1,
+    "KL-PER-01": 7,
+    "KL-PER-02": 2
+  },
+  "kerala_2018_median_lead_time_days": 2,
+  "kerala_2018_median_lead_time_hours": 48,
   "train_class_distribution": {
-    "Green": 25311,
-    "Yellow": 2288,
-    "Orange": 346,
-    "Red": 67
+    "Green": 72237,
+    "Yellow": 22271,
+    "Orange": 8666,
+    "Red": 2026
   },
   "test_class_distribution": {
-    "Green": 6477,
-    "Yellow": 403,
-    "Orange": 52
+    "Green": 16363,
+    "Yellow": 6175,
+    "Orange": 2778,
+    "Red": 904
   }
 }

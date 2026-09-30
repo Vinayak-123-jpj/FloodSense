@@ -13,12 +13,8 @@
   font-family: inherit;
 }
 
-.light-tile-filter {
-  filter: saturate(0.3) contrast(1.05);
-}
-
 .dark-tile-filter {
-  filter: saturate(0.2) invert(1) hue-rotate(180deg) brightness(0.7) contrast(1.2);
+  filter: invert(1) hue-rotate(180deg) desaturate(0.85) brightness(0.7) contrast(1.2);
 }
 
 .custom-station-marker-container {

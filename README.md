@@ -4,9 +4,9 @@
 [![Licence: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python: 3.11](https://img.shields.io/badge/Python-3.11-teal.svg)](backend/)
 [![React: 18](https://img.shields.io/badge/React-18-61dafb.svg)](frontend/)
-[![Accuracy: 95.96%](https://img.shields.io/badge/Model_Accuracy-95.96%25-success.svg)](reports/model_report.md)
+[![Held-Out Accuracy: 90.63%](https://img.shields.io/badge/HeldOut_2018_Accuracy-90.63%25-success.svg)](reports/metrics.json)
 
-**FloodSense** is a software-only flood early-warning digital twin platform that emulates physical IoT sensor grids to deliver 24-to-72-hour early warning predictions across river catchments in Kerala and Assam. Powered by a FastAPI backend, a leakage-audited LightGBM machine learning classifier trained on 35,064 real Open-Meteo records, and a desaturated "Hydrological Survey Atlas" React frontend, FloodSense features hysteresis alert deduplication, multilingual Telegram warnings (English & Hindi), OpenStreetMap evacuation routing, and an open-hardware ESP32 blueprint.
+**FloodSense** is a software-only flood early-warning digital twin platform that emulates physical IoT sensor grids to deliver 24-to-72-hour early warning predictions across river catchments in Kerala and Assam. Powered by a FastAPI backend, a leakage-audited LightGBM machine learning classifier trained on 131,490 daily GloFAS records (1990–2025), and a desaturated "Hydrological Survey Atlas" React frontend, FloodSense features hysteresis alert deduplication, multilingual Telegram warnings (English & Hindi), OpenStreetMap evacuation routing, and an open-hardware ESP32 blueprint.
 
 ---
 
@@ -23,7 +23,7 @@ graph TD
 
     subgraph Core ML Engine & Alerts
         API -->|Readings & Telemetry| DB
-        ML[LightGBM 24h Future Classifier] -->|24h Predictions| DB
+        ML[LightGBM Multi-Horizon Classifier] -->|24h-72h Predictions| DB
         HYST[Hysteresis Alert Engine] -->|Multilingual Messages| BOT[Telegram Bot / In-App Outbox]
     end
 
@@ -58,14 +58,14 @@ docker compose up --build
 
 ## 3. Machine Learning Audit & Performance Summary
 
-- **Prediction Task**: 24-Hour Future Risk Level Classification ($Y_{t+24\text{h}}$)
-- **Data Leakage Audit**: **PASSED**. Enforced 72-hour chronological gap between train and test sets.
-- **Overall Accuracy**: **95.96%**
-- **Macro F1-Score (ML Model)**: **40.91%**
-- **Persistence Baseline Macro F1**: **48.68%**
-- **Threshold Rule Baseline Macro F1**: **44.39%**
-- **False Alarm Rate (Orange/Red Alerts)**: **0.07%**
-- **Kerala August 2018 Backtest Lead Time**: **53 Hours** *(Note: Open-Meteo Flood API river discharge is daily data granularity)*
+- **Prediction Task**: Multi-Horizon Risk Level Classification ($t+1\text{d}, t+2\text{d}, t+3\text{d}$)
+- **Dataset**: 131,490 Daily Hydrological Rows (1990–2025 across 10 stations in Kerala & Assam)
+- **Data Leakage Audit**: **PASSED**. Strict 7-day chronological split gap and held-out 2018 validation protocol.
+- **Held-Out 2018 Test Accuracy**: **90.63%**
+- **Held-Out 2018 Macro F1-Score**: **84.71%** (vs Persistence F1: 85.58%)
+- **Orange/Red High-Risk Recall**: **91.40%**
+- **False Alarm Rate (Orange/Red Alerts)**: **4.11%**
+- **August 2018 Warning Lead Time**: Median of **2 Days (48 Hours)** prior to peak deluge across Kerala gauging stations.
 
 *Full model metrics, confusion matrix, feature importances, and dynamic JSON metrics are available in [`reports/model_report.md`](reports/model_report.md) and [`reports/metrics.json`](reports/metrics.json).*
 
