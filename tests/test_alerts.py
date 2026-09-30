@@ -14,6 +14,7 @@ from backend.alerts.telegram_bot import format_alert_message
 @pytest.fixture(autouse=True)
 def setup_db():
     """Initializes clean database schema prior to each test."""
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     STATION_ALERT_STATE.clear()
     yield
