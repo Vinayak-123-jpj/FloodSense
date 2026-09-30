@@ -73,9 +73,13 @@ def process_reading_for_alert(db: Session, station: Station, reading: Reading):
         # Generate evacuation route link
         evac_url, evac_desc = generate_evacuation_route_link(station.latitude, station.longitude)
 
+        from backend.alerts.telegram_bot import MALAYALAM_ACTION_MAP, ASSAMESE_ACTION_MAP
+
         reason_text = reading.top_drivers or f"Water level reached {reading.water_level_m:.2f}m"
         english_action = ENGLISH_ACTION_MAP.get(effective_risk, "Evacuate to safety.")
         hindi_action = HINDI_ACTION_MAP.get(effective_risk, "सुरक्षित स्थान पर जाएं।")
+        malayalam_action = MALAYALAM_ACTION_MAP.get(effective_risk, "സുരക്ഷിത സ്ഥാനത്തേക്ക് മാറുക.")
+        assamese_action = ASSAMESE_ACTION_MAP.get(effective_risk, "সুৰক্ষিত স্থানলৈ যাওক।")
 
         # 1. Create English Alert Record
         alert_en = Alert(
@@ -106,6 +110,36 @@ def process_reading_for_alert(db: Session, station: Station, reading: Reading):
             outbox_logged=True
         )
         db.add(alert_hi)
+
+        # 3. Create Malayalam Alert Record
+        alert_ml = Alert(
+            station_id=station.id,
+            timestamp=now,
+            risk_level=effective_risk,
+            previous_risk_level=current_risk,
+            reason=reason_text,
+            action_recommended=malayalam_action,
+            evacuation_route_url=evac_url,
+            language="ml",
+            sent_to_telegram=False,
+            outbox_logged=True
+        )
+        db.add(alert_ml)
+
+        # 4. Create Assamese Alert Record
+        alert_as = Alert(
+            station_id=station.id,
+            timestamp=now,
+            risk_level=effective_risk,
+            previous_risk_level=current_risk,
+            reason=reason_text,
+            action_recommended=assamese_action,
+            evacuation_route_url=evac_url,
+            language="as",
+            sent_to_telegram=False,
+            outbox_logged=True
+        )
+        db.add(alert_as)
 
         db.commit()
 

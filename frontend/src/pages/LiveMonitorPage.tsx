@@ -3,10 +3,10 @@ import { useSearchParams } from 'react-router-dom';
 import { FloodMap } from '../components/map/FloodMap';
 import { WaterLevelGauge } from '../components/charts/WaterLevelGauge';
 import { HydrologicalChart } from '../components/charts/HydrologicalChart';
-import { RiskBadge, SimulatedBadge } from '../components/common/Badge';
+import { RiskBadge, SourceBadge } from '../components/common/Badge';
 import { Station, Reading, ForecastHour } from '../types';
 import { api } from '../services/api';
-import { Radio, AlertCircle, Cpu, Wifi } from 'lucide-react';
+import { Radio, AlertCircle, Cpu, Wifi, Database, Server } from 'lucide-react';
 
 export const LiveMonitorPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -19,6 +19,12 @@ export const LiveMonitorPage: React.FC = () => {
   const [topDrivers, setTopDrivers] = useState<string[]>([]);
   const [liveLog, setLiveLog] = useState<string[]>([]);
 
+  // Telemetry source mode toggle
+  const [sourceMode, setSourceMode] = useState<'REAL' | 'SIMULATED'>('REAL');
+  const [realLiveData, setRealLiveData] = useState<any>(null);
+  const [isCachedSnapshot, setIsCachedSnapshot] = useState<boolean>(false);
+  const [fetchedAt, setFetchedAt] = useState<string>('');
+
   // 1. Fetch stations on load
   useEffect(() => {
     api.getStations().then(data => {
@@ -30,16 +36,34 @@ export const LiveMonitorPage: React.FC = () => {
     }).catch(console.error);
   }, [stationParam]);
 
-  // 2. Fetch station readings and forecast when selected station changes
+  // 2. Fetch station readings and forecast when selected station or source mode changes
   useEffect(() => {
     if (!selectedStation) return;
+
+    if (sourceMode === 'REAL') {
+      api.getRealLiveStationData(selectedStation.id)
+        .then(res => {
+          setRealLiveData(res);
+          setIsCachedSnapshot(!!res.is_cached);
+          setFetchedAt(res.fetched_at || '');
+          if (res.top_risk_drivers) {
+            setTopDrivers(res.top_risk_drivers);
+          }
+        })
+        .catch(err => {
+          console.warn('Real live data fetch failed, using fallback simulated telemetry:', err);
+          setIsCachedSnapshot(true);
+        });
+    }
 
     api.getStationReadings(selectedStation.id, 48).then(setReadings).catch(console.error);
     api.getStationForecast(selectedStation.id).then(fData => {
       setForecastPoints(fData.forecast_points);
-      setTopDrivers(fData.top_risk_drivers);
+      if (sourceMode === 'SIMULATED') {
+        setTopDrivers(fData.top_risk_drivers);
+      }
     }).catch(console.error);
-  }, [selectedStation]);
+  }, [selectedStation, sourceMode]);
 
   // 3. Connect WebSocket for live updates over /ws/live
   useEffect(() => {
@@ -84,8 +108,6 @@ export const LiveMonitorPage: React.FC = () => {
     };
   }, []);
 
-  const latestReading = readings.length > 0 ? readings[readings.length - 1] : null;
-
   return (
     <div className="space-y-4 pb-8">
       
@@ -96,20 +118,49 @@ export const LiveMonitorPage: React.FC = () => {
           <h1 className="font-serif text-2xl font-bold text-survey-ink dark:text-night-text">Live Hydrological Network</h1>
         </div>
 
-        {/* Region Filter Buttons */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => api.getStations('Kerala').then(setStations)}
-            className="px-3 py-1 font-mono text-xs rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card text-survey-ink dark:text-night-text hover:border-survey-teal cursor-pointer"
-          >
-            Kerala Region (6)
-          </button>
-          <button
-            onClick={() => api.getStations('Assam').then(setStations)}
-            className="px-3 py-1 font-mono text-xs rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card text-survey-ink dark:text-night-text hover:border-survey-teal cursor-pointer"
-          >
-            Assam Region (5)
-          </button>
+        {/* Telemetry Source Toggle & Region Filter */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Data Source Selector */}
+          <div className="flex items-center rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card p-1">
+            <button
+              onClick={() => setSourceMode('REAL')}
+              className={`flex items-center gap-1.5 px-3 py-1 font-mono text-xs rounded transition-colors cursor-pointer ${
+                sourceMode === 'REAL'
+                  ? 'bg-sky-500 text-white font-semibold shadow-xs'
+                  : 'text-survey-slate dark:text-night-slate hover:text-survey-ink dark:hover:text-night-text'
+              }`}
+            >
+              <Database className="h-3.5 w-3.5" />
+              Real Data (Open-Meteo)
+            </button>
+            <button
+              onClick={() => setSourceMode('SIMULATED')}
+              className={`flex items-center gap-1.5 px-3 py-1 font-mono text-xs rounded transition-colors cursor-pointer ${
+                sourceMode === 'SIMULATED'
+                  ? 'bg-amber-500 text-white font-semibold shadow-xs'
+                  : 'text-survey-slate dark:text-night-slate hover:text-survey-ink dark:hover:text-night-text'
+              }`}
+            >
+              <Cpu className="h-3.5 w-3.5" />
+              Simulated Sensors
+            </button>
+          </div>
+
+          {/* Region Buttons */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => api.getStations('Kerala').then(setStations)}
+              className="px-3 py-1 font-mono text-xs rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card text-survey-ink dark:text-night-text hover:border-survey-teal cursor-pointer"
+            >
+              Kerala Region (6)
+            </button>
+            <button
+              onClick={() => api.getStations('Assam').then(setStations)}
+              className="px-3 py-1 font-mono text-xs rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card text-survey-ink dark:text-night-text hover:border-survey-teal cursor-pointer"
+            >
+              Assam Region (5)
+            </button>
+          </div>
         </div>
       </div>
 
@@ -127,12 +178,19 @@ export const LiveMonitorPage: React.FC = () => {
 
           {/* Live Telemetry Ticker Strip */}
           <div className="rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card p-3 font-mono text-xs">
-            <div className="flex items-center gap-2 mb-2 text-survey-teal dark:text-night-teal font-semibold">
-              <Radio className="h-4 w-4 animate-pulse" /> LIVE TELEMETRY TICKER STREAM (/ws/live)
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <div className="flex items-center gap-2 text-survey-teal dark:text-night-teal font-semibold">
+                <Radio className="h-4 w-4 animate-pulse" /> LIVE TELEMETRY TICKER STREAM (/ws/live)
+              </div>
+              <SourceBadge mode={sourceMode} isCached={isCachedSnapshot} fetchedAt={fetchedAt} />
             </div>
             <div className="h-20 overflow-y-auto space-y-1 text-survey-slate dark:text-night-slate scrollbar-thin">
               {liveLog.length === 0 ? (
-                <div className="italic">Listening for virtual ESP32 sensor broadcasts...</div>
+                <div className="italic">
+                  {sourceMode === 'REAL'
+                    ? 'Connected to Open-Meteo GloFAS discharge reanalysis & weather stream...'
+                    : 'Listening for virtual ESP32 sensor broadcasts...'}
+                </div>
               ) : (
                 liveLog.map((log, idx) => (
                   <div key={idx} className="hover:text-survey-ink dark:hover:text-night-text">{log}</div>
@@ -152,7 +210,7 @@ export const LiveMonitorPage: React.FC = () => {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-mono text-xs text-survey-teal dark:text-night-teal block">{selectedStation.id} • {selectedStation.region}</span>
-                      <SimulatedBadge />
+                      <SourceBadge mode={sourceMode} isCached={isCachedSnapshot} fetchedAt={fetchedAt} />
                     </div>
                     <h2 className="font-serif text-xl font-bold text-survey-ink dark:text-night-text">{selectedStation.name}</h2>
                     <span className="font-sans text-xs text-survey-slate dark:text-night-slate">{selectedStation.river}</span>

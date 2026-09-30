@@ -45,7 +45,7 @@ def test_alert_escalation_and_hysteresis():
     process_reading_for_alert(db, st, r1)
     
     alerts_tick1 = db.query(Alert).filter(Alert.station_id == st.id).all()
-    assert len(alerts_tick1) >= 2 # 1 English + 1 Hindi
+    assert len(alerts_tick1) >= 4 # 1 EN + 1 HI + 1 ML + 1 AS
 
     # 2. Single lower tick (Green) -> Hysteresis MUST NOT downgrade state on first tick
     r2 = Reading(
@@ -67,7 +67,7 @@ def test_alert_escalation_and_hysteresis():
     db.close()
 
 def test_telegram_multilingual_formatting():
-    """Verifies English and Hindi Telegram message formatting."""
+    """Verifies English, Hindi, Malayalam, and Assamese Telegram message formatting."""
     msg_en = format_alert_message("Neeleswaram", "Periyar River", "Orange", 4.8, 6.0, "Heavy rain", "http://map.link", "en")
     assert "FLOOD WARNING" in msg_en
     assert "Neeleswaram" in msg_en
@@ -75,3 +75,12 @@ def test_telegram_multilingual_formatting():
     msg_hi = format_alert_message("Neeleswaram", "Periyar River", "Orange", 4.8, 6.0, "भारी वर्षा", "http://map.link", "hi")
     assert "बाढ़ चेतावनी" in msg_hi
     assert "चेतावनी (Orange)" in msg_hi
+
+    msg_ml = format_alert_message("Neeleswaram", "Periyar River", "Orange", 4.8, 6.0, "കനത്ത മഴ", "http://map.link", "ml")
+    assert "പ്രളയ മുന്നറിയിപ്പ്" in msg_ml
+    assert "മുന്നറിയിപ്പ് (Orange)" in msg_ml
+
+    msg_as = format_alert_message("Neeleswaram", "Periyar River", "Orange", 4.8, 6.0, "প্রবল বৰষুণ", "http://map.link", "as")
+    assert "বানপানী সকিয়ানী" in msg_as
+    assert "সাঁৱধান (Orange)" in msg_as
+

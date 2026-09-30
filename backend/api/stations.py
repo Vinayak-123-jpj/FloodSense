@@ -89,3 +89,13 @@ def get_station_by_id(station_id: str, db: Session = Depends(get_db)):
         "sensor_status": latest_reading.sensor_status if latest_reading else "OK"
     }
     return StationResponse(**st_dict)
+
+@router.get("/{station_id}/real_live", summary="Fetch real Open-Meteo live observed data & GloFAS forecast")
+def get_real_live_station_data(station_id: str, db: Session = Depends(get_db)):
+    """Fetches real live observed rainfall and GloFAS discharge reanalysis from Open-Meteo with caching fallback."""
+    st = db.query(Station).filter(Station.id == station_id).first()
+    if not st:
+        raise HTTPException(status_code=404, detail=f"Station with ID '{station_id}' not found.")
+    
+    from backend.services.real_data_service import fetch_real_live_station_data
+    return fetch_real_live_station_data(st)

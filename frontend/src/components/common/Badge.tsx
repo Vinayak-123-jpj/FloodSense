@@ -50,3 +50,27 @@ export const SimulatedBadge: React.FC = () => (
     SIMULATED TELEMETRY
   </span>
 );
+
+export const SourceBadge: React.FC<{ mode: 'REAL' | 'SIMULATED' | 'REPLAY'; isCached?: boolean; fetchedAt?: string }> = ({ mode, isCached, fetchedAt }) => {
+  if (mode === 'REAL') {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded border border-sky-500/40 bg-sky-500/10 text-sky-800 dark:text-sky-300 font-mono text-[11px] font-semibold tracking-wider uppercase">
+        <span className="h-1.5 w-1.5 rounded-full bg-sky-500 animate-pulse" />
+        REAL (Open-Meteo) {isCached ? `[Cached: ${fetchedAt ? new Date(fetchedAt).toLocaleTimeString() : 'offline'}]` : ''}
+      </span>
+    );
+  }
+  if (mode === 'REPLAY') {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded border border-purple-500/40 bg-purple-500/10 text-purple-800 dark:text-purple-300 font-mono text-[11px] font-semibold tracking-wider uppercase">
+        REPLAY (2018 Held-Out)
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded border border-amber-500/40 bg-amber-500/10 text-amber-800 dark:text-amber-300 font-mono text-[11px] font-semibold tracking-wider uppercase">
+      SIMULATED SENSOR
+    </span>
+  );
+};
+

@@ -28,6 +28,34 @@ ENGLISH_ACTION_MAP = {
     "Red": "Immediate Evacuation! Proceed immediately to designated high ground or relief shelters."
 }
 
+MALAYALAM_RISK_MAP = {
+    "Green": "സാധാരണ (Green)",
+    "Yellow": "ജാഗ്രത (Yellow)",
+    "Orange": "മുന്നറിയിപ്പ് (Orange)",
+    "Red": "തീവ്ര അപായസാധ്യത (Red)"
+}
+
+MALAYALAM_ACTION_MAP = {
+    "Green": "സാധാരണ നിലവാരം. നിരീക്ഷണം തുടരുക.",
+    "Yellow": "ജാഗ്രത പാലിക്കുക. താഴ്ന്ന പ്രദേശങ്ങളിൽ വെള്ളക്കെട്ടിന് സാധ്യത.",
+    "Orange": "സജ്ജരായിരിക്കുക! അടിയന്തര സാധനങ്ങളുമായി സുരക്ഷിത സ്ഥാനങ്ങളിലേക്ക് മാറാൻ തയ്യാറെടുക്കുക.",
+    "Red": "ഉടൻ മാറിത്താമസിക്കുക! സുരക്ഷിത കേന്ദ്രങ്ങളിലേക്കോ ക്യാമ്പുകളിലേക്കോ ഉടനടി മാറുക."
+}
+
+ASSAMESE_RISK_MAP = {
+    "Green": "স্বাভাবিক (Green)",
+    "Yellow": "সতর্ক (Yellow)",
+    "Orange": "সাঁৱধান (Orange)",
+    "Red": "জৰুৰী বিপদ (Red)"
+}
+
+ASSAMESE_ACTION_MAP = {
+    "Green": "স্বাভাৱিক অৱস্থা। জলস্তৰ নিৰীক্ষণ অব্যাহত ৰাখক।",
+    "Yellow": "সজাগ হওক। নামনি অঞ্চলত পানী জমা হ'ব পাৰে।",
+    "Orange": "প্ৰস্তুত থাকক! প্ৰয়োজনীয় সামগ্ৰীৰ সৈতে সুৰক্ষিত স্থানলৈ যোৱাৰ প্ৰস্তুতি চলাওক।",
+    "Red": "তাত্ক্ষণিক স্থানান্তৰ! লগে লগে সুৰক্ষিত উচ্চ স্থান বা আশ্ৰয় শিবিৰলৈ যাওক।"
+}
+
 def format_alert_message(
     station_name: str,
     river: str,
@@ -38,7 +66,9 @@ def format_alert_message(
     evacuation_url: str,
     language: str = "en"
 ) -> str:
-    """Formats English or Hindi alert message text for Telegram dispatch."""
+    """Formats English, Hindi, Malayalam, or Assamese alert message text for Telegram dispatch.
+    Note: Non-English translations are draft templates requiring native-speaker review.
+    """
     if language == "hi":
         risk_str = HINDI_RISK_MAP.get(risk_level, risk_level)
         action_str = HINDI_ACTION_MAP.get(risk_level, "सुरक्षित स्थान पर जाएं।")
@@ -50,6 +80,30 @@ def format_alert_message(
             f"💡 *मुख्य कारण*: {reason}\n"
             f"🏃 *अनुशंसित कार्रवाई*: {action_str}\n\n"
             f"🗺️ [निकासी मार्ग मानचित्र]({evacuation_url})"
+        )
+    elif language == "ml":
+        risk_str = MALAYALAM_RISK_MAP.get(risk_level, risk_level)
+        action_str = MALAYALAM_ACTION_MAP.get(risk_level, "സുരക്ഷിത സ്ഥാനത്തേക്ക് മാറുക.")
+        msg = (
+            f"🚨 *പ്രളയ മുന്നറിയിപ്പ് നോട്ടിഫിക്കേഷൻ*\n\n"
+            f"📍 *സ്റ്റേഷൻ*: {station_name} ({river})\n"
+            f"⚠️ *അപായ നില*: {risk_str}\n"
+            f"📊 *നിലവിലെ ജലനിരപ്പ്*: {water_level_m:.2f}m (അപായ നില: {danger_level_m:.2f}m)\n"
+            f"💡 *പ്രധാന കാരണം*: {reason}\n"
+            f"🏃 *നിർദ്ദേശിച്ച നടപടി*: {action_str}\n\n"
+            f"🗺️ [ഒഴിയൽ പാത മാപ്പ്]({evacuation_url})"
+        )
+    elif language == "as":
+        risk_str = ASSAMESE_RISK_MAP.get(risk_level, risk_level)
+        action_str = ASSAMESE_ACTION_MAP.get(risk_level, "সুৰক্ষিত স্থানলৈ যাওক।")
+        msg = (
+            f"🚨 *বানপানী সকিয়ানী বাৰ্তা*\n\n"
+            f"📍 *ষ্টেচন*: {station_name} ({river})\n"
+            f"⚠️ *বিপদৰ মাত্ৰা*: {risk_str}\n"
+            f"📊 *বৰ্তমান জলস্তৰ*: {water_level_m:.2f}m (বিপদ চিহ্ন: {danger_level_m:.2f}m)\n"
+            f"💡 *প্ৰধান কাৰণ*: {reason}\n"
+            f"🏃 *প্ৰয়োজনীয় পদক্ষেপ*: {action_str}\n\n"
+            f"🗺️ [স্থানান্তৰ পথৰ মানচিত্ৰ]({evacuation_url})"
         )
     else:
         action_str = ENGLISH_ACTION_MAP.get(risk_level, "Evacuate to safety.")
@@ -63,6 +117,7 @@ def format_alert_message(
             f"🗺️ [Evacuation Route Map]({evacuation_url})"
         )
     return msg
+
 
 def send_telegram_alert(message_text: str) -> bool:
     """Dispatches Telegram alert via HTTP POST API call if token is configured."""

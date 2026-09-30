@@ -9,7 +9,7 @@ interface OutboxProps {
 }
 
 export const OutboxList: React.FC<OutboxProps> = ({ alerts, onClear }) => {
-  const [activeLang, setActiveLang] = useState<'en' | 'hi'>('en');
+  const [activeLang, setActiveLang] = useState<'en' | 'hi' | 'ml' | 'as'>('en');
 
   const filteredAlerts = alerts.filter(a => a.language === activeLang);
 
@@ -21,11 +21,14 @@ export const OutboxList: React.FC<OutboxProps> = ({ alerts, onClear }) => {
         <div>
           <span className="font-mono text-xs text-survey-teal dark:text-night-teal uppercase tracking-wider block">EMERGENCY ALERT OUTBOX</span>
           <span className="font-serif text-base font-bold text-survey-ink dark:text-night-text">Dispatched Notifications & Telegram Logs</span>
+          <p className="font-sans text-[11px] italic text-survey-slate dark:text-night-slate mt-0.5">
+            Note: Regional language alert templates (Malayalam & Assamese) are draft translation templates requiring review by native speakers prior to operational field deployment.
+          </p>
         </div>
 
         <div className="flex items-center gap-3">
           {/* Language Toggle Preview */}
-          <div className="flex items-center gap-1 border border-survey-border dark:border-night-border rounded p-1 bg-survey-paper dark:bg-night-bg">
+          <div className="flex flex-wrap items-center gap-1 border border-survey-border dark:border-night-border rounded p-1 bg-survey-paper dark:bg-night-bg">
             <Languages className="h-4 w-4 text-survey-teal dark:text-night-teal ml-1" />
             <button
               onClick={() => setActiveLang('en')}
@@ -42,6 +45,22 @@ export const OutboxList: React.FC<OutboxProps> = ({ alerts, onClear }) => {
               }`}
             >
               हिंदी (Hindi)
+            </button>
+            <button
+              onClick={() => setActiveLang('ml')}
+              className={`px-2.5 py-0.5 font-mono text-xs rounded transition-all cursor-pointer ${
+                activeLang === 'ml' ? 'bg-survey-teal text-white font-bold' : 'text-survey-slate dark:text-night-slate'
+              }`}
+            >
+              മലയാളം (Malayalam)
+            </button>
+            <button
+              onClick={() => setActiveLang('as')}
+              className={`px-2.5 py-0.5 font-mono text-xs rounded transition-all cursor-pointer ${
+                activeLang === 'as' ? 'bg-survey-teal text-white font-bold' : 'text-survey-slate dark:text-night-slate'
+              }`}
+            >
+              অসমীয়া (Assamese)
             </button>
           </div>
 

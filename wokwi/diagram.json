@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "author": "FloodSense Team",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-hc-sr04", "id": "ultrasonic", "top": -120, "left": 150, "attrs": {} },
+    { "type": "wokwi-pushbutton", "id": "rain_button", "top": 120, "left": 150, "attrs": { "color": "blue" } },
+    { "type": "wokwi-potentiometer", "id": "battery_pot", "top": 200, "left": 150, "attrs": {} }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "esp:5V", "ultrasonic:VCC", "red", [ "v0" ] ],
+    [ "esp:GND", "ultrasonic:GND", "black", [ "v0" ] ],
+    [ "esp:D5", "ultrasonic:TRIG", "green", [ "v0" ] ],
+    [ "esp:D18", "ultrasonic:ECHO", "blue", [ "v0" ] ],
+    [ "esp:D19", "rain_button:1.N.O", "orange", [ "v0" ] ],
+    [ "esp:GND", "rain_button:2.N.O", "black", [ "v0" ] ],
+    [ "esp:D34", "battery_pot:SIG", "purple", [ "v0" ] ],
+    [ "esp:3V3", "battery_pot:VCC", "red", [ "v0" ] ],
+    [ "esp:GND", "battery_pot:GND", "black", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}

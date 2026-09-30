@@ -29,16 +29,16 @@
 ---
 
 ### Scene 4: Multilingual Alert Engine & Evacuation Routing (1:45 - 2:15)
-- **Visual**: Navigate to `/alerts` (Alert Outbox). Toggle between English and Hindi alert messages. Click "View Evacuation Route" on an active Red alert to reveal the OpenStreetMap route to the nearest high-ground relief shelter.
+- **Visual**: Navigate to `/alerts` (Alert Outbox). Toggle between English, Hindi, Malayalam, and Assamese alert messages. Click "View Evacuation Route" on an active Red alert to reveal the OpenStreetMap route to the nearest high-ground relief shelter.
 - **Voiceover**:
-  > "When river levels breach thresholds, the hysteresis alert engine fires deduplicated notifications, preventing alarm fatigue caused by noisy sensor readings. Outbox messages are instantly formatted in both English and Hindi, complete with direct OpenStreetMap navigation routes to designated high-elevation evacuation shelters."
+  > "When river levels breach thresholds, the hysteresis alert engine fires deduplicated notifications, preventing alarm fatigue caused by noisy sensor readings. Outbox messages are instantly formatted in English, Hindi, Malayalam, and Assamese, complete with direct OpenStreetMap navigation routes to designated high-elevation evacuation shelters."
 
 ---
 
 ### Scene 5: Data Science Audit & Baseline Honesty Segment (2:15 - 2:45)
-- **Visual**: Navigate to `/model` (Model & Method Page). Show the top metric cards (Macro F1: 84.71%, High-Risk Recall: 91.40%, Lead Time: 2 Days), the multi-horizon baseline comparison table, and the per-station 2018 breakdown table.
+- **Visual**: Navigate to `/model` (Model & Method Page). Show the top metric cards (Macro F1: 84.71%, High-Risk Recall: 91.40%, Lead Time: 2 Days), the multi-horizon baseline comparison table, 95% bootstrap CIs, LORO validation, and the per-station 2018 breakdown table.
 - **Voiceover**:
-  > "Now for our Data Science Audit. In the spirit of scientific transparency: river discharge is GloFAS reanalysis modeled data, thresholds are percentile proxies, and lead times are capped at our 3-day maximum horizon. On our held-out 2018 test set, LightGBM achieves 84.71% Macro F1 at 24 hours and 91.40% recall on severe Orange/Red alert days. At 2-day and 3-day lead horizons, LightGBM cleanly outperforms Persistence and Linear Logistic Regression baselines."
+  > "Now for our Data Science Audit. In the spirit of scientific transparency: river discharge is GloFAS reanalysis modeled data, thresholds are percentile proxies, and lead times are capped at our 3-day maximum horizon. On our held-out 2018 test set, LightGBM achieves 84.71% Macro F1 at 24 hours (95% CI: [80.26%, 88.24%]) and 91.40% recall on severe Orange/Red alert days. While 1-day Macro F1 overlaps with Persistence, LightGBM yields higher high-risk recall and distinct gains at 2-day and 3-day lead horizons."
 
 ---
 

@@ -35,16 +35,17 @@
 - **2-Day Lead ($t+2\text{d}$)**: Accuracy **81.64%** | Macro F1 **72.87%**
 - **3-Day Lead ($t+3\text{d}$)**: Accuracy **77.23%** | Macro F1 **66.01%**
 
-### Protocol (B): Genuinely Out-of-Sample Held-Out 2018 Flood Event Set
+### Protocol (B): Genuinely Out-of-Sample Held-Out 2018 Flood Event Set (with 95% CIs)
 - **Training**: Strictly non-2018 data (excluding 2017-12-25 to 2019-01-07 buffer).
 - **Test Set Accuracy**: **90.63%**
-- **Test Set Macro F1**: **84.71%** (vs Persistence F1 85.58%)
-- **Orange/Red High-Risk Recall**: **91.40%**
+- **Test Set Macro F1**: **84.71%** (95% CI: **[80.26%, 88.24%]** vs Persistence 85.58% [81.31%, 89.83%])
+- **Orange/Red High-Risk Recall**: **91.40%** (vs Persistence 87.21%)
 - **August 2018 Warning Lead Time**: Median of **2 Days (48 Hours)** prior to peak discharge deluge across Kerala river stations.
 
-### Protocol (C): Leave-One-Station-Out (LOSO) Generalization
-- **Held-Out Station (Neeleswaram KL-PER-01)**:
-  - **Accuracy**: **90.21%** | **Macro F1**: **83.45%** | **Orange/Red Recall**: **90.82%**
+### Protocol (C): Leave-One-RIVER-Out (LORO) Spatial Generalization
+- **Rationale**: Stations on the same river (e.g. `KL-PER-01` and `KL-PER-02`) exhibit high discharge cross-correlation ($r > 0.90$). Standard Leave-One-Station-Out can be optimistic due to spatial correlation; Leave-One-RIVER-Out provides a true spatial generalization benchmark.
+- **Held-Out River Basin (Periyar Basin)**:
+  - **Accuracy**: **89.85%** | **Macro F1**: **82.10%** | **Orange/Red Recall**: **89.50%**
 
 ---
 

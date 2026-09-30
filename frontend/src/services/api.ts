@@ -104,5 +104,10 @@ export const api = {
   getFullMetrics: async (): Promise<FullMetricsSummary> => {
     const res = await axios.get('/reports/metrics.json');
     return res.data;
+  },
+
+  getRealLiveStationData: async (id: string): Promise<any> => {
+    const res = await axios.get(`${API_BASE}/stations/${id}/real_live`);
+    return res.data;
   }
 };

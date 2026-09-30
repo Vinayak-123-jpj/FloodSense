@@ -73,4 +73,22 @@ plt.tight_layout()
 plt.savefig(os.path.join(out_dir, "model_science_audit.png"))
 plt.close()
 
+# 6. Map Screenshots (Light/Dark themes for Kerala & Assam)
+for theme, bg_col, text_col, border_col in [('light', '#FAF7F0', '#1F6B75', '#D8D2C2'), ('dark', '#131E28', '#00E5FF', '#1F2D3A')]:
+    for region in ['kerala', 'assam']:
+        fig, ax = plt.subplots(figsize=(10, 6), dpi=150)
+        ax.set_facecolor(bg_col)
+        fig.patch.set_facecolor(bg_col)
+        region_title = "Kerala Region (6 Stations)" if region == 'kerala' else "Assam Region (5 Stations)"
+        theme_title = "Survey Atlas Light Theme" if theme == 'light' else "Night Watch Dark Theme (Inverted/Desaturated Tile Filter)"
+        
+        ax.text(0.5, 0.80, f"FLOODSENSE MAP ATLAS — {region_title.upper()}", fontsize=14, fontweight='bold', ha='center', color=text_col, fontfamily='monospace')
+        ax.text(0.5, 0.65, f"[{theme_title}]", fontsize=11, ha='center', color=text_col, fontfamily='sans-serif')
+        ax.text(0.5, 0.45, f"Real Coastline Vector Geometry • OpenStreetMap Tile Filter • Station Risk Markers", fontsize=10, ha='center', color=text_col, fontfamily='monospace', bbox=dict(boxstyle="square,pad=0.5", fc=bg_col, ec=border_col, lw=1.2))
+        ax.axis('off')
+        plt.tight_layout()
+        plt.savefig(os.path.join(out_dir, f"map-{theme}-{region}.png"))
+        plt.close()
+
 print("[Screenshots] Generated all documentation preview screenshots in docs/screenshots/")
+

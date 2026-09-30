@@ -29,41 +29,86 @@ export const LandingPage: React.FC = () => {
     <div className="space-y-8 pb-12">
       <GuidedDemoModal isOpen={isDemoOpen} onClose={() => setIsDemoOpen(false)} />
       
-      {/* Hero Section */}
+      {/* Hero Section (2-Column Grid) */}
       <section className="border-b border-survey-border dark:border-night-border pb-6">
-        <div className="max-w-4xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded border border-survey-teal/30 dark:border-night-teal/30 bg-survey-card dark:bg-night-card font-mono text-xs text-survey-teal dark:text-night-teal uppercase tracking-widest">
-            <Shield className="h-3.5 w-3.5" /> FOSSEE NATIONAL MAKE-A-THON 2026 BLUEPRINT
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* Left Column: Headline & Value Proposition */}
+          <div className="lg:col-span-7 space-y-4">
+            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded border border-survey-teal/30 dark:border-night-teal/30 bg-survey-card dark:bg-night-card font-mono text-xs text-survey-teal dark:text-night-teal uppercase tracking-widest">
+              <Shield className="h-3.5 w-3.5" /> FOSSEE NATIONAL MAKE-A-THON 2026 BLUEPRINT
+            </div>
+
+            <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-survey-ink dark:text-night-text leading-tight">
+              Flood risk for the next three days, at each river station.
+            </h1>
+
+            <p className="font-sans text-sm sm:text-base text-survey-slate dark:text-night-slate leading-relaxed">
+              A software-only flood early-warning platform. River discharge and rainfall come from public Open-Meteo reanalysis and forecast datasets. Station sensors are virtual/simulated this round, with a complete hardware-ready ESP32 blueprint included.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <button
+                onClick={() => setIsDemoOpen(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded bg-survey-teal hover:bg-survey-teal/90 text-white font-sans text-xs font-semibold transition-all shadow-xs cursor-pointer"
+              >
+                <Compass className="h-3.5 w-3.5" /> Guided Demo Tour
+              </button>
+              <button
+                onClick={() => navigate('/live')}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card hover:bg-survey-border/30 text-survey-ink dark:text-night-text font-sans text-xs font-medium transition-all cursor-pointer"
+              >
+                Open Live Monitor <ArrowRight className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={() => navigate('/replay')}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card hover:bg-survey-border/30 text-survey-ink dark:text-night-text font-sans text-xs font-medium transition-all cursor-pointer"
+              >
+                <Play className="h-3.5 w-3.5 text-survey-teal dark:text-night-teal" /> Replay Kerala 2018 Floods
+              </button>
+            </div>
           </div>
 
-          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-survey-ink dark:text-night-text leading-tight">
-            Precision flood early-warning powered by virtual sensor digital twins.
-          </h1>
+          {/* Right Column: Compact Live Station Risk Summary Strip */}
+          <div className="lg:col-span-5 rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card p-4 space-y-3 shadow-xs">
+            <div className="flex items-center justify-between border-b border-survey-border/50 dark:border-night-border/50 pb-2">
+              <span className="font-mono text-xs font-semibold text-survey-teal dark:text-night-teal uppercase tracking-wider">
+                LIVE STATIONS RISK STRIP ({stations.length})
+              </span>
+              <span className="font-mono text-[10px] text-survey-slate dark:text-night-slate">
+                PUBLIC OPEN-METEO DATA
+              </span>
+            </div>
 
-          <p className="font-sans text-sm sm:text-base text-survey-slate dark:text-night-slate leading-relaxed max-w-3xl">
-            FloodSense combines physical river telemetry, Open-Meteo hydrological forecasts, and LightGBM machine learning to provide 24-to-72-hour early warning lead times across Kerala and Assam river basins.
-          </p>
-
-          <div className="flex flex-wrap items-center gap-3 pt-2">
-            <button
-              onClick={() => setIsDemoOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded bg-survey-teal hover:bg-survey-teal/90 text-white font-sans text-xs font-semibold transition-all shadow-xs cursor-pointer"
-            >
-              <Compass className="h-3.5 w-3.5" /> Guided Demo Tour
-            </button>
-            <button
-              onClick={() => navigate('/live')}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card hover:bg-survey-border/30 text-survey-ink dark:text-night-text font-sans text-xs font-medium transition-all cursor-pointer"
-            >
-              Open Live Monitor <ArrowRight className="h-3.5 w-3.5" />
-            </button>
-            <button
-              onClick={() => navigate('/replay')}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card hover:bg-survey-border/30 text-survey-ink dark:text-night-text font-sans text-xs font-medium transition-all cursor-pointer"
-            >
-              <Play className="h-3.5 w-3.5 text-survey-teal dark:text-night-teal" /> Replay Kerala 2018 Floods
-            </button>
+            <div className="max-h-72 overflow-y-auto space-y-2 pr-1 scrollbar-thin font-mono text-xs">
+              {stations.slice(0, 8).map(st => (
+                <div
+                  key={st.id}
+                  onClick={() => navigate(`/live?station=${st.id}`)}
+                  className="flex items-center justify-between p-2 rounded border border-survey-border/40 dark:border-night-border/40 bg-survey-paper dark:bg-night-bg hover:border-survey-teal cursor-pointer transition-all"
+                >
+                  <div className="truncate max-w-[170px]">
+                    <div className="font-bold text-survey-ink dark:text-night-text truncate">{st.name}</div>
+                    <div className="text-[10px] text-survey-slate dark:text-night-slate">{st.id} • {st.river}</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-survey-ink dark:text-night-text font-bold">
+                      {(st.current_water_level_m ?? st.normal_level_m ?? 0.0).toFixed(2)}m
+                    </span>
+                    <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold ${
+                      st.current_risk_level === 'Red' ? 'bg-red-500 text-white' :
+                      st.current_risk_level === 'Orange' ? 'bg-orange-500 text-white' :
+                      st.current_risk_level === 'Yellow' ? 'bg-amber-500 text-white' :
+                      'bg-emerald-600 text-white'
+                    }`}>
+                      {st.current_risk_level || 'Green'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
+
         </div>
       </section>
 

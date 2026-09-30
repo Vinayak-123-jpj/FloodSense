@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FloodSense Telemetry Reading Schema",
+  "description": "API contract for virtual sensor node & ESP32 firmware telemetry payloads",
+  "type": "object",
+  "required": [
+    "node_id",
+    "water_level_cm",
+    "rainfall_mm_hr",
+    "battery_pct",
+    "rssi"
+  ],
+  "properties": {
+    "node_id": {
+      "type": "string",
+      "pattern": "^[A-Z]{2}-[A-Z]{3}-[0-9]{2}$",
+      "description": "Unique station hardware identifier (e.g. KL-PER-01)"
+    },
+    "water_level_cm": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 5000.0,
+      "description": "Water level measured in centimeters above sensor bed"
+    },
+    "rainfall_mm_hr": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 500.0,
+      "description": "Instantaneous rainfall rate in millimeters per hour"
+    },
+    "battery_pct": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 100.0,
+      "description": "Remaining node battery percentage"
+    },
+    "rssi": {
+      "type": "integer",
+      "minimum": -120,
+      "maximum": 0,
+      "description": "Wireless signal strength in dBm"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Optional ISO 8601 UTC timestamp of measurement"
+    }
+  },
+  "additionalProperties": false
+}
