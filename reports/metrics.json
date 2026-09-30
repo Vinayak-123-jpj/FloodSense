@@ -3,8 +3,11 @@
   "date_range": "1990-01-01 to 2025-12-31",
   "total_daily_samples": 131490,
   "station_count": 10,
-  "percentile_proxies_disclaimer": "Risk labels defined by station-specific training period discharge percentiles (p90=Yellow, p97=Orange, p99.5=Red), NOT official CWC meters.",
-  "modeled_discharge_disclaimer": "GloFAS river discharge is modelled m\u00b3/s data from Open-Meteo, not direct river gauge heights.",
+  "max_prediction_horizon_days": 3,
+  "lead_time_disclaimer": "Lead time is capped at the 3-day maximum horizon. GloFAS discharge is updated daily.",
+  "percentile_proxies_disclaimer": "Risk labels defined by station-specific training period discharge percentiles (p90=Yellow, p97=Orange, p99.5=Red), NOT official CWC stage meters.",
+  "modeled_discharge_disclaimer": "GloFAS river discharge is GloFAS reanalysis modelled m\u00b3/s data, NOT physical river gauge height meters.",
+  "rainfall_disclaimer": "Precipitation data is reanalysis precipitation. Model uses observed past rainfall, NOT forecast rainfall.",
   "multi_horizon_time_split": {
     "1d": {
       "lightgbm": {
@@ -12,28 +15,36 @@
         "macro_f1_pct": 81.4,
         "false_alarm_rate_pct": 4.68,
         "missed_event_rate_pct": 13.96,
-        "orange_red_recall_pct": 86.04
+        "orange_red_recall_pct": 86.04,
+        "orange_red_precision_pct": 74.73,
+        "false_alarms_per_station_year": 14.92
       },
-      "shallow_tree_baseline": {
-        "accuracy_pct": 86.12,
-        "macro_f1_pct": 78.96,
-        "false_alarm_rate_pct": 4.82,
-        "missed_event_rate_pct": 17.54,
-        "orange_red_recall_pct": 82.46
+      "linear_logistic_regression": {
+        "accuracy_pct": 80.99,
+        "macro_f1_pct": 53.54,
+        "false_alarm_rate_pct": 3.98,
+        "missed_event_rate_pct": 45.6,
+        "orange_red_recall_pct": 54.4,
+        "orange_red_precision_pct": 68.34,
+        "false_alarms_per_station_year": 12.93
       },
       "persistence_baseline": {
         "accuracy_pct": 90.0,
         "macro_f1_pct": 84.08,
         "false_alarm_rate_pct": 3.47,
         "missed_event_rate_pct": 12.76,
-        "orange_red_recall_pct": 87.24
+        "orange_red_recall_pct": 87.24,
+        "orange_red_precision_pct": 80.18,
+        "false_alarms_per_station_year": 11.06
       },
       "threshold_baseline": {
         "accuracy_pct": 63.08,
         "macro_f1_pct": 51.8,
         "false_alarm_rate_pct": 26.61,
         "missed_event_rate_pct": 6.63,
-        "orange_red_recall_pct": 93.37
+        "orange_red_recall_pct": 93.37,
+        "orange_red_precision_pct": 35.38,
+        "false_alarms_per_station_year": 87.45
       }
     },
     "2d": {
@@ -42,28 +53,36 @@
         "macro_f1_pct": 72.87,
         "false_alarm_rate_pct": 6.71,
         "missed_event_rate_pct": 20.67,
-        "orange_red_recall_pct": 79.33
+        "orange_red_recall_pct": 79.33,
+        "orange_red_precision_pct": 65.43,
+        "false_alarms_per_station_year": 21.49
       },
-      "shallow_tree_baseline": {
-        "accuracy_pct": 79.98,
-        "macro_f1_pct": 70.5,
-        "false_alarm_rate_pct": 7.4,
-        "missed_event_rate_pct": 21.48,
-        "orange_red_recall_pct": 78.52
+      "linear_logistic_regression": {
+        "accuracy_pct": 79.01,
+        "macro_f1_pct": 52.46,
+        "false_alarm_rate_pct": 5.05,
+        "missed_event_rate_pct": 42.91,
+        "orange_red_recall_pct": 57.09,
+        "orange_red_precision_pct": 64.1,
+        "false_alarms_per_station_year": 16.4
       },
       "persistence_baseline": {
         "accuracy_pct": 82.69,
         "macro_f1_pct": 72.05,
         "false_alarm_rate_pct": 5.98,
         "missed_event_rate_pct": 22.92,
-        "orange_red_recall_pct": 77.08
+        "orange_red_recall_pct": 77.08,
+        "orange_red_precision_pct": 67.28,
+        "false_alarms_per_station_year": 19.22
       },
       "threshold_baseline": {
         "accuracy_pct": 60.56,
         "macro_f1_pct": 48.65,
         "false_alarm_rate_pct": 27.56,
         "missed_event_rate_pct": 12.19,
-        "orange_red_recall_pct": 87.81
+        "orange_red_recall_pct": 87.81,
+        "orange_red_precision_pct": 33.19,
+        "false_alarms_per_station_year": 90.64
       }
     },
     "3d": {
@@ -72,45 +91,153 @@
         "macro_f1_pct": 66.01,
         "false_alarm_rate_pct": 8.32,
         "missed_event_rate_pct": 26.72,
-        "orange_red_recall_pct": 73.28
+        "orange_red_recall_pct": 73.28,
+        "orange_red_precision_pct": 58.39,
+        "false_alarms_per_station_year": 26.79
       },
-      "shallow_tree_baseline": {
-        "accuracy_pct": 75.72,
-        "macro_f1_pct": 64.53,
-        "false_alarm_rate_pct": 8.82,
-        "missed_event_rate_pct": 26.72,
-        "orange_red_recall_pct": 73.28
+      "linear_logistic_regression": {
+        "accuracy_pct": 76.78,
+        "macro_f1_pct": 50.81,
+        "false_alarm_rate_pct": 5.93,
+        "missed_event_rate_pct": 42.67,
+        "orange_red_recall_pct": 57.33,
+        "orange_red_precision_pct": 60.45,
+        "false_alarms_per_station_year": 19.24
       },
       "persistence_baseline": {
         "accuracy_pct": 77.25,
         "macro_f1_pct": 63.19,
         "false_alarm_rate_pct": 7.74,
         "missed_event_rate_pct": 31.34,
-        "orange_red_recall_pct": 68.66
+        "orange_red_recall_pct": 68.66,
+        "orange_red_precision_pct": 58.5,
+        "false_alarms_per_station_year": 24.98
       },
       "threshold_baseline": {
         "accuracy_pct": 57.94,
         "macro_f1_pct": 45.38,
         "false_alarm_rate_pct": 28.57,
         "missed_event_rate_pct": 18.09,
-        "orange_red_recall_pct": 81.91
+        "orange_red_recall_pct": 81.91,
+        "orange_red_precision_pct": 30.88,
+        "false_alarms_per_station_year": 94.04
       }
     }
   },
-  "heldout_2018_event_test": {
-    "lightgbm": {
-      "accuracy_pct": 90.63,
-      "macro_f1_pct": 84.71,
-      "false_alarm_rate_pct": 4.11,
-      "missed_event_rate_pct": 8.6,
-      "orange_red_recall_pct": 91.4
+  "heldout_2018_multi_horizon": {
+    "1d": {
+      "lightgbm": {
+        "accuracy_pct": 90.63,
+        "macro_f1_pct": 84.71,
+        "false_alarm_rate_pct": 4.11,
+        "missed_event_rate_pct": 8.6,
+        "orange_red_recall_pct": 91.4,
+        "orange_red_precision_pct": 76.76,
+        "false_alarms_per_station_year": 13.2
+      },
+      "linear_logistic_regression": {
+        "accuracy_pct": 85.59,
+        "macro_f1_pct": 57.76,
+        "false_alarm_rate_pct": 3.94,
+        "missed_event_rate_pct": 35.64,
+        "orange_red_recall_pct": 64.36,
+        "orange_red_precision_pct": 70.41,
+        "false_alarms_per_station_year": 12.9
+      },
+      "persistence_baseline": {
+        "accuracy_pct": 91.62,
+        "macro_f1_pct": 85.58,
+        "false_alarm_rate_pct": 2.99,
+        "missed_event_rate_pct": 12.79,
+        "orange_red_recall_pct": 87.21,
+        "orange_red_precision_pct": 81.25,
+        "false_alarms_per_station_year": 9.6
+      },
+      "threshold_baseline": {
+        "accuracy_pct": 62.63,
+        "macro_f1_pct": 50.57,
+        "false_alarm_rate_pct": 27.25,
+        "missed_event_rate_pct": 2.73,
+        "orange_red_recall_pct": 97.27,
+        "orange_red_precision_pct": 33.87,
+        "false_alarms_per_station_year": 90.6
+      }
     },
-    "persistence_baseline": {
-      "accuracy_pct": 91.62,
-      "macro_f1_pct": 85.58,
-      "false_alarm_rate_pct": 2.99,
-      "missed_event_rate_pct": 12.79,
-      "orange_red_recall_pct": 87.21
+    "2d": {
+      "lightgbm": {
+        "accuracy_pct": 85.32,
+        "macro_f1_pct": 76.53,
+        "false_alarm_rate_pct": 6.16,
+        "missed_event_rate_pct": 15.09,
+        "orange_red_recall_pct": 84.91,
+        "orange_red_precision_pct": 67.05,
+        "false_alarms_per_station_year": 19.9
+      },
+      "linear_logistic_regression": {
+        "accuracy_pct": 83.62,
+        "macro_f1_pct": 56.49,
+        "false_alarm_rate_pct": 5.2,
+        "missed_event_rate_pct": 32.91,
+        "orange_red_recall_pct": 67.09,
+        "orange_red_precision_pct": 65.31,
+        "false_alarms_per_station_year": 17.0
+      },
+      "persistence_baseline": {
+        "accuracy_pct": 85.32,
+        "macro_f1_pct": 74.07,
+        "false_alarm_rate_pct": 5.32,
+        "missed_event_rate_pct": 22.85,
+        "orange_red_recall_pct": 77.15,
+        "orange_red_precision_pct": 68.15,
+        "false_alarms_per_station_year": 17.2
+      },
+      "threshold_baseline": {
+        "accuracy_pct": 60.74,
+        "macro_f1_pct": 47.8,
+        "false_alarm_rate_pct": 28.11,
+        "missed_event_rate_pct": 6.5,
+        "orange_red_recall_pct": 93.5,
+        "orange_red_precision_pct": 32.2,
+        "false_alarms_per_station_year": 93.9
+      }
+    },
+    "3d": {
+      "lightgbm": {
+        "accuracy_pct": 81.26,
+        "macro_f1_pct": 68.11,
+        "false_alarm_rate_pct": 8.24,
+        "missed_event_rate_pct": 20.13,
+        "orange_red_recall_pct": 79.87,
+        "orange_red_precision_pct": 58.62,
+        "false_alarms_per_station_year": 26.9
+      },
+      "linear_logistic_regression": {
+        "accuracy_pct": 81.92,
+        "macro_f1_pct": 54.99,
+        "false_alarm_rate_pct": 5.85,
+        "missed_event_rate_pct": 34.17,
+        "orange_red_recall_pct": 65.83,
+        "orange_red_precision_pct": 62.18,
+        "false_alarms_per_station_year": 19.1
+      },
+      "persistence_baseline": {
+        "accuracy_pct": 80.71,
+        "macro_f1_pct": 65.35,
+        "false_alarm_rate_pct": 7.03,
+        "missed_event_rate_pct": 30.61,
+        "orange_red_recall_pct": 69.39,
+        "orange_red_precision_pct": 59.11,
+        "false_alarms_per_station_year": 22.9
+      },
+      "threshold_baseline": {
+        "accuracy_pct": 58.25,
+        "macro_f1_pct": 44.3,
+        "false_alarm_rate_pct": 29.2,
+        "missed_event_rate_pct": 12.16,
+        "orange_red_recall_pct": 87.84,
+        "orange_red_precision_pct": 29.97,
+        "false_alarms_per_station_year": 97.9
+      }
     }
   },
   "loso_sample_test": {
@@ -119,16 +246,82 @@
       "macro_f1_pct": 83.45,
       "false_alarm_rate_pct": 3.98,
       "missed_event_rate_pct": 9.18,
-      "orange_red_recall_pct": 90.82
+      "orange_red_recall_pct": 90.82,
+      "orange_red_precision_pct": 75.78,
+      "false_alarms_per_station_year": 465.0
     }
   },
-  "kerala_2018_station_lead_times_days": {
-    "KL-ACH-01": 2,
-    "KL-CHA-01": 2,
-    "KL-MUV-01": 7,
-    "KL-PAM-01": 1,
-    "KL-PER-01": 7,
-    "KL-PER-02": 2
+  "station_2018_details": {
+    "AS-BRA-01": {
+      "actual_orange_red_days_2018": 21,
+      "predicted_orange_red_days_2018": 23,
+      "false_alarm_days_2018": 3,
+      "august_2018_lead_time_days": 1,
+      "august_2018_lead_time_hours": 24
+    },
+    "AS-BRA-02": {
+      "actual_orange_red_days_2018": 12,
+      "predicted_orange_red_days_2018": 18,
+      "false_alarm_days_2018": 6,
+      "august_2018_lead_time_days": 1,
+      "august_2018_lead_time_hours": 24
+    },
+    "AS-DHA-01": {
+      "actual_orange_red_days_2018": 14,
+      "predicted_orange_red_days_2018": 23,
+      "false_alarm_days_2018": 10,
+      "august_2018_lead_time_days": 1,
+      "august_2018_lead_time_hours": 24
+    },
+    "AS-JIA-01": {
+      "actual_orange_red_days_2018": 14,
+      "predicted_orange_red_days_2018": 16,
+      "false_alarm_days_2018": 4,
+      "august_2018_lead_time_days": 2,
+      "august_2018_lead_time_hours": 48
+    },
+    "KL-ACH-01": {
+      "actual_orange_red_days_2018": 53,
+      "predicted_orange_red_days_2018": 61,
+      "false_alarm_days_2018": 8,
+      "august_2018_lead_time_days": 2,
+      "august_2018_lead_time_hours": 48
+    },
+    "KL-CHA-01": {
+      "actual_orange_red_days_2018": 80,
+      "predicted_orange_red_days_2018": 80,
+      "false_alarm_days_2018": 4,
+      "august_2018_lead_time_days": 2,
+      "august_2018_lead_time_hours": 48
+    },
+    "KL-MUV-01": {
+      "actual_orange_red_days_2018": 86,
+      "predicted_orange_red_days_2018": 90,
+      "false_alarm_days_2018": 6,
+      "august_2018_lead_time_days": 3,
+      "august_2018_lead_time_hours": 72
+    },
+    "KL-PAM-01": {
+      "actual_orange_red_days_2018": 43,
+      "predicted_orange_red_days_2018": 48,
+      "false_alarm_days_2018": 6,
+      "august_2018_lead_time_days": 1,
+      "august_2018_lead_time_hours": 24
+    },
+    "KL-PER-01": {
+      "actual_orange_red_days_2018": 92,
+      "predicted_orange_red_days_2018": 94,
+      "false_alarm_days_2018": 5,
+      "august_2018_lead_time_days": 3,
+      "august_2018_lead_time_hours": 72
+    },
+    "KL-PER-02": {
+      "actual_orange_red_days_2018": 62,
+      "predicted_orange_red_days_2018": 76,
+      "false_alarm_days_2018": 19,
+      "august_2018_lead_time_days": 2,
+      "august_2018_lead_time_hours": 48
+    }
   },
   "kerala_2018_median_lead_time_days": 2,
   "kerala_2018_median_lead_time_hours": 48,

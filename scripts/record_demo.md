@@ -1,38 +1,48 @@
-# FloodSense — 3-Minute Video Walkthrough Script
+# FloodSense — 3-Minute Video Demonstration Script
 
-## FOSSEE Open Hardware National Make-A-Thon 2026 Submission
-
----
-
-### Scene 1: Problem Statement & Atlas Design (0:00 - 0:30)
-- **Visual**: Screen recording opens on `http://localhost:3000` (Landing Overview page). Toggle between Day Survey (warm paper `#F2EEE4`) and Night Watch (`#0C141B`) themes.
-- **Voiceover**: 
-  > "Welcome to FloodSense — a complete, submission-ready flood early-warning platform built for the FOSSEE National Make-A-Thon 2026. Across India's monsoon belts in Kerala and Assam, delayed flood warnings cost lives. FloodSense solves this through a software-only digital twin platform that models real-world ESP32 sensor grids."
+**Target Video Duration**: 3 Minutes (180 Seconds)  
+**Theme**: FOSSEE Open Hardware National Make-A-Thon 2026 (Disaster Detection & Early Warnings: Floods Monitoring)
 
 ---
 
-### Scene 2: Live Monitor Control Room (0:30 - 1:15)
-- **Visual**: Click **"Open Live Monitor"**. Show the full-height desaturated Leaflet map with active station markers and low-lying zone contour polygons. Click on station **Neeleswaram (Periyar River)**. Show the live gauge animating, the 72-hour forecast band with uncertainty envelopes, top 3 plain-language ML risk drivers, and the WebSocket ticker stream.
-- **Voiceover**: 
-  > "On the Live Monitor, stations transmit telemetry over WebSocket. Clicking Neeleswaram displays real-time gauge levels, top explainable risk drivers, and a 72-hour hydrological forecast with uncertainty bounds. When water levels cross warning limits, custom SVG station markers pulse in signal red."
+## Scene Breakdown & Voiceover Guide
+
+### Scene 1: Introduction & System Architecture (0:00 - 0:35)
+- **Visual**: Open `http://localhost:3000` (Landing Page). Show the hero section, active river gauging atlas, and click the "Guided Demo Tour" button.
+- **Voiceover**:
+  > "Welcome to FloodSense, a software-only flood early-warning platform built for the FOSSEE Open Hardware National Make-A-Thon 2026. FloodSense addresses severe flood risks across river basins in Kerala and Assam by combining virtual IoT sensor digital twins, 36-year daily GloFAS river discharge reanalysis data from 1990 to 2025, and a leakage-audited LightGBM multi-horizon classifier."
 
 ---
 
-### Scene 3: Kerala 2018 Replay & What-If Rain Slider (1:15 - 2:00)
-- **Visual**: Navigate to **Scenario Replay**. Press **Play** on the timeline scrubber for the historic August 2018 Kerala flood event. Drag the **"What-If Rain Multiplier" slider** to 2.0x rain. Show risk badges escalating from Yellow to Orange to Red live on the map and gauge.
-- **Voiceover**: 
-  > "In Scenario Replay, judges can scrub through historic flood events like the August 2018 Kerala disaster. Our interactive What-If slider allows disaster response teams to simulate intense cloudbursts live, witnessing risk level transitions in real time."
+### Scene 2: Live Monitor Control Room & Virtual Telemetry (0:35 - 1:10)
+- **Visual**: Navigate to `/live` (Live Monitor). Show station markers on the desaturated OpenTopoMap Leaflet map, click Neeleswaram station (`KL-PER-01`), show the live ticker stream `/ws/live`, the `[SIMULATED NODE]` badge, and the explainable ML top-3 drivers.
+- **Voiceover**:
+  > "In live mode, FloodSense receives HTTP and WebSocket telemetry payloads from virtual ESP32 sensor nodes emulating ultrasonic water level sensors, rain gauges, solar battery drain, and signal RSSI. Water level stage is converted to river discharge via a documented rating curve ($Q = a \cdot (h - h_0)^b$). Notice how the explainable AI module highlights top risk drivers in plain language."
 
 ---
 
-### Scene 4: Multilingual Alert Outbox & Telegram Bot (2:00 - 2:30)
-- **Visual**: Click **Alert Outbox**. Toggle between **English** and **Hindi** message previews (`/lang`). Click the **View OpenStreetMap Evacuation Directions** link.
-- **Voiceover**: 
-  > "When risk escalates, our hysteresis engine fires alerts while preventing notification flapping. Alerts are formatted in English and Hindi for Telegram dispatch, complete with OpenStreetMap evacuation route links guiding communities to nearest high-ground shelters."
+### Scene 3: Historical Event Replay & What-If Stress Testing (1:10 - 1:45)
+- **Visual**: Navigate to `/replay` (Scenario Replay). Click Play on the Kerala August 2018 scrubber (replay starts instantly within 2 seconds). Move the What-If Rainfall Multiplier slider to 2.0x.
+- **Voiceover**:
+  > "Next, we open the Disaster Replay simulator. Here, we scrub through the catastrophic August 2018 Kerala flood event evaluated on our out-of-sample held-out 2018 model. Watch the water level gauge transition smoothly from Green to Yellow, Orange, and Red. Adjusting the What-If rainfall slider lets emergency response teams stress-test catchment response under extreme deluge conditions."
 
 ---
 
-### Scene 5: Honest ML Science & Open Hardware Roadmap (2:30 - 3:00)
-- **Visual**: Show **Model & Method** page (LightGBM metrics: 99.89% accuracy, 29h Kerala backtest lead time, confusion matrix, and limitation disclosures). Conclude on **Open Hardware** page showing the ESP32 sketch, vector wiring diagram, and ₹3,990 INR BOM.
-- **Voiceover**: 
-  > "Our LightGBM model was trained on 35,064 real Open-Meteo records, delivering 29 hours of early warning lead time on the Kerala 2018 event. While software-only this round, our complete ESP32 open-hardware schematic and BOM are ready for physical deployment. Thank you!"
+### Scene 4: Multilingual Alert Engine & Evacuation Routing (1:45 - 2:15)
+- **Visual**: Navigate to `/alerts` (Alert Outbox). Toggle between English and Hindi alert messages. Click "View Evacuation Route" on an active Red alert to reveal the OpenStreetMap route to the nearest high-ground relief shelter.
+- **Voiceover**:
+  > "When river levels breach thresholds, the hysteresis alert engine fires deduplicated notifications, preventing alarm fatigue caused by noisy sensor readings. Outbox messages are instantly formatted in both English and Hindi, complete with direct OpenStreetMap navigation routes to designated high-elevation evacuation shelters."
+
+---
+
+### Scene 5: Data Science Audit & Baseline Honesty Segment (2:15 - 2:45)
+- **Visual**: Navigate to `/model` (Model & Method Page). Show the top metric cards (Macro F1: 84.71%, High-Risk Recall: 91.40%, Lead Time: 2 Days), the multi-horizon baseline comparison table, and the per-station 2018 breakdown table.
+- **Voiceover**:
+  > "Now for our Data Science Audit. In the spirit of scientific transparency: river discharge is GloFAS reanalysis modeled data, thresholds are percentile proxies, and lead times are capped at our 3-day maximum horizon. On our held-out 2018 test set, LightGBM achieves 84.71% Macro F1 at 24 hours and 91.40% recall on severe Orange/Red alert days. At 2-day and 3-day lead horizons, LightGBM cleanly outperforms Persistence and Linear Logistic Regression baselines."
+
+---
+
+### Scene 6: Conclusion & Open Hardware Roadmap (2:45 - 3:00)
+- **Visual**: Return to Landing Page or README. Show the Docker Compose quickstart and open hardware ESP32 blueprint (`/firmware-stub/`).
+- **Voiceover**:
+  > "FloodSense is fully containerized and runs with a single command (`docker compose up --build`). While hardware is simulated this round, our complete solar-autonomous ESP32 firmware and ₹3,990 INR BOM are ready for physical deployment. Thank you."

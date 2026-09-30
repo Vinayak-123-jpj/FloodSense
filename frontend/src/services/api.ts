@@ -3,19 +3,29 @@ import { Station, Reading, StationForecast, AlertItem, SimulationStatus } from '
 
 const API_BASE = '/api';
 
-export interface HorizonMetrics {
+export interface DetailedHorizonMetrics {
   accuracy_pct: number;
   macro_f1_pct: number;
   false_alarm_rate_pct: number;
   missed_event_rate_pct: number;
   orange_red_recall_pct: number;
+  orange_red_precision_pct: number;
+  false_alarms_per_station_year: number;
 }
 
-export interface HorizonComparison {
-  lightgbm: HorizonMetrics;
-  shallow_tree_baseline: HorizonMetrics;
-  persistence_baseline: HorizonMetrics;
-  threshold_baseline: HorizonMetrics;
+export interface HorizonBaselineComparison {
+  lightgbm: DetailedHorizonMetrics;
+  linear_logistic_regression: DetailedHorizonMetrics;
+  persistence_baseline: DetailedHorizonMetrics;
+  threshold_baseline: DetailedHorizonMetrics;
+}
+
+export interface Station2018Detail {
+  actual_orange_red_days_2018: number;
+  predicted_orange_red_days_2018: number;
+  false_alarm_days_2018: number;
+  august_2018_lead_time_days: number;
+  august_2018_lead_time_hours: number;
 }
 
 export interface FullMetricsSummary {
@@ -23,19 +33,23 @@ export interface FullMetricsSummary {
   date_range: string;
   total_daily_samples: number;
   station_count: number;
+  max_prediction_horizon_days: number;
+  lead_time_disclaimer: string;
   percentile_proxies_disclaimer: string;
   modeled_discharge_disclaimer: string;
+  rainfall_disclaimer: string;
   multi_horizon_time_split: {
-    '1d': HorizonComparison;
-    '2d': HorizonComparison;
-    '3d': HorizonComparison;
+    '1d': HorizonBaselineComparison;
+    '2d': HorizonBaselineComparison;
+    '3d': HorizonBaselineComparison;
   };
-  heldout_2018_event_test: {
-    lightgbm: HorizonMetrics;
-    persistence_baseline: HorizonMetrics;
+  heldout_2018_multi_horizon: {
+    '1d': HorizonBaselineComparison;
+    '2d': HorizonBaselineComparison;
+    '3d': HorizonBaselineComparison;
   };
-  loso_sample_test: Record<string, HorizonMetrics>;
-  kerala_2018_station_lead_times_days: Record<string, number>;
+  loso_sample_test: Record<string, DetailedHorizonMetrics>;
+  station_2018_details: Record<string, Station2018Detail>;
   kerala_2018_median_lead_time_days: number;
   kerala_2018_median_lead_time_hours: number;
   train_class_distribution: Record<string, number>;

@@ -13,8 +13,9 @@
   font-family: inherit;
 }
 
-.dark-tile-filter {
-  filter: invert(1) hue-rotate(180deg) desaturate(0.85) brightness(0.7) contrast(1.2);
+.dark-tile-filter,
+.dark .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) desaturate(0.8) brightness(0.55) contrast(1.2) !important;
 }
 
 .custom-station-marker-container {

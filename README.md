@@ -1,10 +1,10 @@
-# FloodSense — Software-Only Flood Early-Warning Platform
+# FloodSense — Software-Only Flood Early-Warning Platform & Digital Twin
 ### FOSSEE Open Hardware National Make-A-Thon 2026 (Disaster Detection & Early Warnings: Floods Monitoring)
 
 [![Licence: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python: 3.11](https://img.shields.io/badge/Python-3.11-teal.svg)](backend/)
 [![React: 18](https://img.shields.io/badge/React-18-61dafb.svg)](frontend/)
-[![Held-Out Accuracy: 90.63%](https://img.shields.io/badge/HeldOut_2018_Accuracy-90.63%25-success.svg)](reports/metrics.json)
+[![Held-Out 2018 Macro F1: 84.71%](https://img.shields.io/badge/HeldOut_2018_Macro_F1-84.71%25-success.svg)](reports/metrics.json)
 
 **FloodSense** is a software-only flood early-warning digital twin platform that emulates physical IoT sensor grids to deliver 24-to-72-hour early warning predictions across river catchments in Kerala and Assam. Powered by a FastAPI backend, a leakage-audited LightGBM machine learning classifier trained on 131,490 daily GloFAS records (1990–2025), and a desaturated "Hydrological Survey Atlas" React frontend, FloodSense features hysteresis alert deduplication, multilingual Telegram warnings (English & Hindi), OpenStreetMap evacuation routing, and an open-hardware ESP32 blueprint.
 
@@ -56,39 +56,63 @@ docker compose up --build
 
 ---
 
-## 3. Machine Learning Audit & Performance Summary
+## 3. Platform Screenshots
 
-- **Prediction Task**: Multi-Horizon Risk Level Classification ($t+1\text{d}, t+2\text{d}, t+3\text{d}$)
-- **Dataset**: 131,490 Daily Hydrological Rows (1990–2025 across 10 stations in Kerala & Assam)
-- **Data Leakage Audit**: **PASSED**. Strict 7-day chronological split gap and held-out 2018 validation protocol.
-- **Held-Out 2018 Test Accuracy**: **90.63%**
-- **Held-Out 2018 Macro F1-Score**: **84.71%** (vs Persistence F1: 85.58%)
-- **Orange/Red High-Risk Recall**: **91.40%**
-- **False Alarm Rate (Orange/Red Alerts)**: **4.11%**
-- **August 2018 Warning Lead Time**: Median of **2 Days (48 Hours)** prior to peak deluge across Kerala gauging stations.
+![Landing Page Atlas](docs/screenshots/landing_page_atlas.png)
 
-*Full model metrics, confusion matrix, feature importances, and dynamic JSON metrics are available in [`reports/model_report.md`](reports/model_report.md) and [`reports/metrics.json`](reports/metrics.json).*
+![Live Monitor Control Room](docs/screenshots/live_monitor_room.png)
 
----
+![Kerala 2018 Historical Replay](docs/screenshots/kerala_2018_replay_scrubber.png)
 
-## 4. System Limitations & Honesty
+![Multilingual Alert Outbox](docs/screenshots/alert_outbox_multilingual.png)
 
-1. **Daily vs Hourly Granularity**: Open-Meteo Flood API provides **daily** river discharge, whereas precipitation is **hourly**. Micro-burst flash floods under 3 hours rely heavily on the `rain_sum_6h` feature until daily discharge updates.
-2. **Dam Release Anomaly**: Natural river hydraulics are assumed. Unannounced upstream dam gate releases without rain correlation can cause delayed predictions.
+![Model Science Audit Report](docs/screenshots/model_science_audit.png)
 
 ---
 
-## 5. Open Hardware Deployment Roadmap
+## 4. Machine Learning Audit & Side-by-Side Baselines
 
-While sensors are simulated this round, FloodSense includes an open-hardware blueprint in `/firmware-stub/`:
-- **`node_firmware.ino`**: ESP32 C++ Arduino sketch using JSN-SR04T ultrasonic transducer & tipping bucket rain gauge.
-- **`wiring_diagram.svg`**: Vector wiring schematic.
-- **`bom.md`**: Bill of Materials (INR ₹3,990 per node, ~$48 USD).
+### Held-Out 2018 Flood Event Validation Set (100% Out-of-Sample)
+
+| Prediction Horizon | Model / Benchmark | Macro F1 | Orange/Red Recall | Orange/Red Precision | False Alarm Rate (FAR) | False Alarms / Stn-Yr | Accuracy |
+|---|---|---|---|---|---|---|---|
+| **t + 1d (24h)** | **LightGBM (Primary)** | **84.71%** | **91.40%** | **76.76%** | **4.11%** | **13.20** | **90.63%** |
+| | Linear (Logistic Regression) [Pure NumPy] | 57.76% | 64.36% | 70.41% | 3.94% | 12.90 | 85.59% |
+| | Persistence Baseline | 85.58% | 87.21% | 81.25% | 2.99% | 9.60 | 91.62% |
+| | Rainfall Threshold Rule | 50.57% | 97.27% | 33.87% | 27.25% | 90.60 | 62.63% |
+| **t + 2d (48h)** | **LightGBM (Primary)** | **76.53%** | **84.91%** | **67.05%** | **6.16%** | **19.90** | **85.32%** |
+| | Linear (Logistic Regression) [Pure NumPy] | 56.49% | 67.09% | 65.31% | 5.20% | 17.00 | 83.62% |
+| | Persistence Baseline | 74.07% | 77.15% | 68.15% | 5.32% | 17.20 | 85.32% |
+| | Rainfall Threshold Rule | 47.80% | 93.50% | 32.20% | 28.11% | 93.90 | 60.74% |
+| **t + 3d (72h)** | **LightGBM (Primary)** | **68.11%** | **79.87%** | **58.62%** | **8.24%** | **26.90** | **81.26%** |
+| | Linear (Logistic Regression) [Pure NumPy] | 54.99% | 65.83% | 62.18% | 5.85% | 19.10 | 81.92% |
+| | Persistence Baseline | 65.35% | 69.39% | 59.11% | 7.03% | 22.90 | 80.71% |
+| | Rainfall Threshold Rule | 44.30% | 87.84% | 29.97% | 29.20% | 97.90 | 58.25% |
 
 ---
 
-## 6. License & Credits
+## 5. Scientific Limitations & Data Honesty
+
+1. **GloFAS Modeled Discharge**: River discharge ($m^3/s$) is derived from Open-Meteo GloFAS reanalysis modeling, NOT physical river gauge height meters.
+2. **Observed Past Rainfall Only**: Model features use historical observed past rainfall, NOT future numerical weather forecast predictions.
+3. **Percentile Risk Proxies**: Danger thresholds are station-specific historical training period discharge percentiles (p90=Yellow, p97=Orange, p99.5=Red), NOT official CWC stage levels.
+4. **Max Horizon Cap**: Prediction lead times are strictly capped at the 3-day ($t+3\text{d}$) maximum horizon. GloFAS discharge updates daily.
+5. **Rating Curve Rating Approximation**: Sensor water level stage ($h$) is converted to discharge ($Q$) via a documented rating curve equation ($Q = a \cdot (h - h_0)^b$).
+
+---
+
+## 6. Open Hardware Roadmap (Planned, Not Built This Round)
+
+*Note: There is NO physical hardware deployed in this round. The system operates via a software virtual sensor layer. The hardware blueprint below is planned for future physical field deployment.*
+
+- **Firmware Stub**: `/firmware-stub/node_firmware.ino` (ESP32 C++ sketch using JSN-SR04T ultrasonic transducer & tipping bucket rain gauge).
+- **Schematic**: `/firmware-stub/wiring_diagram.svg`.
+- **Bill of Materials**: `/firmware-stub/bom.md` (Target BOM cost: ₹3,990 INR / ~$48 USD per node).
+
+---
+
+## 7. License & Credits
 
 - **License**: [MIT License](LICENSE)
 - **Built for**: FOSSEE Open Hardware National Make-A-Thon 2026 (Disaster Detection & Early Warnings: Floods Monitoring)
-- **Data Sources**: Open-Meteo Weather & Global Flood APIs.
+- **Data Sources**: Open-Meteo Weather & GloFAS Global Flood APIs / geoBoundaries State Geometry.

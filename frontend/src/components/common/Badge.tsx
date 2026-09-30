@@ -38,9 +38,15 @@ export const RiskBadge: React.FC<BadgeProps> = ({ level, size = 'md' }) => {
   };
 
   return (
-    <span className={`inline-flex items-center rounded border ${cfg.bg} ${sizeClasses[size]} tracking-wide uppercase shadow-sm`}>
+    <span className={`inline-flex items-center rounded border ${cfg.bg} ${sizeClasses[size]} tracking-wide uppercase shadow-xs`}>
       <span className="text-[10px] select-none">{cfg.shape}</span>
       <span>{cfg.label}</span>
     </span>
   );
 };
+
+export const SimulatedBadge: React.FC = () => (
+  <span className="inline-flex items-center px-2 py-0.5 rounded border border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300 font-mono text-[10px] font-semibold tracking-wider uppercase">
+    SIMULATED TELEMETRY
+  </span>
+);

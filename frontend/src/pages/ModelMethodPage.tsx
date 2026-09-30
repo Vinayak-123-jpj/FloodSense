@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { api, FullMetricsSummary } from '../services/api';
+import { api, FullMetricsSummary, DetailedHorizonMetrics, Station2018Detail } from '../services/api';
 import { ShieldCheck, AlertTriangle, Cpu, Layers, BarChart3, Database } from 'lucide-react';
 
 export const ModelMethodPage: React.FC = () => {
@@ -9,10 +9,11 @@ export const ModelMethodPage: React.FC = () => {
     api.getFullMetrics().then(setMetrics).catch(console.error);
   }, []);
 
-  const m1d = metrics?.multi_horizon_time_split['1d']?.lightgbm;
-  const m2d = metrics?.multi_horizon_time_split['2d']?.lightgbm;
-  const m3d = metrics?.multi_horizon_time_split['3d']?.lightgbm;
-  const heldout = metrics?.heldout_2018_event_test?.lightgbm;
+  const heldout1d = metrics?.heldout_2018_multi_horizon?.['1d'];
+  const heldout2d = metrics?.heldout_2018_multi_horizon?.['2d'];
+  const heldout3d = metrics?.heldout_2018_multi_horizon?.['3d'];
+
+  const stationDetails: Record<string, Station2018Detail> = metrics?.station_2018_details || {};
 
   return (
     <div className="space-y-8 pb-12">
@@ -29,183 +30,258 @@ export const ModelMethodPage: React.FC = () => {
       {/* Metrics Top Banner */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-mono">
         <div className="rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card p-4 space-y-1">
-          <span className="text-[11px] text-survey-teal dark:text-night-teal uppercase block">HELDOUT 2018 ACCURACY</span>
-          <div className="text-2xl font-bold text-survey-ink dark:text-night-text">
-            {heldout ? `${heldout.accuracy_pct}%` : '90.63%'}
-          </div>
-          <span className="font-sans text-[11px] text-survey-slate dark:text-night-slate">Genuinely Out-of-Sample 2018 Set</span>
-        </div>
-
-        <div className="rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card p-4 space-y-1">
           <span className="text-[11px] text-survey-teal dark:text-night-teal uppercase block">HELDOUT 2018 MACRO F1</span>
           <div className="text-2xl font-bold text-survey-ink dark:text-night-text">
-            {heldout ? `${heldout.macro_f1_pct}%` : '84.71%'}
+            {heldout1d?.lightgbm ? `${heldout1d.lightgbm.macro_f1_pct}%` : '84.71%'}
           </div>
           <span className="font-sans text-[11px] text-survey-slate dark:text-night-slate">
-            High-Risk Recall: {heldout ? `${heldout.orange_red_recall_pct}%` : '91.4%'}
+            vs Persistence F1 {heldout1d?.persistence_baseline ? `${heldout1d.persistence_baseline.macro_f1_pct}%` : '85.58%'}
           </span>
         </div>
 
         <div className="rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card p-4 space-y-1">
-          <span className="text-[11px] text-survey-teal dark:text-night-teal uppercase block">AUGUST 2018 LEAD TIME</span>
+          <span className="text-[11px] text-survey-teal dark:text-night-teal uppercase block">HIGH-RISK RECALL</span>
           <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+            {heldout1d?.lightgbm ? `${heldout1d.lightgbm.orange_red_recall_pct}%` : '91.40%'}
+          </div>
+          <span className="font-sans text-[11px] text-survey-slate dark:text-night-slate">
+            vs Persistence Recall {heldout1d?.persistence_baseline ? `${heldout1d.persistence_baseline.orange_red_recall_pct}%` : '87.21%'}
+          </span>
+        </div>
+
+        <div className="rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card p-4 space-y-1">
+          <span className="text-[11px] text-survey-teal dark:text-night-teal uppercase block">MEDIAN WARNING LEAD TIME</span>
+          <div className="text-2xl font-bold text-survey-ink dark:text-night-text">
             {metrics ? `${metrics.kerala_2018_median_lead_time_days} Days (${metrics.kerala_2018_median_lead_time_hours}h)` : '2 Days (48h)'}
           </div>
-          <span className="font-sans text-[11px] text-survey-slate dark:text-night-slate">Prior to peak flood deluge</span>
+          <span className="font-sans text-[11px] text-survey-slate dark:text-night-slate">Capped at 3-day max horizon</span>
         </div>
 
         <div className="rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card p-4 space-y-1">
           <span className="text-[11px] text-survey-teal dark:text-night-teal uppercase block">FALSE ALARM RATE (FAR)</span>
           <div className="text-2xl font-bold text-survey-ink dark:text-night-text">
-            {heldout ? `${heldout.false_alarm_rate_pct}%` : '4.11%'}
+            {heldout1d?.lightgbm ? `${heldout1d.lightgbm.false_alarm_rate_pct}%` : '4.11%'}
           </div>
-          <span className="font-sans text-[11px] text-survey-slate dark:text-night-slate">Orange/Red alert false positive rate</span>
+          <span className="font-sans text-[11px] text-survey-slate dark:text-night-slate">
+            {heldout1d?.lightgbm ? `${heldout1d.lightgbm.false_alarms_per_station_year} days/station-year` : '13.2 days/stn-yr'}
+          </span>
         </div>
       </div>
 
-      {/* Disclaimers & Data Honesty Banner */}
-      <section className="rounded border border-amber-300 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20 p-4 space-y-2 font-sans text-xs">
+      {/* Disclaimers & Data Science Audit Banner */}
+      <section className="rounded border border-amber-300 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20 p-5 space-y-3 font-sans text-xs">
         <div className="flex items-center gap-2 font-serif font-bold text-sm text-amber-900 dark:text-amber-200">
-          <AlertTriangle className="h-5 w-5 text-amber-600" /> Critical Data Science Disclaimers
+          <AlertTriangle className="h-5 w-5 text-amber-600" /> Explicit Data Science Disclaimers & Data Honesty
         </div>
-        <ul className="list-disc list-inside space-y-1 text-survey-ink dark:text-night-text leading-relaxed">
-          <li><strong>GloFAS Modeled Discharge:</strong> River discharge values ($m^3/s$) are obtained from Open-Meteo GloFAS reanalysis modeling, NOT physical river gauge height meters.</li>
-          <li><strong>Percentile Risk Labels:</strong> Station danger levels are defined using station-specific historical training period percentiles (p90=Yellow, p97=Orange, p99.5=Red), NOT official CWC absolute stage thresholds.</li>
-          <li><strong>Daily Temporal Resolution:</strong> Training data consists of daily rows (131,490 samples from 1990 to 2025 across 10 stations), matching GloFAS update rates.</li>
+        <ul className="list-disc list-inside space-y-1.5 text-survey-ink dark:text-night-text leading-relaxed">
+          <li><strong>GloFAS Modeled Discharge:</strong> River discharge (m³/s) is derived from GloFAS reanalysis modeling via Open-Meteo, NOT direct physical river gauge height meters.</li>
+          <li><strong>Observed Past Rainfall Only:</strong> The model uses historical past observed rainfall features, NOT future numerical weather forecast inputs.</li>
+          <li><strong>Percentile Risk Proxies:</strong> Danger thresholds are station-specific historical training period discharge percentiles (p90=Yellow, p97=Orange, p99.5=Red), NOT official CWC stage levels.</li>
+          <li><strong>Max Horizon Cap:</strong> Prediction lead times are strictly capped at the 3-day (t+3d) maximum horizon. GloFAS discharge is updated daily.</li>
         </ul>
       </section>
 
-      {/* Multi-Horizon Performance Comparison Table */}
+      {/* Science Audit Banner: Benchmark Comparison vs Persistence */}
+      <section className="rounded border border-emerald-300 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20 p-5 space-y-2 font-sans text-xs">
+        <div className="flex items-center gap-2 font-serif font-bold text-sm text-emerald-900 dark:text-emerald-200">
+          <ShieldCheck className="h-5 w-5 text-emerald-600" /> Baseline Comparison & Horizon Honest Finding
+        </div>
+        <p className="text-survey-ink dark:text-night-text leading-relaxed">
+          <strong>1-Day Horizon (t+1d):</strong> Persistence achieves slightly higher overall Macro F1 ({heldout1d?.persistence_baseline?.macro_f1_pct}% vs LightGBM {heldout1d?.lightgbm?.macro_f1_pct}%) due to high day-to-day discharge autocorrelation, but <strong>LightGBM achieves higher High-Risk Recall ({heldout1d?.lightgbm?.orange_red_recall_pct}% vs {heldout1d?.persistence_baseline?.orange_red_recall_pct}%)</strong> on critical Orange/Red alert days.
+          <br />
+          <strong>2-Day (t+2d) and 3-Day (t+3d) Horizons:</strong> <strong>LightGBM cleanly outperforms Persistence in both Macro F1 and High-Risk Recall</strong> (2d: {heldout2d?.lightgbm?.macro_f1_pct}% vs {heldout2d?.persistence_baseline?.macro_f1_pct}%; 3d: {heldout3d?.lightgbm?.macro_f1_pct}% vs {heldout3d?.persistence_baseline?.macro_f1_pct}%).
+        </p>
+      </section>
+
+      {/* Genuinely Out-of-Sample Held-Out 2018 Benchmark Table */}
       <section className="space-y-3">
-        <h2 className="font-serif text-xl font-bold text-survey-ink dark:text-night-text">Multi-Horizon Performance & Baseline Comparison</h2>
+        <h2 className="font-serif text-xl font-bold text-survey-ink dark:text-night-text">Held-Out 2018 Event Benchmark (Genuinely Out-of-Sample)</h2>
         
         <div className="overflow-x-auto rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card">
           <table className="w-full text-left border-collapse font-sans text-xs">
             <thead>
               <tr className="border-b border-survey-border dark:border-night-border bg-survey-paper dark:bg-night-bg font-mono text-[11px] text-survey-teal dark:text-night-teal uppercase">
                 <th className="p-3">Horizon</th>
-                <th className="p-3">Model</th>
-                <th className="p-3">Accuracy</th>
+                <th className="p-3">Model / Baseline</th>
                 <th className="p-3">Macro F1</th>
-                <th className="p-3">False Alarm Rate (FAR)</th>
-                <th className="p-3">Missed Event Rate (MER)</th>
                 <th className="p-3">Orange/Red Recall</th>
+                <th className="p-3">Orange/Red Precision</th>
+                <th className="p-3">FAR</th>
+                <th className="p-3">False Alarms / Stn-Yr</th>
+                <th className="p-3">Accuracy</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-survey-border/40 dark:divide-night-border/40">
               {/* 1d Horizon */}
-              <tr className="bg-survey-paper/30 dark:bg-night-bg/30 hover:bg-survey-paper/50">
-                <td className="p-3 font-mono font-bold" rowSpan={4}>t + 1d (24h)</td>
-                <td className="p-3 font-semibold text-survey-ink dark:text-night-text">LightGBM (Primary)</td>
-                <td className="p-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">{m1d?.accuracy_pct}%</td>
-                <td className="p-3 font-mono font-bold">{m1d?.macro_f1_pct}%</td>
-                <td className="p-3 font-mono">{m1d?.false_alarm_rate_pct}%</td>
-                <td className="p-3 font-mono">{m1d?.missed_event_rate_pct}%</td>
-                <td className="p-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">{m1d?.orange_red_recall_pct}%</td>
-              </tr>
-              <tr className="hover:bg-survey-paper/50">
-                <td className="p-3 text-survey-slate dark:text-night-slate">Shallow Tree Baseline (depth=2)</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['1d']?.shallow_tree_baseline?.accuracy_pct}%</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['1d']?.shallow_tree_baseline?.macro_f1_pct}%</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['1d']?.shallow_tree_baseline?.false_alarm_rate_pct}%</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['1d']?.shallow_tree_baseline?.missed_event_rate_pct}%</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['1d']?.shallow_tree_baseline?.orange_red_recall_pct}%</td>
-              </tr>
-              <tr className="hover:bg-survey-paper/50">
-                <td className="p-3 text-survey-slate dark:text-night-slate">Persistence Baseline</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['1d']?.persistence_baseline?.accuracy_pct}%</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['1d']?.persistence_baseline?.macro_f1_pct}%</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['1d']?.persistence_baseline?.false_alarm_rate_pct}%</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['1d']?.persistence_baseline?.missed_event_rate_pct}%</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['1d']?.persistence_baseline?.orange_red_recall_pct}%</td>
-              </tr>
-              <tr className="hover:bg-survey-paper/50">
-                <td className="p-3 text-survey-slate dark:text-night-slate">Threshold Rule Benchmark</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['1d']?.threshold_baseline?.accuracy_pct}%</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['1d']?.threshold_baseline?.macro_f1_pct}%</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['1d']?.threshold_baseline?.false_alarm_rate_pct}%</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['1d']?.threshold_baseline?.missed_event_rate_pct}%</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['1d']?.threshold_baseline?.orange_red_recall_pct}%</td>
-              </tr>
+              {heldout1d && (
+                <>
+                  <tr className="bg-survey-paper/30 dark:bg-night-bg/30 hover:bg-survey-paper/50">
+                    <td className="p-3 font-mono font-bold" rowSpan={4}>t + 1d (24h)</td>
+                    <td className="p-3 font-semibold text-survey-ink dark:text-night-text">LightGBM (Primary)</td>
+                    <td className="p-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">{heldout1d.lightgbm.macro_f1_pct}%</td>
+                    <td className="p-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">{heldout1d.lightgbm.orange_red_recall_pct}%</td>
+                    <td className="p-3 font-mono">{heldout1d.lightgbm.orange_red_precision_pct}%</td>
+                    <td className="p-3 font-mono">{heldout1d.lightgbm.false_alarm_rate_pct}%</td>
+                    <td className="p-3 font-mono">{heldout1d.lightgbm.false_alarms_per_station_year}</td>
+                    <td className="p-3 font-mono text-survey-slate dark:text-night-slate">{heldout1d.lightgbm.accuracy_pct}%</td>
+                  </tr>
+                  <tr className="hover:bg-survey-paper/50">
+                    <td className="p-3 text-survey-slate dark:text-night-slate">Linear (Logistic Regression) [Pure NumPy]</td>
+                    <td className="p-3 font-mono">{heldout1d.linear_logistic_regression.macro_f1_pct}%</td>
+                    <td className="p-3 font-mono">{heldout1d.linear_logistic_regression.orange_red_recall_pct}%</td>
+                    <td className="p-3 font-mono">{heldout1d.linear_logistic_regression.orange_red_precision_pct}%</td>
+                    <td className="p-3 font-mono">{heldout1d.linear_logistic_regression.false_alarm_rate_pct}%</td>
+                    <td className="p-3 font-mono">{heldout1d.linear_logistic_regression.false_alarms_per_station_year}</td>
+                    <td className="p-3 font-mono text-survey-slate dark:text-night-slate">{heldout1d.linear_logistic_regression.accuracy_pct}%</td>
+                  </tr>
+                  <tr className="hover:bg-survey-paper/50">
+                    <td className="p-3 text-survey-slate dark:text-night-slate">Persistence Baseline</td>
+                    <td className="p-3 font-mono font-semibold">{heldout1d.persistence_baseline.macro_f1_pct}%</td>
+                    <td className="p-3 font-mono">{heldout1d.persistence_baseline.orange_red_recall_pct}%</td>
+                    <td className="p-3 font-mono">{heldout1d.persistence_baseline.orange_red_precision_pct}%</td>
+                    <td className="p-3 font-mono">{heldout1d.persistence_baseline.false_alarm_rate_pct}%</td>
+                    <td className="p-3 font-mono">{heldout1d.persistence_baseline.false_alarms_per_station_year}</td>
+                    <td className="p-3 font-mono text-survey-slate dark:text-night-slate">{heldout1d.persistence_baseline.accuracy_pct}%</td>
+                  </tr>
+                  <tr className="hover:bg-survey-paper/50">
+                    <td className="p-3 text-survey-slate dark:text-night-slate">Rainfall Threshold Rule</td>
+                    <td className="p-3 font-mono">{heldout1d.threshold_baseline.macro_f1_pct}%</td>
+                    <td className="p-3 font-mono">{heldout1d.threshold_baseline.orange_red_recall_pct}%</td>
+                    <td className="p-3 font-mono">{heldout1d.threshold_baseline.orange_red_precision_pct}%</td>
+                    <td className="p-3 font-mono">{heldout1d.threshold_baseline.false_alarm_rate_pct}%</td>
+                    <td className="p-3 font-mono">{heldout1d.threshold_baseline.false_alarms_per_station_year}</td>
+                    <td className="p-3 font-mono text-survey-slate dark:text-night-slate">{heldout1d.threshold_baseline.accuracy_pct}%</td>
+                  </tr>
+                </>
+              )}
 
               {/* 2d Horizon */}
-              <tr className="bg-survey-paper/30 dark:bg-night-bg/30 hover:bg-survey-paper/50">
-                <td className="p-3 font-mono font-bold" rowSpan={2}>t + 2d (48h)</td>
-                <td className="p-3 font-semibold text-survey-ink dark:text-night-text">LightGBM (Primary)</td>
-                <td className="p-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">{m2d?.accuracy_pct}%</td>
-                <td className="p-3 font-mono font-bold">{m2d?.macro_f1_pct}%</td>
-                <td className="p-3 font-mono">{m2d?.false_alarm_rate_pct}%</td>
-                <td className="p-3 font-mono">{m2d?.missed_event_rate_pct}%</td>
-                <td className="p-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">{m2d?.orange_red_recall_pct}%</td>
-              </tr>
-              <tr className="hover:bg-survey-paper/50">
-                <td className="p-3 text-survey-slate dark:text-night-slate">Persistence Baseline</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['2d']?.persistence_baseline?.accuracy_pct}%</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['2d']?.persistence_baseline?.macro_f1_pct}%</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['2d']?.persistence_baseline?.false_alarm_rate_pct}%</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['2d']?.persistence_baseline?.missed_event_rate_pct}%</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['2d']?.persistence_baseline?.orange_red_recall_pct}%</td>
-              </tr>
+              {heldout2d && (
+                <>
+                  <tr className="bg-survey-paper/30 dark:bg-night-bg/30 hover:bg-survey-paper/50">
+                    <td className="p-3 font-mono font-bold" rowSpan={4}>t + 2d (48h)</td>
+                    <td className="p-3 font-semibold text-survey-ink dark:text-night-text">LightGBM (Primary)</td>
+                    <td className="p-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">{heldout2d.lightgbm.macro_f1_pct}%</td>
+                    <td className="p-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">{heldout2d.lightgbm.orange_red_recall_pct}%</td>
+                    <td className="p-3 font-mono">{heldout2d.lightgbm.orange_red_precision_pct}%</td>
+                    <td className="p-3 font-mono">{heldout2d.lightgbm.false_alarm_rate_pct}%</td>
+                    <td className="p-3 font-mono">{heldout2d.lightgbm.false_alarms_per_station_year}</td>
+                    <td className="p-3 font-mono text-survey-slate dark:text-night-slate">{heldout2d.lightgbm.accuracy_pct}%</td>
+                  </tr>
+                  <tr className="hover:bg-survey-paper/50">
+                    <td className="p-3 text-survey-slate dark:text-night-slate">Linear (Logistic Regression) [Pure NumPy]</td>
+                    <td className="p-3 font-mono">{heldout2d.linear_logistic_regression.macro_f1_pct}%</td>
+                    <td className="p-3 font-mono">{heldout2d.linear_logistic_regression.orange_red_recall_pct}%</td>
+                    <td className="p-3 font-mono">{heldout2d.linear_logistic_regression.orange_red_precision_pct}%</td>
+                    <td className="p-3 font-mono">{heldout2d.linear_logistic_regression.false_alarm_rate_pct}%</td>
+                    <td className="p-3 font-mono">{heldout2d.linear_logistic_regression.false_alarms_per_station_year}</td>
+                    <td className="p-3 font-mono text-survey-slate dark:text-night-slate">{heldout2d.linear_logistic_regression.accuracy_pct}%</td>
+                  </tr>
+                  <tr className="hover:bg-survey-paper/50">
+                    <td className="p-3 text-survey-slate dark:text-night-slate">Persistence Baseline</td>
+                    <td className="p-3 font-mono">{heldout2d.persistence_baseline.macro_f1_pct}%</td>
+                    <td className="p-3 font-mono">{heldout2d.persistence_baseline.orange_red_recall_pct}%</td>
+                    <td className="p-3 font-mono">{heldout2d.persistence_baseline.orange_red_precision_pct}%</td>
+                    <td className="p-3 font-mono">{heldout2d.persistence_baseline.false_alarm_rate_pct}%</td>
+                    <td className="p-3 font-mono">{heldout2d.persistence_baseline.false_alarms_per_station_year}</td>
+                    <td className="p-3 font-mono text-survey-slate dark:text-night-slate">{heldout2d.persistence_baseline.accuracy_pct}%</td>
+                  </tr>
+                  <tr className="hover:bg-survey-paper/50">
+                    <td className="p-3 text-survey-slate dark:text-night-slate">Rainfall Threshold Rule</td>
+                    <td className="p-3 font-mono">{heldout2d.threshold_baseline.macro_f1_pct}%</td>
+                    <td className="p-3 font-mono">{heldout2d.threshold_baseline.orange_red_recall_pct}%</td>
+                    <td className="p-3 font-mono">{heldout2d.threshold_baseline.orange_red_precision_pct}%</td>
+                    <td className="p-3 font-mono">{heldout2d.threshold_baseline.false_alarm_rate_pct}%</td>
+                    <td className="p-3 font-mono">{heldout2d.threshold_baseline.false_alarms_per_station_year}</td>
+                    <td className="p-3 font-mono text-survey-slate dark:text-night-slate">{heldout2d.threshold_baseline.accuracy_pct}%</td>
+                  </tr>
+                </>
+              )}
 
               {/* 3d Horizon */}
-              <tr className="bg-survey-paper/30 dark:bg-night-bg/30 hover:bg-survey-paper/50">
-                <td className="p-3 font-mono font-bold" rowSpan={2}>t + 3d (72h)</td>
-                <td className="p-3 font-semibold text-survey-ink dark:text-night-text">LightGBM (Primary)</td>
-                <td className="p-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">{m3d?.accuracy_pct}%</td>
-                <td className="p-3 font-mono font-bold">{m3d?.macro_f1_pct}%</td>
-                <td className="p-3 font-mono">{m3d?.false_alarm_rate_pct}%</td>
-                <td className="p-3 font-mono">{m3d?.missed_event_rate_pct}%</td>
-                <td className="p-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">{m3d?.orange_red_recall_pct}%</td>
-              </tr>
-              <tr className="hover:bg-survey-paper/50">
-                <td className="p-3 text-survey-slate dark:text-night-slate">Persistence Baseline</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['3d']?.persistence_baseline?.accuracy_pct}%</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['3d']?.persistence_baseline?.macro_f1_pct}%</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['3d']?.persistence_baseline?.false_alarm_rate_pct}%</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['3d']?.persistence_baseline?.missed_event_rate_pct}%</td>
-                <td className="p-3 font-mono">{metrics?.multi_horizon_time_split['3d']?.persistence_baseline?.orange_red_recall_pct}%</td>
-              </tr>
+              {heldout3d && (
+                <>
+                  <tr className="bg-survey-paper/30 dark:bg-night-bg/30 hover:bg-survey-paper/50">
+                    <td className="p-3 font-mono font-bold" rowSpan={4}>t + 3d (72h)</td>
+                    <td className="p-3 font-semibold text-survey-ink dark:text-night-text">LightGBM (Primary)</td>
+                    <td className="p-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">{heldout3d.lightgbm.macro_f1_pct}%</td>
+                    <td className="p-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">{heldout3d.lightgbm.orange_red_recall_pct}%</td>
+                    <td className="p-3 font-mono">{heldout3d.lightgbm.orange_red_precision_pct}%</td>
+                    <td className="p-3 font-mono">{heldout3d.lightgbm.false_alarm_rate_pct}%</td>
+                    <td className="p-3 font-mono">{heldout3d.lightgbm.false_alarms_per_station_year}</td>
+                    <td className="p-3 font-mono text-survey-slate dark:text-night-slate">{heldout3d.lightgbm.accuracy_pct}%</td>
+                  </tr>
+                  <tr className="hover:bg-survey-paper/50">
+                    <td className="p-3 text-survey-slate dark:text-night-slate">Linear (Logistic Regression) [Pure NumPy]</td>
+                    <td className="p-3 font-mono">{heldout3d.linear_logistic_regression.macro_f1_pct}%</td>
+                    <td className="p-3 font-mono">{heldout3d.linear_logistic_regression.orange_red_recall_pct}%</td>
+                    <td className="p-3 font-mono">{heldout3d.linear_logistic_regression.orange_red_precision_pct}%</td>
+                    <td className="p-3 font-mono">{heldout3d.linear_logistic_regression.false_alarm_rate_pct}%</td>
+                    <td className="p-3 font-mono">{heldout3d.linear_logistic_regression.false_alarms_per_station_year}</td>
+                    <td className="p-3 font-mono text-survey-slate dark:text-night-slate">{heldout3d.linear_logistic_regression.accuracy_pct}%</td>
+                  </tr>
+                  <tr className="hover:bg-survey-paper/50">
+                    <td className="p-3 text-survey-slate dark:text-night-slate">Persistence Baseline</td>
+                    <td className="p-3 font-mono">{heldout3d.persistence_baseline.macro_f1_pct}%</td>
+                    <td className="p-3 font-mono">{heldout3d.persistence_baseline.orange_red_recall_pct}%</td>
+                    <td className="p-3 font-mono">{heldout3d.persistence_baseline.orange_red_precision_pct}%</td>
+                    <td className="p-3 font-mono">{heldout3d.persistence_baseline.false_alarm_rate_pct}%</td>
+                    <td className="p-3 font-mono">{heldout3d.persistence_baseline.false_alarms_per_station_year}</td>
+                    <td className="p-3 font-mono text-survey-slate dark:text-night-slate">{heldout3d.persistence_baseline.accuracy_pct}%</td>
+                  </tr>
+                  <tr className="hover:bg-survey-paper/50">
+                    <td className="p-3 text-survey-slate dark:text-night-slate">Rainfall Threshold Rule</td>
+                    <td className="p-3 font-mono">{heldout3d.threshold_baseline.macro_f1_pct}%</td>
+                    <td className="p-3 font-mono">{heldout3d.threshold_baseline.orange_red_recall_pct}%</td>
+                    <td className="p-3 font-mono">{heldout3d.threshold_baseline.orange_red_precision_pct}%</td>
+                    <td className="p-3 font-mono">{heldout3d.threshold_baseline.false_alarm_rate_pct}%</td>
+                    <td className="p-3 font-mono">{heldout3d.threshold_baseline.false_alarms_per_station_year}</td>
+                    <td className="p-3 font-mono text-survey-slate dark:text-night-slate">{heldout3d.threshold_baseline.accuracy_pct}%</td>
+                  </tr>
+                </>
+              )}
             </tbody>
           </table>
         </div>
       </section>
 
-      {/* Section: Kerala August 2018 Historic Backtest */}
-      <section className="space-y-4">
-        <div className="flex items-center gap-2">
-          <ShieldCheck className="h-5 w-5 text-survey-teal dark:text-night-teal" />
-          <h2 className="font-serif text-xl font-bold text-survey-ink dark:text-night-text">Held-Out 2018 Flood Event Validation & Backtest</h2>
-        </div>
+      {/* Per-Station 2018 Lead Time & False Alarm Breakdown Table */}
+      <section className="space-y-3">
+        <h2 className="font-serif text-xl font-bold text-survey-ink dark:text-night-text">Per-Station 2018 Flood Event Breakdown</h2>
+        <p className="font-sans text-xs text-survey-slate dark:text-night-slate">
+          Actual Orange/Red days, predicted high-risk days, false alarm days, and August 2018 warning lead times per station (capped at 3-day max horizon).
+        </p>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-          <div className="lg:col-span-7 rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card p-2">
-            <img
-              src="/reports/kerala_2018_backtest.png"
-              alt="Kerala 2018 Backtest Lead Time Chart"
-              className="w-full h-auto rounded border border-survey-border/50"
-            />
-          </div>
-          <div className="lg:col-span-5 space-y-3 font-sans text-xs text-survey-ink dark:text-night-text leading-relaxed">
-            <div className="rounded bg-survey-paper dark:bg-night-bg p-3 border border-survey-border dark:border-night-border">
-              <h3 className="font-serif font-bold text-sm text-survey-teal dark:text-night-teal mb-1">Genuinely Out-of-Sample Protocol</h3>
-              <p>
-                Year 2018 (including a 7-day safety buffer on each side: 2017-12-25 to 2019-01-07) was strictly removed from training data.
-                Station discharge percentiles were recalculated strictly on non-2018 training data.
-              </p>
-            </div>
-            <ul className="space-y-2 list-disc list-inside">
-              <li><strong>Accuracy:</strong> {heldout?.accuracy_pct}% on held-out 2018 dataset.</li>
-              <li><strong>Macro F1:</strong> {heldout?.macro_f1_pct}% (vs Persistence {metrics?.heldout_2018_event_test?.persistence_baseline?.macro_f1_pct}%).</li>
-              <li><strong>High-Risk Recall:</strong> {heldout?.orange_red_recall_pct}% recall on severe Orange/Red alert days.</li>
-              <li><strong>Lead Time:</strong> Median warning lead time of <strong>{metrics?.kerala_2018_median_lead_time_days} days ({metrics?.kerala_2018_median_lead_time_hours} hours)</strong> prior to peak discharge across Kerala stations.</li>
-            </ul>
-          </div>
+        <div className="overflow-x-auto rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card">
+          <table className="w-full text-left border-collapse font-sans text-xs">
+            <thead>
+              <tr className="border-b border-survey-border dark:border-night-border bg-survey-paper dark:bg-night-bg font-mono text-[11px] text-survey-teal dark:text-night-teal uppercase">
+                <th className="p-3">Station ID</th>
+                <th className="p-3">Actual Orange/Red Days (2018)</th>
+                <th className="p-3">Predicted High-Risk Days</th>
+                <th className="p-3">False Alarm Days (2018)</th>
+                <th className="p-3">August 2018 Warning Lead Time</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-survey-border/40 dark:divide-night-border/40">
+              {Object.entries(stationDetails).map(([stId, details]) => (
+                <tr key={stId} className="hover:bg-survey-paper/50 dark:hover:bg-night-bg/50 font-mono">
+                  <td className="p-3 font-bold text-survey-ink dark:text-night-text">{stId}</td>
+                  <td className="p-3 text-amber-700 dark:text-amber-400 font-bold">{details.actual_orange_red_days_2018} days</td>
+                  <td className="p-3">{details.predicted_orange_red_days_2018} days</td>
+                  <td className="p-3">{details.false_alarm_days_2018} days</td>
+                  <td className="p-3 text-emerald-600 dark:text-emerald-400 font-bold">
+                    {details.august_2018_lead_time_days} Days ({details.august_2018_lead_time_hours}h)
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
 
       {/* Section: Confusion Matrix & Feature Importance */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
         <div className="rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card p-4 space-y-3">
           <h3 className="font-serif text-lg font-bold text-survey-ink dark:text-night-text">Held-Out 2018 Confusion Matrix</h3>
           <img src="/reports/confusion_matrix.png" alt="Confusion Matrix" className="w-full h-auto rounded border border-survey-border/40" />
@@ -215,7 +291,6 @@ export const ModelMethodPage: React.FC = () => {
           <h3 className="font-serif text-lg font-bold text-survey-ink dark:text-night-text">Feature Importance Ranking</h3>
           <img src="/reports/feature_importance.png" alt="Feature Importance" className="w-full h-auto rounded border border-survey-border/40" />
         </div>
-
       </section>
 
     </div>

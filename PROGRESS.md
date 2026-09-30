@@ -1,6 +1,6 @@
 # FloodSense Development Progress
 
-## Current Status: FIX AND AUDIT ROUND 2 COMPLETED
+## Current Status: ROUND 3 (VERIFICATION, HONESTY & SUBMISSION PACK) COMPLETED
 
 ### Phase Checklist
 - [x] **Phase 0: Plan & Setup**
@@ -9,13 +9,16 @@
 - [x] **Phase 3: Alert Engine & Multilingual Bot**
 - [x] **Phase 4: Frontend Development ("Hydrological Survey Atlas")**
 - [x] **Phase 5: Packaging & Submission Polish**
-- [x] **Fix & Audit Round 2** (OpenTopoMap/OSRM keyless tiles, 4s offline tile timeout fallback, daily resolution dataset 1990-2025 with 131,490 daily samples, station training-period discharge percentiles, multi-horizon 1d/2d/3d models, held-out 2018 validation protocol, LOSO test, dynamic metrics.json, Pytest test suite, clean frontend build, and screenshot generation)
+- [x] **Fix & Audit Round 2** (OpenTopoMap/OSRM keyless tiles, 4s offline tile timeout fallback, daily resolution dataset 1990-2025, multi-horizon models, held-out 2018 validation)
+- [x] **Round 3: Verification, Honesty & Submission Pack** (Night Watch dark theme map filter, pure-Python NumPy Logistic Regression baseline, per-horizon baselines on held-out 2018 set, UI metric honesty, rating curve consistency, SIMULATED badges, guided demo tour, submission answers, video script, clean git & docker checks)
 
 ---
 
 ### Detailed Log
-#### Fix & Audit Round 2
-- **FIX A (Map)**: Updated `FloodMap.tsx` with keyless OpenTopoMap tiles (light mode) and desaturated OSM tiles (dark mode). Implemented 4-second timeout to vector GeoJSON fallback (`KERALA_BOUNDARY_GEOJSON` and `ASSAM_BOUNDARY_GEOJSON`), `fitBounds` centering, and station label decluttering at zoom >= 9.
-- **FIX B (Data & ML Pipeline)**: Rebuilt long-term historical dataset at DAILY resolution spanning 1990–2025 across 10 gauging stations (131,490 daily samples saved to `/data/raw/`). Station danger thresholds defined by training period discharge percentiles (p90=Yellow, p97=Orange, p99.5=Red). Evaluated 3 validation protocols: Time split with 7d gap, Genuinely out-of-sample Held-Out Year 2018 Flood Event set, and Leave-One-Station-Out (LOSO). Trained multi-horizon models (1d, 2d, 3d lead times). Replaced LogisticRegression with LightGBM baselines to bypass Windows AppLocker DLL policy blocks.
-- **FIX C (Dynamic UI Metrics)**: Updated `api.ts`, `LandingPage.tsx`, `ModelMethodPage.tsx`, and `ScenarioReplayPage.tsx` to read dynamic metrics from `reports/metrics.json` without hardcoding. Updated `README.md`, `docs/model_card.md`, and `reports/model_report.md`.
-- **FIX D (Verification & Deliverables)**: Passed all 13 Pytest tests (`pytest -v`), executed clean frontend production build (`npm run build` with 0 errors), populated `/docs/screenshots/` with evaluation charts.
+#### Round 3 Summary
+- **Map Polish (A)**: Enforced `.dark .leaflet-tile-pane` dark theme filter (`invert(1) hue-rotate(180deg) desaturate(0.8) brightness(0.55)`). Replaced crude ocean-crossing outlines in `regionOutlines.ts` with real coastal-tracing polygon coordinates for Kerala and Assam boundaries and channel paths for Periyar, Pamba, and Brahmaputra rivers.
+- **ML Honesty & Pure-Python Baseline (B)**: Implemented `LogisticRegressionNumPy` (OvR Logistic Regression in pure Python/NumPy without compiled C-extensions). Evaluated LightGBM, Linear Logistic Regression, Persistence, and Threshold Rule baselines across 1d, 2d, 3d horizons on the held-out 2018 test set. Shifted landing headline metrics to Macro F1 (84.71%) vs Persistence (85.58%), High-Risk Recall (91.40%), and Warning Lead Time (2 Days / 48 Hours, capped at 3-day max horizon). Exported per-station 2018 lead times, actual Orange/Red days, and false alarms.
+- **Simulator Rating Curve & SIMULATED Badges (C)**: Standardized stage-to-discharge rating curve conversion ($Q = a \cdot (h - h_0)^b$). Added `SimulatedBadge` (`[SIMULATED TELEMETRY]`) to Live Monitor and WaterLevelGauge header cards.
+- **Guided Demo Tour (E)**: Created `GuidedDemoModal.tsx` on the Landing Page providing a skippable 5-step interactive tour of Live Monitor, Kerala 2018 Replay, What-If Slider, Alert Outbox, and Model Audit page.
+- **Submission Pack (F)**: Created `submission/submission_answers.md`, `scripts/record_demo.md`, `scripts/generate_screenshots_docs.py`, and updated `README.md`, `docs/model_card.md`, and `reports/model_report.md`.
+- **Final Checks (G)**: 13/13 Pytest tests passed (`pytest -v`), frontend compiled with 0 errors (`npm run build`).

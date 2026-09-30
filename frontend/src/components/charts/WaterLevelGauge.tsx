@@ -28,7 +28,7 @@ export const WaterLevelGauge: React.FC<GaugeProps> = ({
     <div className="rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card p-4 shadow-xs">
       <div className="flex items-center justify-between mb-3 border-b border-survey-border/60 dark:border-night-border/60 pb-2">
         <div>
-          <span className="font-mono text-xs text-survey-teal dark:text-night-teal uppercase tracking-wider block">HYDROLOGICAL GAUGE</span>
+          <span className="font-mono text-xs text-survey-teal dark:text-night-teal uppercase tracking-wider block">HYDROLOGICAL GAUGE (SIMULATED NODE)</span>
           <span className="font-serif text-base font-bold text-survey-ink dark:text-night-text">{station.name} ({station.river})</span>
         </div>
         <div className="flex items-center gap-3 text-xs font-mono text-survey-slate dark:text-night-slate">

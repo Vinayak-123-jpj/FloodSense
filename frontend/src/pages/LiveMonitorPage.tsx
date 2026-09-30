@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { FloodMap } from '../components/map/FloodMap';
 import { WaterLevelGauge } from '../components/charts/WaterLevelGauge';
 import { HydrologicalChart } from '../components/charts/HydrologicalChart';
-import { RiskBadge } from '../components/common/Badge';
+import { RiskBadge, SimulatedBadge } from '../components/common/Badge';
 import { Station, Reading, ForecastHour } from '../types';
 import { api } from '../services/api';
 import { Radio, AlertCircle, Cpu, Wifi } from 'lucide-react';
@@ -150,7 +150,10 @@ export const LiveMonitorPage: React.FC = () => {
               <div className="rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card p-4 space-y-3">
                 <div className="flex items-start justify-between">
                   <div>
-                    <span className="font-mono text-xs text-survey-teal dark:text-night-teal block">{selectedStation.id} • {selectedStation.region}</span>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-mono text-xs text-survey-teal dark:text-night-teal block">{selectedStation.id} • {selectedStation.region}</span>
+                      <SimulatedBadge />
+                    </div>
                     <h2 className="font-serif text-xl font-bold text-survey-ink dark:text-night-text">{selectedStation.name}</h2>
                     <span className="font-sans text-xs text-survey-slate dark:text-night-slate">{selectedStation.river}</span>
                   </div>
