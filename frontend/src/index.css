@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-survey-paper dark:bg-night-bg text-survey-ink dark:text-night-text;
+  }
+}
+
+/* Custom Leaflet desaturated map overrides */
+.leaflet-container {
+  font-family: inherit;
+}
+
+.custom-leaflet-popup .leaflet-popup-content-wrapper {
+  background-color: #FAF7F0;
+  border: 1px solid #D8D2C2;
+  border-radius: 4px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.dark .custom-leaflet-popup .leaflet-popup-content-wrapper {
+  background-color: #131E28;
+  border-color: #1F2D3A;
+  color: #E6E1D5;
+}
+
+.custom-leaflet-popup .leaflet-popup-tip {
+  background-color: #FAF7F0;
+}
+
+.dark .custom-leaflet-popup .leaflet-popup-tip {
+  background-color: #131E28;
+}
