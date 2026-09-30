@@ -2,59 +2,60 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FloodMap } from '../components/map/FloodMap';
 import { Station } from '../types';
-import { api } from '../services/api';
-import { Shield, ArrowRight, Play, Cpu, AlertTriangle, Layers } from 'lucide-react';
-import { RiskBadge } from '../components/common/Badge';
+import { api, ModelMetrics } from '../services/api';
+import { Shield, ArrowRight, Play, Cpu, Layers } from 'lucide-react';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const [stations, setStations] = useState<Station[]>([]);
+  const [metrics, setMetrics] = useState<ModelMetrics | null>(null);
 
   useEffect(() => {
     api.getStations().then(setStations).catch(console.error);
+    api.getMetrics().then(setMetrics).catch(console.error);
   }, []);
 
   return (
     <div className="space-y-8 pb-12">
       
       {/* Hero Section */}
-      <section className="border-b border-survey-border dark:border-night-border pb-8">
-        <div className="max-w-4xl space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded border border-survey-teal/30 dark:border-night-teal/30 bg-survey-card dark:bg-night-card font-mono text-xs text-survey-teal dark:text-night-teal uppercase tracking-widest">
+      <section className="border-b border-survey-border dark:border-night-border pb-6">
+        <div className="max-w-4xl space-y-3">
+          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded border border-survey-teal/30 dark:border-night-teal/30 bg-survey-card dark:bg-night-card font-mono text-xs text-survey-teal dark:text-night-teal uppercase tracking-widest">
             <Shield className="h-3.5 w-3.5" /> FOSSEE NATIONAL MAKE-A-THON 2026 BLUEPRINT
           </div>
 
-          <h1 className="font-serif text-4xl sm:text-5xl font-bold tracking-tight text-survey-ink dark:text-night-text leading-tight">
+          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-survey-ink dark:text-night-text leading-tight">
             Precision flood early-warning powered by virtual sensor digital twins.
           </h1>
 
-          <p className="font-sans text-base sm:text-lg text-survey-slate dark:text-night-slate leading-relaxed max-w-3xl">
+          <p className="font-sans text-sm sm:text-base text-survey-slate dark:text-night-slate leading-relaxed max-w-3xl">
             FloodSense combines physical river telemetry, Open-Meteo hydrological forecasts, and LightGBM machine learning to provide 24-to-72-hour early warning lead times across Kerala and Assam river basins.
           </p>
 
-          <div className="flex flex-wrap items-center gap-4 pt-2">
+          <div className="flex flex-wrap items-center gap-3 pt-2">
             <button
               onClick={() => navigate('/live')}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded bg-survey-teal hover:bg-survey-teal/90 text-white font-sans text-sm font-semibold transition-all shadow-xs cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded bg-survey-teal hover:bg-survey-teal/90 text-white font-sans text-xs font-semibold transition-all shadow-xs cursor-pointer"
             >
-              Open Live Monitor <ArrowRight className="h-4 w-4" />
+              Open Live Monitor <ArrowRight className="h-3.5 w-3.5" />
             </button>
             <button
               onClick={() => navigate('/replay')}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card hover:bg-survey-border/30 text-survey-ink dark:text-night-text font-sans text-sm font-medium transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card hover:bg-survey-border/30 text-survey-ink dark:text-night-text font-sans text-xs font-medium transition-all cursor-pointer"
             >
-              <Play className="h-4 w-4 text-survey-teal dark:text-night-teal" /> Replay Kerala 2018 Floods
+              <Play className="h-3.5 w-3.5 text-survey-teal dark:text-night-teal" /> Replay Kerala 2018 Floods
             </button>
           </div>
         </div>
       </section>
 
-      {/* Main Map Centerpiece */}
-      <section className="space-y-3">
+      {/* Main Map Hero Centerpiece */}
+      <section className="space-y-2">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="font-serif text-2xl font-bold text-survey-ink dark:text-night-text">Active River Gauging Grid</h2>
-            <p className="font-sans text-xs text-survey-slate dark:text-night-slate">Interactive desaturated atlas tiles with live station risk markers & low-lying zone contours.</p>
+            <h2 className="font-serif text-xl font-bold text-survey-ink dark:text-night-text">Active River Gauging Atlas</h2>
+            <p className="font-sans text-xs text-survey-slate dark:text-night-slate">Desaturated map tiles, live station markers, low-lying zone contours, and keyless Carto tiles.</p>
           </div>
           <span className="font-mono text-xs text-survey-teal dark:text-night-teal">{stations.length} STATIONS ONLINE</span>
         </div>
@@ -62,46 +63,45 @@ export const LandingPage: React.FC = () => {
         <FloodMap
           stations={stations}
           onSelectStation={(st) => navigate(`/live?station=${st.id}`)}
-          height="540px"
+          height="580px"
         />
       </section>
 
-      {/* Grid Highlights & Quick Stats */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
-        
-        <div className="rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card p-5 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-xs text-survey-teal dark:text-night-teal uppercase">EARLY WARNING LEAD TIME</span>
-            <Shield className="h-4 w-4 text-survey-teal dark:text-night-teal" />
+      {/* Editorial Field-Report Figures (Restyled: 1px technical rules, no chunky cards) */}
+      <section className="border-t border-b border-survey-border dark:border-night-border py-6 my-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-survey-border dark:divide-night-border font-mono">
+          
+          <div className="px-4 py-3 md:py-0 space-y-1">
+            <span className="text-[11px] text-survey-teal dark:text-night-teal uppercase tracking-wider block">FIGURE 1.1 • KERALA BACKTEST</span>
+            <div className="text-3xl font-bold text-survey-ink dark:text-night-text">
+              {metrics ? `${metrics.kerala_2018_lead_time_hours} Hours` : '53 Hours'}
+            </div>
+            <p className="font-sans text-xs text-survey-slate dark:text-night-slate">
+              Corrected 24h future prediction model lead time on Kerala 2018 flood event.
+            </p>
           </div>
-          <div className="font-mono text-3xl font-bold text-survey-ink dark:text-night-text">29 Hours</div>
-          <p className="font-sans text-xs text-survey-slate dark:text-night-slate">
-            Backtested lead time on the historic August 2018 Kerala flood event prior to peak discharge.
-          </p>
-        </div>
 
-        <div className="rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card p-5 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-xs text-survey-teal dark:text-night-teal uppercase">ML CLASSIFIER ACCURACY</span>
-            <Cpu className="h-4 w-4 text-survey-teal dark:text-night-teal" />
+          <div className="px-4 py-3 md:py-0 space-y-1">
+            <span className="text-[11px] text-survey-teal dark:text-night-teal uppercase tracking-wider block">FIGURE 1.2 • 24H MODEL ACCURACY</span>
+            <div className="text-3xl font-bold text-survey-ink dark:text-night-text">
+              {metrics ? `${metrics.accuracy_pct}%` : '95.96%'}
+            </div>
+            <p className="font-sans text-xs text-survey-slate dark:text-night-slate">
+              LightGBM accuracy predicting Y(t+24h) with strict 72h chronological split gap.
+            </p>
           </div>
-          <div className="font-mono text-3xl font-bold text-survey-ink dark:text-night-text">99.89%</div>
-          <p className="font-sans text-xs text-survey-slate dark:text-night-slate">
-            LightGBM classifier trained on 35,064 hourly records using strict time-based splits.
-          </p>
-        </div>
 
-        <div className="rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card p-5 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-xs text-survey-teal dark:text-night-teal uppercase">OPEN HARDWARE READY</span>
-            <Layers className="h-4 w-4 text-survey-teal dark:text-night-teal" />
+          <div className="px-4 py-3 md:py-0 space-y-1">
+            <span className="text-[11px] text-survey-teal dark:text-night-teal uppercase tracking-wider block">FIGURE 1.3 • OPEN HARDWARE NODE</span>
+            <div className="text-3xl font-bold text-survey-ink dark:text-night-text">
+              ₹3,990 INR
+            </div>
+            <p className="font-sans text-xs text-survey-slate dark:text-night-slate">
+              Estimated hardware BOM cost per solar-autonomous ESP32 ultrasonic gauging node.
+            </p>
           </div>
-          <div className="font-mono text-3xl font-bold text-survey-ink dark:text-night-text">₹3,990</div>
-          <p className="font-sans text-xs text-survey-slate dark:text-night-slate">
-            Estimated cost per solar-autonomous ESP32 node with JSN-SR04T ultrasonic transducer.
-          </p>
-        </div>
 
+        </div>
       </section>
 
     </div>

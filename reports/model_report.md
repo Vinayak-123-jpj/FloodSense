@@ -1,85 +1,100 @@
-# FloodSense Machine Learning Risk Model Evaluation Report
+# FloodSense Machine Learning Risk Model & Leakage Audit Report
 
-## Executive Summary
-- **Primary Algorithm**: LightGBM Classifier
-- **Evaluation Method**: Strict Chronological Time-Based Train/Test Split (80% Train / 20% Test)
-- **Overall Accuracy**: **99.89%**
-- **Macro F1-Score**: **97.31%**
-- **False Alarm Rate (Red Alerts)**: **0.00%**
-- **Kerala August 2018 Historic Event Backtest Lead Time**: **29 Hours**
+## Executive Summary & Honest Audit Findings
+- **Prediction Task**: 24-Hour Future Flood Risk Classification ($Y_{t+24	ext{h}}$)
+- **Data Leakage Audit Status**: **PASSED (Corrected)**
+- **Overall Accuracy**: **95.96%**
+- **Macro F1-Score (ML Model)**: **40.91%**
+- **Persistence Baseline Macro F1**: **48.68%**
+- **Threshold Rule Baseline Macro F1**: **44.39%**
+- **False Alarm Rate (Orange/Red Alerts)**: **0.07%**
+- **Missed Event Rate (Orange/Red Alerts)**: **98.08%**
+- **Kerala August 2018 Backtest Lead Time**: **53 Hours** *(Note: Open-Meteo Flood API river discharge is daily data granularity)*
 
 ---
 
-## 1. Train/Test Split & Dataset Overview
-Data was compiled from real Open-Meteo Historical Weather and Flood APIs for Kerala (Periyar basin) and Assam (Brahmaputra basin).
-
+## 1. Data Leakage Audit & Task Redefinition
 > [!IMPORTANT]
-> **Data Leakage Prevention**: A strict **chronological time split** was enforced. The model was trained on early historic timestamps and evaluated exclusively on future unseen timestamps. Random cross-validation splits were avoided as they leak future hydrological trends into past predictions.
+> **Leakage Audit Resolution**: In early iterations, predicting risk level at time $t$ using discharge measured at time $t$ caused target leakage because current discharge directly encodes current risk.
+> **Corrected Definition**: Features at time $t$ use ONLY data available up to time $t$. The target variable is redefined as the **future risk level at $t + 24	ext{h}$**. This establishes a genuine early warning forecasting task. A **72-hour chronological gap** was enforced between train and test sets to eliminate rolling window overlaps.
 
-- Total Ingested Telemetry Samples: `35,064` hourly records
-- Training Set (First 80%): `28,051` samples
-- Test Set (Unseen Last 20%): `7,013` samples
-
----
-
-## 2. Performance Metrics vs Baseline Model
-
-### FloodSense LightGBM Classifier
-```text
-              precision    recall  f1-score   support
-
-       Green       1.00      1.00      1.00      6558
-      Yellow       0.98      1.00      0.99       403
-      Orange       0.98      0.88      0.93        52
-
-    accuracy                           1.00      7013
-   macro avg       0.99      0.96      0.97      7013
-weighted avg       1.00      1.00      1.00      7013
-
-```
-
-### Threshold Baseline Model (Single-Variable Rule Benchmark)
-```text
-              precision    recall  f1-score   support
-
-       Green       1.00      0.93      0.97      6558
-      Yellow       0.42      0.78      0.55       403
-      Orange       0.37      1.00      0.54        52
-
-    accuracy                           0.93      7013
-   macro avg       0.60      0.91      0.69      7013
-weighted avg       0.96      0.93      0.94      7013
-
-```
+- **Total Telemetry Samples**: `35,016` hourly records
+- **Train Set (80%)**: `28,012` samples
+- **72h Chronological Gap**: 72 hours excluded
+- **Test Set (20%)**: `6,932` samples
 
 ---
 
-## 3. Confusion Matrix
+## 2. Performance Comparison vs Baselines
+
+### FloodSense 24h Future LightGBM Classifier
+```text
+              precision    recall  f1-score   support
+
+       Green       0.98      0.99      0.98      6477
+      Yellow       0.66      0.65      0.65       403
+      Orange       0.00      0.00      0.00        52
+         Red       0.00      0.00      0.00         0
+
+    accuracy                           0.96      6932
+   macro avg       0.41      0.41      0.41      6932
+weighted avg       0.95      0.96      0.96      6932
+
+```
+
+### Baseline (a): Persistence Model (Future Risk at t+24h = Current Risk at t)
+```text
+              precision    recall  f1-score   support
+
+       Green       0.98      0.98      0.98      6477
+      Yellow       0.57      0.57      0.57       403
+      Orange       0.40      0.40      0.40        52
+         Red       0.00      0.00      0.00         0
+
+    accuracy                           0.95      6932
+   macro avg       0.49      0.49      0.49      6932
+weighted avg       0.95      0.95      0.95      6932
+
+```
+
+### Baseline (b): Threshold Rule Model (Single-Variable Rule Benchmark)
+```text
+              precision    recall  f1-score   support
+
+       Green       0.99      0.92      0.96      6477
+      Yellow       0.33      0.62      0.43       403
+      Orange       0.26      0.71      0.39        52
+         Red       0.00      0.00      0.00         0
+
+    accuracy                           0.91      6932
+   macro avg       0.40      0.56      0.44      6932
+weighted avg       0.95      0.91      0.92      6932
+
+```
+
+---
+
+## 3. Class Distribution & Imbalance Audit
+- **Train Set Distribution**: `{'Green': 25311, 'Yellow': 2288, 'Orange': 346, 'Red': 67}`
+- **Test Set Distribution**: `{'Green': 6477, 'Yellow': 403, 'Orange': 52}`
+
+---
+
+## 4. Confusion Matrix & Feature Importance
 ![Confusion Matrix](confusion_matrix.png)
-
----
-
-## 4. Feature Importance
 ![Feature Importance](feature_importance.png)
-
-Top feature drivers identified by the model:
-1. `rain_sum_72h`: 72-hour cumulative precipitation (primary driver for flash floods and reservoir inflows).
-2. `discharge_m3s`: River discharge rate in m³/s.
-3. `antecedent_wetness_index`: 7-day exponential decay antecedent soil saturation.
-4. `discharge_rate_of_change_24h`: Velocity of rising floodwaters.
 
 ---
 
 ## 5. Kerala August 2018 Backtest Lead Time Analysis
 ![Kerala 2018 Backtest](kerala_2018_backtest.png)
 
-During the historic August 2018 Kerala flood event (August 8–20, 2018):
-- The model issued an **Orange/Red Flood Warning** `29 hours` prior to the peak river discharge level at the Neeleswaram / Aluva Periyar gauge.
-- **Lead Time Performance**: Provided actionable lead time for disaster management authorities to initiate evacuations before severe inundation occurred.
+During the August 2018 Kerala flood event:
+- The 24-hour future prediction model issued an **Orange/Red warning 53 hours prior** to peak discharge at Neeleswaram / Aluva.
+- **Granularity Limit**: Daily river discharge from Open-Meteo API limits intra-day peak precision to daily updates.
 
 ---
 
 ## 6. Honest Limitations & Model Failures
-- **Granularity Mismatch**: Open-Meteo Flood API provides **daily** river discharge, whereas precipitation is **hourly**. Consequently, micro-burst urban flash floods occurring under 3 hours rely heavily on the `rain_sum_6h` feature until daily discharge updates.
-- **Dam Release Anomaly**: The model currently assumes natural river hydraulics. Unannounced upstream dam spillway gate openings without rain correlation can lead to delayed predictions.
-- **False Positives**: Mild over-prediction of Yellow alerts during intense 1-hour cloudbursts that rapidly drain into soil without elevating mainstem river levels.
+- **Granularity Mismatch**: Daily river discharge vs hourly rainfall means intra-day flash floods under 3 hours rely heavily on the 6h rainfall sum feature.
+- **Unannounced Dam Releases**: Manually triggered reservoir gate openings without rain correlation can delay prediction warnings.

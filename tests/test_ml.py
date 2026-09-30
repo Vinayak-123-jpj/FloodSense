@@ -1,29 +1,29 @@
-"""Unit Tests for ML Risk Engine & Explainability.
+"""Unit Tests for ML Risk Engine, Future Target Redefinition & No-Leakage Check.
 
-Tests feature computation, model inference, fallback risk rules,
+Tests feature computation, future target shift (t+24h), model inference, fallback risk rules,
 and plain-language driver generation.
 """
 
 import pandas as pd
-from backend.ml.feature_engineering import build_features
+import numpy as np
+from backend.ml.feature_engineering import build_features, FEATURE_COLUMNS
 from backend.ml.explainability import generate_plain_language_explanation
 from backend.ml.predictor import get_model, rule_based_fallback
 from backend.models import Station
 
-def test_feature_engineering():
-    """Verifies calculation of rolling rainfall, discharge, and risk labels."""
+def test_no_leakage_feature_check():
+    """Verifies that features at time t use ONLY data available up to time t and target is shifted 24h into future."""
     df = pd.DataFrame({
         "timestamp": pd.date_range("2026-08-01", periods=100, freq="h"),
         "precipitation_mm": [5.0] * 100,
         "river_discharge_m3s": [200.0] * 100
     })
-    fe_df = build_features(df, warning_threshold_discharge=300.0, danger_threshold_discharge=550.0)
+    fe_df = build_features(df, warning_threshold_discharge=300.0, danger_threshold_discharge=550.0, horizon_hours=24)
     
-    assert "rain_sum_6h" in fe_df.columns
-    assert "rain_sum_72h" in fe_df.columns
-    assert fe_df["rain_sum_6h"].iloc[-1] == 30.0
-    assert fe_df["rain_sum_72h"].iloc[-1] == 360.0 # >250 -> Red label
-    assert fe_df["risk_label"].iloc[-1] == 3
+    assert "target_risk_future" in fe_df.columns
+    # Check that target_risk_future at row 0 equals current_risk_at_t at row 24
+    assert fe_df["target_risk_future"].iloc[0] == fe_df["current_risk_at_t"].iloc[24]
+    assert len(fe_df) == 100 - 24  # Tail shifted rows dropped
 
 def test_explainability_generator():
     """Verifies plain-language top-3 factor driver text generation."""

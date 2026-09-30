@@ -1,0 +1,25 @@
+{
+  "model_name": "LightGBM Multi-class Classifier (24h Future Risk)",
+  "prediction_horizon_hours": 24,
+  "train_samples": 28012,
+  "test_samples": 6932,
+  "split_gap_hours": 72,
+  "accuracy_pct": 95.96,
+  "macro_f1_pct": 40.91,
+  "persistence_baseline_macro_f1_pct": 48.68,
+  "threshold_baseline_macro_f1_pct": 44.39,
+  "false_alarm_rate_pct": 0.07,
+  "missed_event_rate_pct": 98.08,
+  "kerala_2018_lead_time_hours": 53,
+  "train_class_distribution": {
+    "Green": 25311,
+    "Yellow": 2288,
+    "Orange": 346,
+    "Red": 67
+  },
+  "test_class_distribution": {
+    "Green": 6477,
+    "Yellow": 403,
+    "Orange": 52
+  }
+}

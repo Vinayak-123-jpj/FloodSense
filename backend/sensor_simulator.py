@@ -26,9 +26,8 @@ class SensorNodeSimulator:
         return {
             "water_level_m": station.normal_level_m,
             "rainfall_mm_hr": 0.0,
-            "battery_pct": round(random.uniform(85.0, 100.0), 1),
-            "rssi": random.randint(-75, -55),
-            "trend_direction": 0.0,
+            "battery_pct": round(random.uniform(90.0, 100.0), 1),
+            "rssi": random.randint(-70, -55),
             "is_faulty": False
         }
 
@@ -46,9 +45,11 @@ class SensorNodeSimulator:
                 if sim_state and not sim_state.is_running:
                     return
                 rain_mult = sim_state.rain_multiplier if sim_state else 1.0
+                scenario = sim_state.current_scenario if sim_state else "live"
                 stations = db_session.query(Station).all()
             else:
                 rain_mult = 1.0
+                scenario = "live"
                 stations = []
 
             for st in stations:
@@ -57,42 +58,44 @@ class SensorNodeSimulator:
 
                 state = self.node_states[st.id]
 
-                # 1. Weather / Rainfall simulation
-                # 5% chance of monsoon rain spell starting
-                if random.random() < 0.05:
-                    state["rainfall_mm_hr"] = random.uniform(5.0, 45.0) * rain_mult
+                # 1. Weather / Rainfall simulation based on mode
+                if scenario == "kerala_2018" or rain_mult > 1.5:
+                    # High rain storm scenario
+                    state["rainfall_mm_hr"] = random.uniform(15.0, 55.0) * rain_mult
                 else:
-                    state["rainfall_mm_hr"] = max(0.0, state["rainfall_mm_hr"] * 0.85)
+                    # LIVE MODE: Normal baseline state (mostly 0mm, 2% chance of light rain 2-8mm)
+                    if random.random() < 0.02:
+                        state["rainfall_mm_hr"] = random.uniform(2.0, 8.0) * rain_mult
+                    else:
+                        state["rainfall_mm_hr"] = max(0.0, state["rainfall_mm_hr"] * 0.7)
 
-                # 2. Water level hydrological response to rainfall & discharge decay
-                rain_effect = (state["rainfall_mm_hr"] * 0.008)
-                discharge_decay = 0.003
-                state["water_level_m"] += rain_effect - discharge_decay
+                # 2. Hydrological response: relaxation towards normal_level_m + rain effect
+                rain_effect = (state["rainfall_mm_hr"] * 0.005)
+                # Pull water level smoothly back to normal_level_m baseline
+                level_decay = (st.normal_level_m - state["water_level_m"]) * 0.08
+                
+                state["water_level_m"] += rain_effect + level_decay
+                state["water_level_m"] = max(st.normal_level_m * 0.8, state["water_level_m"])
 
-                # Ensure water level stays within realistic bounds (never below 0.5m)
-                state["water_level_m"] = max(0.5, state["water_level_m"])
-
-                # Add realistic sensor Gaussian measurement noise (+/- 1.5 cm)
-                noise_m = random.gauss(0, 0.015)
+                # Add realistic sensor Gaussian measurement noise (+/- 1.0 cm)
+                noise_m = random.gauss(0, 0.010)
                 measured_water_level_m = max(0.1, state["water_level_m"] + noise_m)
                 water_level_cm = measured_water_level_m * 100.0
 
                 # 3. Battery drain & solar panel charge dynamics
-                if state["rainfall_mm_hr"] > 0:
-                    # Cloud cover -> drain battery
-                    state["battery_pct"] = max(5.0, state["battery_pct"] - random.uniform(0.01, 0.05))
+                if state["rainfall_mm_hr"] > 5.0:
+                    state["battery_pct"] = max(10.0, state["battery_pct"] - random.uniform(0.01, 0.03))
                 else:
-                    # Clear daylight -> solar charging
-                    state["battery_pct"] = min(100.0, state["battery_pct"] + random.uniform(0.02, 0.08))
+                    state["battery_pct"] = min(100.0, state["battery_pct"] + random.uniform(0.02, 0.05))
 
                 # 4. RSSI signal fluctuations
-                state["rssi"] = max(-110, min(-50, state["rssi"] + random.randint(-3, 3)))
+                state["rssi"] = max(-105, min(-50, state["rssi"] + random.randint(-2, 2)))
 
                 # 5. Packet loss simulation (2% dropped packet rate)
                 if random.random() < 0.02:
                     continue  # Packet dropped!
 
-                # Construct payload identical to physical ESP32 HTTP POST
+                # Construct payload
                 payload = {
                     "node_id": st.id,
                     "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -104,7 +107,6 @@ class SensorNodeSimulator:
                 }
 
                 if use_direct_db:
-                    # Direct Python call via API helper
                     from backend.api.readings import calculate_risk_and_drivers, trigger_alert_processing
                     risk_level, top_drivers = calculate_risk_and_drivers(db_session, st, measured_water_level_m, state["rainfall_mm_hr"])
                     
@@ -125,7 +127,6 @@ class SensorNodeSimulator:
                     db_session.commit()
                     trigger_alert_processing(db_session, st, db_reading)
                 else:
-                    # HTTP POST to API endpoint
                     try:
                         requests.post(self.api_url, json=payload, timeout=2.0)
                     except Exception:
