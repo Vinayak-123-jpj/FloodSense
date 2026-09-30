@@ -3,7 +3,7 @@
   "station_name": "Neeleswaram",
   "data_source": "REAL (Open-Meteo GloFAS & Weather Reanalysis)",
   "data_source_badge": "REAL",
-  "fetched_at": "2026-09-30T22:10:02.519331+00:00",
+  "fetched_at": "2026-09-30T22:50:33.948134+00:00",
   "is_cached": false,
   "current_observed_discharge_m3s": 160.0,
   "current_observed_water_level_m": 3.56,

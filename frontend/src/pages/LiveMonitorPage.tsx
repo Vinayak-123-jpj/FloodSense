@@ -20,7 +20,8 @@ export const LiveMonitorPage: React.FC = () => {
   const [liveLog, setLiveLog] = useState<string[]>([]);
 
   // Telemetry source mode toggle
-  const [sourceMode, setSourceMode] = useState<'REAL' | 'SIMULATED'>('REAL');
+  const initialSource = searchParams.get('source')?.toUpperCase() === 'SIMULATED' ? 'SIMULATED' : 'REAL';
+  const [sourceMode, setSourceMode] = useState<'REAL' | 'SIMULATED'>(initialSource);
   const [realLiveData, setRealLiveData] = useState<any>(null);
   const [isCachedSnapshot, setIsCachedSnapshot] = useState<boolean>(false);
   const [fetchedAt, setFetchedAt] = useState<string>('');
@@ -114,8 +115,8 @@ export const LiveMonitorPage: React.FC = () => {
       {/* Page Header Bar */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-survey-border dark:border-night-border pb-3">
         <div>
-          <span className="font-mono text-xs text-survey-teal dark:text-night-teal uppercase tracking-wider block">REAL-TIME MONITORING CONTROL ROOM</span>
-          <h1 className="font-serif text-2xl font-bold text-survey-ink dark:text-night-text">Live Hydrological Network</h1>
+          <span className="font-mono text-xs text-survey-teal dark:text-night-teal uppercase tracking-wider block">HYDROLOGICAL NETWORK MONITORING</span>
+          <h1 className="font-serif text-2xl font-bold text-survey-ink dark:text-night-text">River Station Telemetry & Risk Monitor</h1>
         </div>
 
         {/* Telemetry Source Toggle & Region Filter */}
@@ -180,7 +181,7 @@ export const LiveMonitorPage: React.FC = () => {
           <div className="rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card p-3 font-mono text-xs">
             <div className="flex items-center justify-between gap-2 mb-2">
               <div className="flex items-center gap-2 text-survey-teal dark:text-night-teal font-semibold">
-                <Radio className="h-4 w-4 animate-pulse" /> LIVE TELEMETRY TICKER STREAM (/ws/live)
+                <Radio className="h-4 w-4 animate-pulse" /> TELEMETRY STREAM
               </div>
               <SourceBadge mode={sourceMode} isCached={isCachedSnapshot} fetchedAt={fetchedAt} />
             </div>
@@ -188,7 +189,7 @@ export const LiveMonitorPage: React.FC = () => {
               {liveLog.length === 0 ? (
                 <div className="italic">
                   {sourceMode === 'REAL'
-                    ? 'Connected to Open-Meteo GloFAS discharge reanalysis & weather stream...'
+                    ? 'Connected to Open-Meteo GloFAS discharge reanalysis & forecast stream...'
                     : 'Listening for virtual ESP32 sensor broadcasts...'}
                 </div>
               ) : (
@@ -226,6 +227,7 @@ export const LiveMonitorPage: React.FC = () => {
               {/* Water Level Gauge */}
               <WaterLevelGauge
                 station={selectedStation}
+                currentDischargeM3s={selectedStation.current_discharge_m3s}
                 currentWaterLevelM={selectedStation.current_water_level_m}
                 batteryPct={selectedStation.battery_pct}
                 rssi={selectedStation.rssi}
@@ -242,9 +244,9 @@ export const LiveMonitorPage: React.FC = () => {
                     topDrivers.map((driver, i) => <li key={i}>{driver}</li>)
                   ) : (
                     <>
-                      <li>Water level within normal baseline thresholds</li>
-                      <li>72-hour cumulative precipitation forecast is nominal</li>
-                      <li>Upstream discharge flow velocity stable</li>
+                      <li>River discharge within normal baseline percentiles</li>
+                      <li>7-day cumulative rainfall below warning thresholds</li>
+                      <li>Antecedent catchment moisture levels nominal</li>
                     </>
                   )}
                 </ul>

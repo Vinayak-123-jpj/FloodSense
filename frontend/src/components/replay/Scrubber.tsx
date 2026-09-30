@@ -113,7 +113,7 @@ export const Scrubber: React.FC<ScrubberProps> = ({
           <div className="flex-1">
             <div className="flex justify-between text-xs font-mono mb-1">
               <span className="text-survey-ink dark:text-night-text font-medium flex items-center gap-1">
-                <Sliders className="h-3 w-3" /> WHAT-IF RAIN MULTIPLIER
+                <Sliders className="h-3 w-3" /> Rainfall Stress Multiplier (scenario, not a forecast)
               </span>
               <span className="text-amber-600 dark:text-amber-400 font-bold">{rainMultiplier.toFixed(1)}x Rain</span>
             </div>

@@ -1,0 +1,145 @@
+{
+  "version": 1,
+  "author": "FloodSense Team",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-esp32-devkit-c-v4",
+      "id": "esp",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-hc-sr04",
+      "id": "ultrasonic",
+      "top": -120,
+      "left": 50,
+      "attrs": {
+        "distance": "240"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_green",
+      "top": 50,
+      "left": 150,
+      "attrs": {
+        "color": "green"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_yellow",
+      "top": 80,
+      "left": 150,
+      "attrs": {
+        "color": "yellow"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_red",
+      "top": 110,
+      "left": 150,
+      "attrs": {
+        "color": "red"
+      }
+    }
+  ],
+  "connections": [
+    [
+      "esp:TX",
+      "",
+      "",
+      []
+    ],
+    [
+      "esp:RX",
+      "",
+      "",
+      []
+    ],
+    [
+      "esp:GND.1",
+      "ultrasonic:GND",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "esp:5V",
+      "ultrasonic:VCC",
+      "red",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "esp:GPIO5",
+      "ultrasonic:TRIG",
+      "blue",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "esp:GPIO18",
+      "ultrasonic:ECHO",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "esp:GPIO21",
+      "led_green:A",
+      "green",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "esp:GPIO22",
+      "led_yellow:A",
+      "gold",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "esp:GPIO23",
+      "led_red:A",
+      "red",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "esp:GND.2",
+      "led_green:C",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "esp:GND.2",
+      "led_yellow:C",
+      "black",
+      [
+        "v0"
+      ]
+    ],
+    [
+      "esp:GND.2",
+      "led_red:C",
+      "black",
+      [
+        "v0"
+      ]
+    ]
+  ],
+  "dependencies": {}
+}

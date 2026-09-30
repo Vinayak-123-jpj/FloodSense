@@ -73,26 +73,26 @@ docker compose up --build
 
 ## 4. Machine Learning Audit & Side-by-Side Baselines
 
-### Held-Out 2018 Flood Event Validation Set (100% Out-of-Sample)
+### Held-Out 2018 Flood Event Validation Set (100% Out-of-Sample, 11 Stations)
 
 | Prediction Horizon | Model / Benchmark | Macro F1 (95% CI) | Orange/Red Recall | Orange/Red Precision | False Alarm Rate (FAR) | False Alarms / Stn-Yr | Accuracy |
 |---|---|---|---|---|---|---|---|
-| **t + 1d (24h)** | **LightGBM (Primary)** | **84.71% [80.26%, 88.24%]** | **91.40%** | **76.76%** | **4.11%** | **13.20** | **90.63%** |
-| | Linear (Logistic Regression) [Pure NumPy] | 57.76% [52.10%, 63.40%] | 64.36% | 70.41% | 3.94% | 12.90 | 85.59% |
-| | Persistence Baseline | 85.58% [81.31%, 89.83%] | 87.21% | 81.25% | 2.99% | 9.60 | 91.62% |
-| | Rainfall Threshold Rule | 50.57% [45.10%, 56.20%] | 97.27% | 33.87% | 27.25% | 90.60 | 62.63% |
-| **t + 2d (48h)** | **LightGBM (Primary)** | **76.53% [71.80%, 81.20%]** | **84.91%** | **67.05%** | **6.16%** | **19.90** | **85.32%** |
-| | Linear (Logistic Regression) [Pure NumPy] | 56.49% [50.80%, 62.10%] | 67.09% | 65.31% | 5.20% | 17.00 | 83.62% |
-| | Persistence Baseline | 74.07% [69.10%, 79.00%] | 77.15% | 68.15% | 5.32% | 17.20 | 85.32% |
-| | Rainfall Threshold Rule | 47.80% [42.30%, 53.40%] | 93.50% | 32.20% | 28.11% | 93.90 | 60.74% |
-| **t + 3d (72h)** | **LightGBM (Primary)** | **68.11% [63.20%, 73.00%]** | **79.87%** | **58.62%** | **8.24%** | **26.90** | **81.26%** |
-| | Linear (Logistic Regression) [Pure NumPy] | 54.99% [49.30%, 60.60%] | 65.83% | 62.18% | 5.85% | 19.10 | 81.92% |
-| | Persistence Baseline | 65.35% [60.10%, 70.60%] | 69.39% | 59.11% | 7.03% | 22.90 | 80.71% |
-| | Rainfall Threshold Rule | 44.30% [39.00%, 49.80%] | 87.84% | 29.97% | 29.20% | 97.90 | 58.25% |
+| **t + 1d (24h)** | **LightGBM (Primary)** | 83.57% [81.08%, 85.54%] | **90.93% [87.71%, 93.74%]** | 75.29% | 4.15% | 13.45 | 90.36% |
+| | Linear (Logistic Regression) [Pure NumPy] | 60.95% [59.14%, 62.64%] | 70.36% | 74.73% | 3.26% | 10.73 | 88.47% |
+| | **Persistence Baseline** | **85.01% [82.71%, 86.84%]** | 86.90% [83.54%, 89.71%] | **80.56%** | **2.92%** | **9.45** | **91.71%** |
+| | Rainfall Threshold Rule | 48.86% [45.56%, 52.29%] | 97.38% | 32.48% | 27.28% | 91.27 | 61.94% |
+| **t + 2d (48h)** | **LightGBM (Primary)** | **74.89% [71.57%, 77.39%]** | **84.07% [79.78%, 88.00%]** | 65.67% | 6.08% | 19.82 | 85.18% |
+| | Linear (Logistic Regression) [Pure NumPy] | 57.76% [55.95%, 59.40%] | 67.54% | **67.81%** | **4.39%** | **14.45** | 85.33% |
+| | Persistence Baseline | 73.49% [70.20%, 76.22%] | 76.41% | 67.44% | 5.10% | 16.64 | **85.50%** |
+| | Rainfall Threshold Rule | 46.26% [43.07%, 49.39%] | 93.55% | 30.89% | 28.08% | 94.36 | 60.22% |
+| **t + 3d (72h)** | **LightGBM (Primary)** | **67.74% [64.52%, 70.35%]** | **77.62% [72.75%, 82.23%]** | 57.98% | 7.73% | 25.36 | 81.25% |
+| | Linear (Logistic Regression) [Pure NumPy] | 55.11% [53.34%, 56.74%] | 64.31% | **63.29%** | **5.13%** | **16.82** | **82.49%** |
+| | Persistence Baseline | 64.79% [61.64%, 67.76%] | 68.35% | 58.35% | 6.71% | 22.00 | 80.97% |
+| | Rainfall Threshold Rule | 43.19% [40.32%, 46.07%] | 88.31% | 28.53% | 29.47% | 99.45 | 57.54% |
 
-*Note on 95% Confidence Intervals*: 7-day block bootstrap resamples (150 iterations) reveal overlapping CIs between LightGBM and Persistence on 1d Macro F1. LightGBM demonstrates statistically distinct advantages in High-Risk Recall (91.40% vs 87.21%) and multi-day 2d/3d lead performance.
+*Note on 95% Confidence Intervals*: 7-day block bootstrap resamples (1,000 iterations) show overlapping CIs between LightGBM and Persistence on 1d Macro F1 (Persistence [82.7%, 86.8%] vs LightGBM [81.1%, 85.5%]). However, LightGBM achieves superior High-Risk Recall at 1d (90.93% vs 86.90%) and outperforms Persistence across both Macro F1 and Recall at 2d and 3d horizons.
 
-*Note on Leave-One-RIVER-Out (LORO)*: Stations on the same river (e.g. `KL-PER-01` and `KL-PER-02`) exhibit high discharge cross-correlation ($r > 0.90$). Standard Leave-One-Station-Out is optimistic due to spatial correlation; Leave-One-RIVER-Out provides realistic spatial generalization evaluation.
+*Note on Leave-One-RIVER-Out (LORO)*: Stations located on the same river (e.g. `KL-PER-01` and `KL-PER-02`) share basin discharge dynamics ($r > 0.90$). Standard cross-validation across stations in the same basin overestimates spatial generalization. Leave-One-RIVER-Out (LORO) provides a strict out-of-basin spatial generalization evaluation.
 
 ---
 

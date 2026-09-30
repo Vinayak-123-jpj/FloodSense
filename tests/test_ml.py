@@ -52,17 +52,34 @@ def test_2018_split_gap_and_non_leakage():
     assert len(buffer_dates) == 0
 
 def test_explainability_generator():
-    """Verifies plain-language top-3 factor driver text generation."""
+    """Verifies plain-language top-3 factor driver text generation uses ONLY real features."""
     features = {
-        "rain_sum_72h": 185.0,
-        "rain_sum_24h": 65.0,
-        "rain_sum_6h": 20.0,
+        "rain_1d": 45.0,
+        "rain_3d": 120.0,
+        "rain_7d": 185.0,
+        "rain_14d": 250.0,
+        "rain_30d": 380.0,
         "discharge_m3s": 350.0,
-        "discharge_rate_of_change_24h": 25.0,
-        "antecedent_wetness_index": 45.0
+        "discharge_roc_3d": 45.0,
+        "antecedent_wetness_7d": 42.0,
+        "month": 8,
+        "day_of_year": 227
     }
     explanation = generate_plain_language_explanation(features, "Orange")
     assert len(explanation) > 0
+
+    # Ensure prohibited invented terms are NEVER present
+    assert "velocity" not in explanation.lower()
+    assert "elevation offset" not in explanation.lower()
+
+    # Verify that drivers correspond only to valid features in FEATURE_COLUMNS_DAILY
+    from backend.ml.explainability import FEATURE_NAME_MAP
+    drivers = [d.strip() for d in explanation.split(";")]
+    assert len(drivers) <= 3
+    for d in drivers:
+        matched = any(v.lower() in d.lower() for v in FEATURE_NAME_MAP.values())
+        assert matched, f"Driver statement '{d}' does not match any valid model feature in {FEATURE_NAME_MAP.values()}"
+
 
 def test_rule_based_fallback():
     """Verifies rule engine returns correct risk level when model is absent."""

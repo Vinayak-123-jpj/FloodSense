@@ -45,7 +45,7 @@ def test_alert_escalation_and_hysteresis():
     process_reading_for_alert(db, st, r1)
     
     alerts_tick1 = db.query(Alert).filter(Alert.station_id == st.id).all()
-    assert len(alerts_tick1) >= 4 # 1 EN + 1 HI + 1 ML + 1 AS
+    assert len(alerts_tick1) >= 3 # 1 EN + 1 HI + 1 ML (Kerala station)
 
     # 2. Single lower tick (Green) -> Hysteresis MUST NOT downgrade state on first tick
     r2 = Reading(

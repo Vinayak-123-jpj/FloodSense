@@ -11,6 +11,8 @@ export interface DetailedHorizonMetrics {
   orange_red_recall_pct: number;
   orange_red_precision_pct: number;
   false_alarms_per_station_year: number;
+  macro_f1_ci_95?: [number, number];
+  orange_red_recall_ci_95?: [number, number];
 }
 
 export interface HorizonBaselineComparison {
@@ -21,6 +23,11 @@ export interface HorizonBaselineComparison {
 }
 
 export interface Station2018Detail {
+  river_name?: string;
+  green_days_2018?: number;
+  yellow_days_2018?: number;
+  orange_days_2018?: number;
+  red_days_2018?: number;
   actual_orange_red_days_2018: number;
   predicted_orange_red_days_2018: number;
   false_alarm_days_2018: number;
@@ -34,6 +41,8 @@ export interface FullMetricsSummary {
   total_daily_samples: number;
   station_count: number;
   max_prediction_horizon_days: number;
+  statistical_ci_note?: string;
+  station_independence_note?: string;
   lead_time_disclaimer: string;
   percentile_proxies_disclaimer: string;
   modeled_discharge_disclaimer: string;
@@ -48,12 +57,22 @@ export interface FullMetricsSummary {
     '2d': HorizonBaselineComparison;
     '3d': HorizonBaselineComparison;
   };
-  loso_sample_test: Record<string, DetailedHorizonMetrics>;
+  leave_one_river_out_loro?: Record<string, DetailedHorizonMetrics>;
+  loso_sample_test?: Record<string, DetailedHorizonMetrics>;
   station_2018_details: Record<string, Station2018Detail>;
   kerala_2018_median_lead_time_days: number;
   kerala_2018_median_lead_time_hours: number;
   train_class_distribution: Record<string, number>;
   test_class_distribution: Record<string, number>;
+  confusion_matrix_heldout_2018?: {
+    labels: string[];
+    matrix: number[][];
+  };
+  feature_importances?: Array<{
+    feature: string;
+    label: string;
+    importance: number;
+  }>;
 }
 
 export const api = {

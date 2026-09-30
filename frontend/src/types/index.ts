@@ -13,6 +13,10 @@ export interface Station {
   normal_level_m: number;
   description?: string;
   current_water_level_m?: number;
+  current_discharge_m3s?: number;
+  p90_m3s?: number;
+  p97_m3s?: number;
+  p99_5_m3s?: number;
   current_risk_level?: RiskLevel;
   battery_pct?: number;
   rssi?: number;

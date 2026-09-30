@@ -1,64 +1,105 @@
-"""ML Risk Prediction Explainability Module.
+"""ML Risk Prediction Explainability Module using Tree SHAP / pred_contrib.
 
-Translates complex model feature weights, rolling rainfall anomalies, and river discharge dynamics
-into plain-language human-readable risk driver explanations for UI presentation and alerts.
+Computes exact per-prediction feature contributions from LightGBM (pred_contrib=True)
+and maps the top 3 drivers to plain-language statements using ONLY the real features:
+['rain_1d', 'rain_3d', 'rain_7d', 'rain_14d', 'rain_30d', 'discharge_m3s',
+ 'discharge_roc_3d', 'antecedent_wetness_7d', 'month', 'day_of_year'].
 """
 
-from typing import List, Dict
+import numpy as np
+import pandas as pd
+from typing import Dict, List, Tuple, Any
 
-def generate_plain_language_explanation(features: Dict[str, float], risk_level: str) -> str:
-    """Generates plain-language top-3 factor bullet points driving the risk assessment.
+from backend.ml.feature_engineering import FEATURE_COLUMNS_DAILY
+
+VALID_EXPLANATION_FEATURE_NAMES = set(FEATURE_COLUMNS_DAILY)
+
+FEATURE_NAME_MAP = {
+    "rain_1d": "1-day rainfall",
+    "rain_3d": "3-day cumulative rainfall",
+    "rain_7d": "7-day cumulative rainfall",
+    "rain_14d": "14-day cumulative rainfall",
+    "rain_30d": "30-day cumulative rainfall",
+    "discharge_m3s": "River discharge",
+    "discharge_roc_3d": "3-day discharge rate of change",
+    "antecedent_wetness_7d": "7-day antecedent soil wetness",
+    "day_of_year": "Monsoon seasonal timing (day of year)",
+    "month": "Seasonal monsoon cycle (month)"
+}
+
+def format_driver_statement(feature_name: str, value: float) -> str:
+    """Formats a single real feature into a plain-language explanation with units."""
+    if feature_name in ["rain_1d", "rain_3d", "rain_7d", "rain_14d", "rain_30d"]:
+        return f"{FEATURE_NAME_MAP[feature_name]} ({value:.1f} mm)"
+    elif feature_name == "discharge_m3s":
+        return f"River discharge ({value:.1f} m³/s)"
+    elif feature_name == "discharge_roc_3d":
+        sign = "+" if value >= 0 else ""
+        return f"3-day discharge rate of change ({sign}{value:.1f} m³/s)"
+    elif feature_name == "antecedent_wetness_7d":
+        return f"7-day antecedent soil wetness ({value:.1f} mm)"
+    elif feature_name == "day_of_year":
+        return f"Seasonal monsoon timing (day {int(value)} of year)"
+    elif feature_name == "month":
+        return f"Seasonal monsoon cycle (month {int(value)})"
+    return f"{feature_name}: {value:.1f}"
+
+def compute_top_drivers_from_model(
+    model: Any,
+    input_df: pd.DataFrame,
+    predicted_class: int = 1
+) -> List[Tuple[str, float, float]]:
+    """Computes exact per-prediction feature contributions using LightGBM pred_contrib=True.
     
-    Args:
-        features: Dictionary containing rolling rainfall, discharge, and wetness index values.
-        risk_level: Predicted risk level ('Green', 'Yellow', 'Orange', 'Red').
-
     Returns:
-        Semicolon-separated string of plain-language driver statements.
+        List of tuples: (feature_name, feature_value, contribution_score)
     """
-    drivers = []
-    
-    r72 = features.get("rain_sum_72h", 0.0)
-    r24 = features.get("rain_sum_24h", 0.0)
-    r6 = features.get("rain_sum_6h", 0.0)
-    d = features.get("discharge_m3s", 0.0)
-    d_roc = features.get("discharge_rate_of_change_24h", 0.0)
-    api = features.get("antecedent_wetness_index", 0.0)
+    X = input_df[FEATURE_COLUMNS_DAILY]
+    n_features = len(FEATURE_COLUMNS_DAILY)
 
-    # Factor 1: Cumulative Rainfall
-    if r72 >= 150.0:
-        drivers.append(f"Severe 72h cumulative rainfall ({r72:.1f} mm) exceeding catchment absorption capacity")
-    elif r72 >= 75.0:
-        drivers.append(f"Elevated 72h cumulative rainfall ({r72:.1f} mm)")
-    elif r24 >= 30.0:
-        drivers.append(f"Heavy 24h precipitation spell ({r24:.1f} mm)")
-    elif r6 >= 15.0:
-        drivers.append(f"Recent intense rainfall burst ({r6:.1f} mm in last 6h)")
+    if hasattr(model, "booster_"):
+        booster = model.booster_
+        contribs = booster.predict(X, pred_contrib=True)
+        contribs_arr = np.array(contribs)
 
-    # Factor 2: River Discharge & Flow Velocity
-    if d >= 500.0:
-        drivers.append(f"Extreme river discharge flow velocity ({d:.1f} m³/s)")
-    elif d >= 300.0:
-        drivers.append(f"High river discharge ({d:.1f} m³/s) approaching channel danger marks")
-    
-    if d_roc > 20.0:
-        drivers.append(f"Rapidly surging river discharge (+{d_roc:.1f} m³/s rise over 24h)")
-
-    # Factor 3: Antecedent Soil Saturation
-    if api >= 40.0:
-        drivers.append(f"High antecedent soil saturation (API: {api:.1f}) preventing surface infiltration")
-    elif api >= 20.0:
-        drivers.append(f"Moderate soil moisture accumulation (API: {api:.1f})")
-
-    # Baseline fallback statement if no critical drivers active
-    if not drivers:
-        if risk_level == "Green":
-            drivers.append("Hydrological parameters within normal seasonal baseline range")
-            drivers.append("Stable river discharge with minimal surface runoff")
-            drivers.append("Low 72-hour cumulative precipitation forecast")
+        if contribs_arr.ndim == 2:
+            # Multi-class output flattened or binary
+            # For 4 classes: shape is (n_samples, 4 * (n_features + 1))
+            row_contribs = contribs_arr[0]
+            stride = n_features + 1
+            cls_idx = min(3, max(0, predicted_class))
+            feat_contribs = row_contribs[cls_idx * stride : cls_idx * stride + n_features]
         else:
-            drivers.append(f"Water level approaching warning threshold")
-            drivers.append(f"Accumulated watershed runoff: {r72:.1f} mm")
+            feat_contribs = contribs_arr[0, :n_features]
+    else:
+        # Fallback: absolute feature values normalized
+        feat_contribs = np.zeros(n_features)
+        for i, col in enumerate(FEATURE_COLUMNS_DAILY):
+            val = float(X.iloc[0][col])
+            feat_contribs[i] = val
 
-    # Limit to top 3 factors
-    return "; ".join(drivers[:3])
+    # Rank features by contribution
+    ranked_indices = np.argsort(-np.abs(feat_contribs))
+    results = []
+    for idx in ranked_indices:
+        fname = FEATURE_COLUMNS_DAILY[idx]
+        val = float(X.iloc[0][fname])
+        score = float(feat_contribs[idx])
+        results.append((fname, val, score))
+
+    return results
+
+def generate_plain_language_explanation(features: Dict[str, float], risk_level: str = "Green", model: Any = None) -> str:
+    """Generates plain-language top-3 factor bullet points using ONLY real model features."""
+    df_row = pd.DataFrame([{col: features.get(col, 0.0) for col in FEATURE_COLUMNS_DAILY}])
+    
+    risk_int_map = {"Green": 0, "Yellow": 1, "Orange": 2, "Red": 3}
+    pred_cls = risk_int_map.get(risk_level, 1)
+
+    ranked = compute_top_drivers_from_model(model, df_row, pred_cls)
+    
+    top3_statements = []
+    for fname, val, score in ranked[:3]:
+        top3_statements.append(format_driver_statement(fname, val))
+
+    return "; ".join(top3_statements)

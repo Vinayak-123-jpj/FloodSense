@@ -81,7 +81,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             <div className="max-h-72 overflow-y-auto space-y-2 pr-1 scrollbar-thin font-mono text-xs">
-              {stations.slice(0, 8).map(st => (
+              {stations.map(st => (
                 <div
                   key={st.id}
                   onClick={() => navigate(`/live?station=${st.id}`)}
@@ -92,8 +92,8 @@ export const LandingPage: React.FC = () => {
                     <div className="text-[10px] text-survey-slate dark:text-night-slate">{st.id} • {st.river}</div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-survey-ink dark:text-night-text font-bold">
-                      {(st.current_water_level_m ?? st.normal_level_m ?? 0.0).toFixed(2)}m
+                    <span className="text-survey-ink dark:text-night-text font-bold text-[11px]">
+                      {(st.current_discharge_m3s ?? 35.0).toFixed(0)} m³/s
                     </span>
                     <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold ${
                       st.current_risk_level === 'Red' ? 'bg-red-500 text-white' :
@@ -126,6 +126,7 @@ export const LandingPage: React.FC = () => {
           stations={stations}
           onSelectStation={(st) => navigate(`/live?station=${st.id}`)}
           height="580px"
+          selectedRegion="Kerala"
         />
       </section>
 

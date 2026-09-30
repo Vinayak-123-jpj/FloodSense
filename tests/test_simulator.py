@@ -25,3 +25,27 @@ def test_sensor_simulator_live_baseline():
     assert node_state["water_level_m"] == 2.0
     assert node_state["rainfall_mm_hr"] == 0.0
     assert 90.0 <= node_state["battery_pct"] <= 100.0
+
+def test_replay_peak_flood_kerala():
+    """Verifies that replay at peak-flood day (50% progress / Aug 16) returns at least one Orange or Red station for Kerala."""
+    from fastapi.testclient import TestClient
+    from backend.main import app
+
+    with TestClient(app) as client:
+        # Test at peak flood (50% progress)
+        res = client.get("/api/simulate/replay?scenario=kerala_2018&progress_pct=50.0")
+        assert res.status_code == 200
+        data = res.json()
+        assert data["scenario"] == "kerala_2018"
+        assert data["overall_risk"] in ["Orange", "Red"]
+        
+        # Verify at least one station is Orange or Red
+        severe_stations = [s for s in data["stations"] if s["risk_level"] in ["Orange", "Red"]]
+        assert len(severe_stations) >= 1
+
+        # Test What-If rain multiplier
+        res_whatif = client.get("/api/simulate/replay?scenario=kerala_2018&progress_pct=10.0&rain_multiplier=2.0")
+        assert res_whatif.status_code == 200
+        data_whatif = res_whatif.json()
+        assert data_whatif["rain_multiplier"] == 2.0
+

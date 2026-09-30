@@ -31,6 +31,8 @@ import lightgbm as lgb
 
 from backend.ml.feature_engineering import build_daily_features, compute_station_percentiles, FEATURE_COLUMNS_DAILY
 
+from scipy.optimize import minimize
+
 RISK_MAP = {0: "Green", 1: "Yellow", 2: "Orange", 3: "Red"}
 
 RIVER_MAP = {
@@ -42,23 +44,22 @@ RIVER_MAP = {
     "KL-MUV-01": "Muvattupuzha",
     "AS-BRA-01": "Brahmaputra",
     "AS-BRA-02": "Brahmaputra",
-    "AS-JIA-01": "Jiadhol",
-    "AS-DHA-01": "Kopili"
+    "AS-KOP-01": "Kopili",
+    "AS-DHA-01": "Dhansiri",
+    "AS-JIA-01": "Jia Bharali"
 }
 
 class LogisticRegressionNumPy:
-    """Pure-Python / NumPy One-vs-Rest Logistic Regression Classifier.
+    """Pure-Python / NumPy One-vs-Rest Logistic Regression Classifier with L-BFGS-B optimization.
     Runs cleanly without importing sklearn compiled C-extensions (Windows AppLocker policy safe).
+    Standardizes features, applies balanced class weights, and optimizes with L2 regularization.
     """
-    def __init__(self, lr=0.05, n_iters=60):
-        self.lr = lr
-        self.n_iters = n_iters
+    def __init__(self, alpha=1.0, max_iter=100, lr=0.05, n_iters=100, **kwargs):
+        self.alpha = alpha
+        self.max_iter = max(max_iter, n_iters)
         self.weights = {}
         self.biases = {}
         self.classes = [0, 1, 2, 3]
-
-    def _sigmoid(self, z):
-        return 1.0 / (1.0 + np.exp(-np.clip(z, -30.0, 30.0)))
 
     def fit(self, X: pd.DataFrame, y: pd.Series):
         X_arr = X.values.astype(float)
@@ -71,23 +72,26 @@ class LogisticRegressionNumPy:
 
         for c in self.classes:
             y_binary = (y_arr == c).astype(float)
-            w = np.zeros(n_features)
-            b = 0.0
-            pos_count = sum(y_binary)
+            pos_count = np.sum(y_binary)
             pos_weight = (n_samples - pos_count) / max(1.0, pos_count) if pos_count > 0 else 1.0
+            weights = np.where(y_binary == 1, pos_weight, 1.0)
 
-            for _ in range(self.n_iters):
-                linear = np.dot(X_norm, w) + b
-                y_pred = self._sigmoid(linear)
-                weight_factors = np.where(y_binary == 1, pos_weight, 1.0)
-                error = (y_pred - y_binary) * weight_factors
-                dw = (1.0 / n_samples) * np.dot(X_norm.T, error)
-                db = (1.0 / n_samples) * np.sum(error)
-                w -= self.lr * dw
-                b -= self.lr * db
+            def loss_and_grad(params):
+                w = params[:-1]
+                b = params[-1]
+                z = np.clip(np.dot(X_norm, w) + b, -30.0, 30.0)
+                p = 1.0 / (1.0 + np.exp(-z))
+                eps = 1e-12
+                loss = -np.sum(weights * (y_binary * np.log(p + eps) + (1.0 - y_binary) * np.log(1.0 - p + eps))) + 0.5 * self.alpha * np.sum(w ** 2)
+                err = weights * (p - y_binary)
+                gw = np.dot(X_norm.T, err) + self.alpha * w
+                gb = np.sum(err)
+                return loss, np.append(gw, gb)
 
-            self.weights[c] = w
-            self.biases[c] = b
+            init_params = np.zeros(n_features + 1)
+            res = minimize(loss_and_grad, init_params, method='L-BFGS-B', jac=True, options={'maxiter': self.max_iter})
+            self.weights[c] = res.x[:-1]
+            self.biases[c] = res.x[-1]
 
     def predict(self, X: pd.DataFrame) -> np.ndarray:
         X_arr = X.values.astype(float)
@@ -95,8 +99,8 @@ class LogisticRegressionNumPy:
         probs = np.zeros((len(X_norm), len(self.classes)))
 
         for idx, c in enumerate(self.classes):
-            linear = np.dot(X_norm, self.weights[c]) + self.biases[c]
-            probs[:, idx] = self._sigmoid(linear)
+            z = np.clip(np.dot(X_norm, self.weights[c]) + self.biases[c], -30.0, 30.0)
+            probs[:, idx] = 1.0 / (1.0 + np.exp(-z))
 
         return np.array(self.classes)[np.argmax(probs, axis=1)]
 
@@ -116,7 +120,7 @@ def evaluate_threshold_baseline(X_test: pd.DataFrame) -> np.ndarray:
     return np.array(y_pred)
 
 
-def compute_block_bootstrap_ci(y_true: np.ndarray, y_pred: np.ndarray, n_bootstraps: int = 150, block_size: int = 7) -> dict:
+def compute_block_bootstrap_ci(y_true: np.ndarray, y_pred: np.ndarray, n_bootstraps: int = 1000, block_size: int = 7) -> dict:
     """Computes 95% confidence intervals for Macro F1 and High-Risk Recall by resampling 7-day blocks."""
     np.random.seed(42)
     n_samples = len(y_true)
@@ -214,7 +218,7 @@ def run_training_pipeline():
     df_assam = pd.read_csv(assam_path) if os.path.exists(assam_path) else pd.DataFrame()
 
     df_raw = pd.concat([df_kerala, df_assam], ignore_index=True)
-    df_raw["date"] = pd.to_datetime(df_raw["date"])
+    df_raw["date"] = pd.to_datetime(df_raw["date"].astype(str).str[:10])
     df_raw = df_raw.sort_values(["station_id", "date"]).reset_index(drop=True)
     num_stations = len(df_raw["station_id"].unique())
 
