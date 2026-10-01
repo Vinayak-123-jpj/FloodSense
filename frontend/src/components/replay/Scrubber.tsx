@@ -7,6 +7,9 @@ interface ScrubberProps {
   scenario: string;
   rainMultiplier: number;
   progressPct: number;
+  currentDate?: string;
+  startDate?: string;
+  endDate?: string;
   onTogglePlay: () => void;
   onSpeedChange: (speed: number) => void;
   onScenarioChange: (scenario: string) => void;
@@ -15,12 +18,22 @@ interface ScrubberProps {
   onReset: () => void;
 }
 
+function formatDateLabel(rawDate?: string): string {
+  if (!rawDate) return '';
+  const d = new Date(rawDate);
+  if (isNaN(d.getTime())) return rawDate;
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
 export const Scrubber: React.FC<ScrubberProps> = ({
   isPlaying,
   speed,
   scenario,
   rainMultiplier,
   progressPct,
+  currentDate,
+  startDate,
+  endDate,
   onTogglePlay,
   onSpeedChange,
   onScenarioChange,
@@ -28,6 +41,10 @@ export const Scrubber: React.FC<ScrubberProps> = ({
   onScrub,
   onReset
 }) => {
+  const displayStart = formatDateLabel(startDate || (scenario === 'assam_2020' ? '2020-07-01' : '2018-08-01'));
+  const displayEnd = formatDateLabel(endDate || (scenario === 'assam_2020' ? '2020-07-31' : '2018-08-31'));
+  const displayCurrent = formatDateLabel(currentDate || (scenario === 'assam_2020' ? '2020-07-15' : '2018-08-16'));
+
   return (
     <div className="rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card p-4 shadow-xs">
       
@@ -54,9 +71,11 @@ export const Scrubber: React.FC<ScrubberProps> = ({
       {/* Main Timeline Scrubber Bar */}
       <div className="mb-4">
         <div className="flex justify-between text-xs font-mono text-survey-slate dark:text-night-slate mb-1">
-          <span>EVENT START (T-00:00)</span>
-          <span className="text-survey-teal dark:text-night-teal font-semibold">SCRUBBER: {progressPct.toFixed(0)}%</span>
-          <span>PEAK DISCHARGE (T+72h)</span>
+          <span className="font-semibold text-survey-ink dark:text-night-text">{displayStart}</span>
+          <span className="text-survey-teal dark:text-night-teal font-bold px-2 py-0.5 rounded bg-survey-paper dark:bg-night-bg border border-survey-border dark:border-night-border">
+            DATE: {displayCurrent} ({progressPct.toFixed(0)}%)
+          </span>
+          <span className="font-semibold text-survey-ink dark:text-night-text">{displayEnd}</span>
         </div>
         <input
           type="range"
@@ -111,11 +130,18 @@ export const Scrubber: React.FC<ScrubberProps> = ({
         <div className="flex items-center gap-3 bg-survey-paper dark:bg-night-bg p-2.5 rounded border border-survey-border dark:border-night-border">
           <CloudRain className="h-5 w-5 text-survey-teal dark:text-night-teal shrink-0" />
           <div className="flex-1">
-            <div className="flex justify-between text-xs font-mono mb-1">
+            <div className="flex justify-between items-center text-xs font-mono mb-1">
               <span className="text-survey-ink dark:text-night-text font-medium flex items-center gap-1">
-                <Sliders className="h-3 w-3" /> Rainfall Stress Multiplier (scenario, not a forecast)
+                <Sliders className="h-3 w-3" /> Rainfall Stress Multiplier
               </span>
-              <span className="text-amber-600 dark:text-amber-400 font-bold">{rainMultiplier.toFixed(1)}x Rain</span>
+              <div className="flex items-center gap-1.5">
+                {rainMultiplier !== 1.0 && (
+                  <span className="bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 px-1.5 py-0.5 rounded text-[10px] font-bold border border-amber-300 dark:border-amber-700">
+                    scenario, not a forecast
+                  </span>
+                )}
+                <span className="text-amber-600 dark:text-amber-400 font-bold">{rainMultiplier.toFixed(1)}x Rain</span>
+              </div>
             </div>
             <input
               type="range"

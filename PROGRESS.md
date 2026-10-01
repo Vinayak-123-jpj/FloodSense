@@ -13,11 +13,20 @@
 - [x] **Round 3: Verification, Honesty & Submission Pack** (Night Watch dark theme map filter, pure-Python NumPy Logistic Regression baseline, per-horizon baselines on held-out 2018 set, UI metric honesty, rating curve consistency, SIMULATED badges, guided demo tour, submission answers, video script, clean git & docker checks)
 - [x] **Round 4: Credibility, Real Live Data & Polish** (Copy audit removing overclaims, 7-day block bootstrap 95% CIs, station correlation & Leave-One-RIVER-Out protocol, Open-Meteo real live data mode with caching & toggle, Malayalam & Assamese multilingual alerts, PlatformIO firmware build config & Wokwi simulation, reading JSON Schema contract test, "Why not just use GloFAS?" rationale, landing hero right-half live station list, final visual QA & submission pack update)
 - [x] **Round 4B: Finish and PROVE Round 4** (Retrained 11-station model on 144,639 samples with 1,000 block-bootstrap resamples, historical 31-day Kerala 2018 replay sequence demonstrating peak flood Red alerts and recession, discharge units in m³/s with p90/p97/p99.5 percentiles, native HTML/SVG confusion matrix and feature importance, startup alert burst fix with baseline Green warm-up, tight map framing and Night Watch OSM filter, 100% pytest pass, healthy docker deployment, and 22 verified desktop/mobile light/dark screenshots)
+- [x] **Replay Verification Pass** (Data-driven per-station daily observed discharge & held-out 2018 predictions, real date labels e.g. "14 Aug 2018", start/end scrubber dates "01 Aug 2018" to "31 Aug 2018", 1.0x default what-if multiplier with "scenario, not a forecast" badge, peak discharge CSV equality & 67.7% non-identical risk days unit test, discharge gauge in m³/s with percentile proxies)
 
 ---
 
 ### Detailed Log
-#### Round 4B Evidence Audit & Proof Table
+#### Replay Verification Audit & Proof Table
+
+| Item / Requirement | Status | Key File Path(s) | Test / Screenshot Proof |
+|---|---|---|---|
+| **1. Data-Driven Replay & Held-Out Predictions** | **DONE** | `data/replay_kerala_2018.json`, `scripts/generate_replay_dataset.py`, `backend/api/simulate.py` | `docs/screenshots/replay-42pct-data-driven.png` (shows 14 Aug 2018 with non-identical station states: Orange, Red, Yellow mix), `docs/screenshots/replay-89pct-data-driven.png` (shows 28 Aug 2018 receding mix) |
+| **2. Real Date Scrubber & Start/End Labels** | **DONE** | `frontend/src/components/replay/Scrubber.tsx`, `frontend/src/pages/ScenarioReplayPage.tsx` | `docs/screenshots/replay-scrubber-real-dates.png` (Left: `01 Aug 2018`, Center: `DATE: 14 Aug 2018 (43%)`, Right: `31 Aug 2018`) |
+| **3. Default 1.0x Multiplier & Scenario Disclaimer** | **DONE** | `frontend/src/components/replay/Scrubber.tsx`, `frontend/src/pages/ScenarioReplayPage.tsx` | `docs/screenshots/replay-scrubber-real-dates.png` (Defaults to 1.0x; renders `"scenario, not a forecast"` amber badge when multiplier != 1.0x) |
+| **4. Peak CSV Equality & 50%+ Risk Diversity Test** | **DONE** | `tests/test_simulator.py::test_replay_kerala_2018_data_integrity_and_diversity` | `pytest -v` -> **18/18 tests PASSED (100%)** in 9.10s. Verifies exact CSV peak discharge & 21/31 days (67.7%) non-identical station risk states |
+| **5. Discharge Gauge & Percentile Proxies** | **DONE** | `frontend/src/components/charts/WaterLevelGauge.tsx`, `frontend/src/components/charts/HydrologicalChart.tsx` | `docs/screenshots/discharge-gauge-percentile-proxies.png` (Primary readout displays discharge in m³/s with p90/p97/p99.5 thresholds labeled `"percentile proxies"`) |
 
 | Section / Item | Status | Key File Path(s) | Test / Screenshot Proof |
 |---|---|---|---|

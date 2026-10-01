@@ -343,6 +343,9 @@ export const ScenarioReplayPage: React.FC = () => {
         scenario={scenario}
         rainMultiplier={rainMultiplier}
         progressPct={progressPct}
+        currentDate={currentFrame?.date}
+        startDate={replayData?.start_date}
+        endDate={replayData?.end_date}
         onTogglePlay={() => setIsPlaying(!isPlaying)}
         onSpeedChange={setSpeed}
         onScenarioChange={setScenario}

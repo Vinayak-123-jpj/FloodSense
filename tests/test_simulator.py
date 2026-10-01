@@ -49,3 +49,59 @@ def test_replay_peak_flood_kerala():
         data_whatif = res_whatif.json()
         assert data_whatif["rain_multiplier"] == 2.0
 
+def test_replay_kerala_2018_data_integrity_and_diversity():
+    """Verifies that at 1.0x multiplier, replay discharge on peak-discharge days matches CSV,
+    and station risk classes are not identical across all six Kerala stations on at least 50% of days in August 2018.
+    """
+    import os
+    import pandas as pd
+    from fastapi.testclient import TestClient
+    from backend.main import app
+
+    csv_path = os.path.join(os.path.dirname(__file__), "..", "data", "raw", "kerala_daily_1990_2025.csv")
+    df = pd.read_csv(csv_path)
+    df["date"] = pd.to_datetime(df["date"].astype(str).str[:10])
+    aug = df[(df["date"] >= "2018-08-01") & (df["date"] <= "2018-08-31")]
+
+    # Find peak discharge date & value for each station
+    peaks = {}
+    for st_id, g in aug.groupby("station_id"):
+        max_row = g.loc[g["river_discharge_m3s"].idxmax()]
+        peaks[st_id] = {
+            "date": str(max_row["date"])[:10],
+            "discharge": float(max_row["river_discharge_m3s"])
+        }
+
+    with TestClient(app) as client:
+        # 1. Verify peak discharge day values match CSV exactly at 1.0x
+        for st_id, peak_info in peaks.items():
+            dt_str = peak_info["date"]
+            day_idx = int(dt_str.split("-")[2]) - 1 # 0-indexed day
+            pct = round((day_idx / 30.0) * 100.0, 1)
+
+            res = client.get(f"/api/simulate/replay?scenario=kerala_2018&progress_pct={pct}&rain_multiplier=1.0")
+            assert res.status_code == 200
+            data = res.json()
+            st_data = next((s for s in data["stations"] if s["id"] == st_id), None)
+            assert st_data is not None, f"Station {st_id} missing in replay"
+            assert abs(st_data["discharge_m3s"] - round(peak_info["discharge"], 1)) < 0.1, \
+                f"Peak discharge mismatch for {st_id}: expected {peak_info['discharge']}, got {st_data['discharge_m3s']}"
+
+        # 2. Check risk class diversity across August 2018 (>= 50% not-identical days)
+        not_identical_count = 0
+        total_days = 31
+
+        for day in range(1, 32):
+            pct = round(((day - 1) / 30.0) * 100.0, 1)
+            res = client.get(f"/api/simulate/replay?scenario=kerala_2018&progress_pct={pct}&rain_multiplier=1.0")
+            assert res.status_code == 200
+            data = res.json()
+
+            risks = [s["risk_level"] for s in data["stations"]]
+            if len(set(risks)) > 1:
+                not_identical_count += 1
+
+        diversity_ratio = not_identical_count / total_days
+        assert diversity_ratio >= 0.50, f"Risk classes were identical on too many days: {not_identical_count}/31 = {diversity_ratio:.2%}"
+
+
