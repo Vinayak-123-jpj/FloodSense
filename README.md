@@ -119,11 +119,11 @@ docker compose up --build
 
 ## 7. Why Not Just Use GloFAS Directly?
 
-Global systems like GloFAS are indispensable, but they are not designed to be end-to-end local early-warning platforms for municipal emergency managers. FloodSense builds on top of GloFAS to address critical operational gaps:
-1. **Resolution & Local Geometry**: GloFAS provides global 0.1° (~10km) discharge reanalysis updated once daily. Local river basins (such as the Periyar or Jia Bharali) require hyper-local telemetry, station-level thresholding, and sub-hourly alerting.
-2. **Actionable Risk Translation**: GloFAS outputs coarse volumetric discharge ($m^3/s$). FloodSense translates discharge and rainfall into clear local risk states (Green/Yellow/Orange/Red), plain-language driver explanations, and automated local evacuation route links.
+Global systems like GloFAS provide essential global hydrological forecasts, but they are not designed as complete, end-to-end local early-warning platforms for municipal emergency responders. FloodSense builds on GloFAS and Open-Meteo data to deliver actionable local capability:
+1. **Station Risk Classes & Thresholding**: GloFAS outputs coarse volumetric discharge ($m^3/s$). FloodSense computes station-specific historical baseline percentiles (p90, p97, p99.5) and classifies risk into Green, Yellow, Orange, and Red states with SHAP feature explanations.
+2. **Local-Language Actionable Alerts**: GloFAS provides global gridded data arrays. FloodSense translates high-risk conditions into actionable alerts in English, Malayalam, Assamese, and Hindi paired with nearest evacuation shelter links.
 3. **Alert Flapping & Hysteresis Control**: Raw threshold alerts fluctuate rapidly near danger marks. FloodSense enforces a state-machine hysteresis engine to prevent alert fatigue among emergency responders.
-4. **Hardware & Offline Resiliency**: FloodSense integrates directly with low-cost ESP32 field telemetry nodes, works 100% offline using bundled local datasets, and dispatches localized multilingual alerts (English, Hindi, Malayalam, Assamese) via Telegram and in-app outbox.
+4. **Offline Resilience & Hardware-Ready Blueprint**: FloodSense bundles offline historical datasets and cached snapshots for operation during network outages, and provides an open ESP32 hardware node blueprint (planned for physical deployment, simulated this round).
 
 ---
 

@@ -28,7 +28,7 @@ FEATURE_NAME_MAP = {
 }
 
 def format_driver_statement(feature_name: str, value: float) -> str:
-    """Formats a single real feature into a plain-language explanation with units."""
+    """Formats a single real feature into a plain-language explanation with numbers."""
     if feature_name in ["rain_1d", "rain_3d", "rain_7d", "rain_14d", "rain_30d"]:
         return f"{FEATURE_NAME_MAP[feature_name]} ({value:.1f} mm)"
     elif feature_name == "discharge_m3s":
@@ -38,10 +38,8 @@ def format_driver_statement(feature_name: str, value: float) -> str:
         return f"3-day discharge rate of change ({sign}{value:.1f} m³/s)"
     elif feature_name == "antecedent_wetness_7d":
         return f"7-day antecedent soil wetness ({value:.1f} mm)"
-    elif feature_name == "day_of_year":
-        return f"Seasonal monsoon timing (day {int(value)} of year)"
-    elif feature_name == "month":
-        return f"Seasonal monsoon cycle (month {int(value)})"
+    elif feature_name in ["day_of_year", "month"]:
+        return "usual monsoon-season conditions"
     return f"{feature_name}: {value:.1f}"
 
 def compute_top_drivers_from_model(
@@ -89,8 +87,8 @@ def compute_top_drivers_from_model(
 
     return results
 
-def generate_plain_language_explanation(features: Dict[str, float], risk_level: str = "Green", model: Any = None) -> str:
-    """Generates plain-language top-3 factor bullet points using ONLY real model features."""
+def get_top_drivers_list(features: Dict[str, float], risk_level: str = "Green", model: Any = None) -> List[str]:
+    """Generates top-3 factor statements using real model feature contributions (LightGBM pred_contrib / SHAP)."""
     df_row = pd.DataFrame([{col: features.get(col, 0.0) for col in FEATURE_COLUMNS_DAILY}])
     
     risk_int_map = {"Green": 0, "Yellow": 1, "Orange": 2, "Red": 3}
@@ -102,4 +100,9 @@ def generate_plain_language_explanation(features: Dict[str, float], risk_level: 
     for fname, val, score in ranked[:3]:
         top3_statements.append(format_driver_statement(fname, val))
 
-    return "; ".join(top3_statements)
+    return top3_statements
+
+def generate_plain_language_explanation(features: Dict[str, float], risk_level: str = "Green", model: Any = None) -> str:
+    """Generates plain-language top-3 factor bullet points using ONLY real model features."""
+    drivers = get_top_drivers_list(features, risk_level, model)
+    return "; ".join(drivers)

@@ -9,6 +9,8 @@ interface GaugeProps {
   batteryPct?: number;
   rssi?: number;
   sensorStatus?: string;
+  mode?: 'REAL' | 'SIMULATED' | 'REPLAY';
+  maxGaugeScale?: number;
 }
 
 export const WaterLevelGauge: React.FC<GaugeProps> = ({
@@ -17,7 +19,9 @@ export const WaterLevelGauge: React.FC<GaugeProps> = ({
   currentWaterLevelM,
   batteryPct = 98.0,
   rssi = -65,
-  sensorStatus = 'OK'
+  sensorStatus = 'OK',
+  mode = 'REAL',
+  maxGaugeScale
 }) => {
   // Percentile proxies fallback
   const p90 = station.p90_m3s || (station.region === 'Assam' ? 4500 : 160);
@@ -26,13 +30,13 @@ export const WaterLevelGauge: React.FC<GaugeProps> = ({
 
   const displayDischarge = currentDischargeM3s !== undefined
     ? currentDischargeM3s
-    : (station.current_discharge_m3s !== undefined ? station.current_discharge_m3s : 24.5);
+    : (station.current_discharge_m3s !== undefined && station.current_discharge_m3s !== null ? station.current_discharge_m3s : 0.0);
 
   const displayStage = currentWaterLevelM !== undefined
     ? currentWaterLevelM
     : (station.current_water_level_m !== undefined ? station.current_water_level_m : station.normal_level_m);
 
-  const maxScale = Math.max(p99_5 * 1.35, displayDischarge * 1.15, 100);
+  const maxScale = maxGaugeScale || Math.max(p99_5 * 1.35, displayDischarge * 1.15, 100);
   const fillPct = Math.min(100, Math.max(0, (displayDischarge / maxScale) * 100));
 
   const p90Pct = (p90 / maxScale) * 100;
@@ -65,16 +69,20 @@ export const WaterLevelGauge: React.FC<GaugeProps> = ({
             {station.name} ({station.river})
           </span>
         </div>
-        <div className="flex items-center gap-3 text-xs font-mono text-survey-slate dark:text-night-slate">
-          <span className="flex items-center gap-1" title="Virtual Node Battery">
-            <Battery className={`h-4 w-4 ${batteryPct < 20 ? 'text-red-500' : 'text-emerald-600'}`} />
-            {batteryPct.toFixed(0)}%
-          </span>
-          <span className="flex items-center gap-1" title="RSSI Signal">
-            <Wifi className="h-4 w-4 text-survey-teal dark:text-night-teal" />
-            {rssi} dBm
-          </span>
-        </div>
+
+        {/* Battery & RSSI - ONLY shown in SIMULATED mode */}
+        {mode === 'SIMULATED' && (
+          <div className="flex items-center gap-3 text-xs font-mono text-survey-slate dark:text-night-slate">
+            <span className="flex items-center gap-1" title="Virtual Node Battery">
+              <Battery className={`h-4 w-4 ${batteryPct < 20 ? 'text-red-500' : 'text-emerald-600'}`} />
+              {batteryPct.toFixed(0)}%
+            </span>
+            <span className="flex items-center gap-1" title="RSSI Signal">
+              <Wifi className="h-4 w-4 text-survey-teal dark:text-night-teal" />
+              {rssi} dBm
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Primary Readout: River Discharge */}
@@ -90,13 +98,13 @@ export const WaterLevelGauge: React.FC<GaugeProps> = ({
         </div>
         <div className="text-right font-mono text-xs space-y-0.5">
           <span className="text-red-600 dark:text-red-400 block font-semibold">
-            Red (p99.5): {p99_5.toFixed(1)} m³/s
+            Red (p99.5): {p99_5.toFixed(1)} m³/s (percentile proxy)
           </span>
           <span className="text-amber-600 dark:text-amber-400 block font-semibold">
-            Orange (p97): {p97.toFixed(1)} m³/s
+            Orange (p97): {p97.toFixed(1)} m³/s (percentile proxy)
           </span>
           <span className="text-yellow-600 dark:text-yellow-400 block font-semibold">
-            Yellow (p90): {p90.toFixed(1)} m³/s
+            Yellow (p90): {p90.toFixed(1)} m³/s (percentile proxy)
           </span>
         </div>
       </div>
@@ -140,20 +148,22 @@ export const WaterLevelGauge: React.FC<GaugeProps> = ({
         </div>
       </div>
 
-      {/* Secondary Readout: Water Level Stage (SIMULATED NODE) */}
-      <div className="rounded bg-survey-paper/60 dark:bg-night-bg/60 border border-survey-border/40 dark:border-night-border/40 p-2 flex items-center justify-between font-mono text-xs">
-        <div className="flex items-center gap-2">
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-survey-border/40 dark:bg-night-border/40 text-survey-slate dark:text-night-slate">
-            SIMULATED
-          </span>
-          <span className="text-survey-ink dark:text-night-text">
-            Stage Height: <strong>{displayStage.toFixed(2)} m</strong>
+      {/* Secondary Readout: Water Level Stage - ONLY shown in SIMULATED mode */}
+      {mode === 'SIMULATED' && (
+        <div className="rounded bg-survey-paper/60 dark:bg-night-bg/60 border border-survey-border/40 dark:border-night-border/40 p-2 flex items-center justify-between font-mono text-xs">
+          <div className="flex items-center gap-2">
+            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-survey-border/40 dark:bg-night-border/40 text-survey-slate dark:text-night-slate">
+              SIMULATED
+            </span>
+            <span className="text-survey-ink dark:text-night-text">
+              Stage Height: <strong>{displayStage.toFixed(2)} m</strong>
+            </span>
+          </div>
+          <span className="text-[10px] text-survey-slate dark:text-night-slate">
+            Rating curve Q = a(h - h₀)ᵇ
           </span>
         </div>
-        <span className="text-[10px] text-survey-slate dark:text-night-slate">
-          Rating curve Q = a(h - h₀)ᵇ
-        </span>
-      </div>
+      )}
 
       {/* Explicit Disclaimer */}
       <p className="mt-2 text-[10px] font-sans text-survey-slate dark:text-night-slate leading-tight">

@@ -70,10 +70,13 @@ def get_station_forecast(station_id: str, db: Session = Depends(get_db)):
             upper_bound_m=round(upper_bound, 2)
         ))
 
+    from backend.ml.explainability import format_driver_statement
+    cum_rain = float(sum(p.rainfall_mm_hr for p in points))
+    dis_val = float(latest_reading.water_level_m * 45.0) if latest_reading else float(station.normal_level_m * 45.0)
     top_drivers = [
-        f"Upstream river discharge velocity: baseline normal",
-        f"Forecasted 72h cumulative precipitation: {sum(p.rainfall_mm_hr for p in points):.1f} mm",
-        f"Station elevation offset: {station.elevation_m}m AMSL"
+        format_driver_statement("discharge_m3s", dis_val),
+        format_driver_statement("rain_3d", cum_rain),
+        format_driver_statement("antecedent_wetness_7d", max(0.0, cum_rain * 0.4))
     ]
 
     return StationForecastResponse(

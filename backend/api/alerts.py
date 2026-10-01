@@ -49,7 +49,9 @@ def get_alerts(
 
 @router.post("/clear", summary="Clear or acknowledge alert outbox logs")
 def clear_alerts(db: Session = Depends(get_db)):
-    """Clears all historical alerts from outbox display."""
+    """Clears all historical alerts from outbox display and resets state baseline."""
+    from backend.alerts.alert_engine import STATION_ALERT_STATE
+    STATION_ALERT_STATE.clear()
     db.query(Alert).delete()
     db.commit()
     return {"status": "success", "message": "Alert outbox logs cleared successfully."}

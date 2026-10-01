@@ -93,7 +93,9 @@ export const LandingPage: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-survey-ink dark:text-night-text font-bold text-[11px]">
-                      {(st.current_discharge_m3s ?? 35.0).toFixed(0)} m³/s
+                      {st.current_discharge_m3s !== undefined && st.current_discharge_m3s !== null
+                        ? `${st.current_discharge_m3s.toFixed(1)} m³/s`
+                        : 'No data'}
                     </span>
                     <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold ${
                       st.current_risk_level === 'Red' ? 'bg-red-500 text-white' :

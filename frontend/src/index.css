@@ -15,7 +15,12 @@
 
 .dark-tile-filter,
 .dark .leaflet-tile-pane {
-  filter: invert(1) hue-rotate(180deg) desaturate(0.8) brightness(0.55) contrast(1.2) !important;
+  filter: invert(1) hue-rotate(180deg) brightness(.7) contrast(.9) saturate(.4) !important;
+}
+
+.light-tile-filter,
+.light .leaflet-tile-pane {
+  filter: sepia(0.25) saturate(0.75) contrast(0.95) !important;
 }
 
 .custom-station-marker-container {

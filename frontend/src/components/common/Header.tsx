@@ -1,11 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useTheme } from '../../theme/ThemeContext';
 import { Sun, Moon, Radio, Activity } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  const location = useLocation();
   const [timeStr, setTimeStr] = useState<string>('');
+
+  const searchParams = new URLSearchParams(location.search);
+  const sourceParam = searchParams.get('source')?.toUpperCase();
+
+  let navStatusLabel = "REAL DATA (Open-Meteo)";
+  if (location.pathname.startsWith('/replay')) {
+    navStatusLabel = "REPLAY 2018";
+  } else if (location.pathname.startsWith('/live')) {
+    if (sourceParam === 'SIMULATED') {
+      navStatusLabel = "SIMULATED SENSORS";
+    } else {
+      navStatusLabel = "REAL DATA (Open-Meteo)";
+    }
+  }
 
   useEffect(() => {
     const updateTime = () => {
@@ -53,7 +68,7 @@ export const Header: React.FC = () => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span>VIRTUAL SENSORS LIVE</span>
+            <span className="font-semibold">{navStatusLabel}</span>
           </div>
         </div>
 

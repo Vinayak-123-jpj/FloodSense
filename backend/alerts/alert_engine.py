@@ -22,17 +22,16 @@ def process_reading_for_alert(db: Session, station: Station, reading: Reading):
 
     now = datetime.now(timezone.utc)
 
-    # Prevent startup burst: initialize station state to Green baseline
+    # Baseline baseline startup / source switch: record current risk state with ZERO alerts fired
     if st_id not in STATION_ALERT_STATE:
         STATION_ALERT_STATE[st_id] = {
-            "current_risk": "Green",
+            "current_risk": new_risk,
             "pending_downgrade": None,
             "consecutive_ticks": 0,
-            "last_alert_time": datetime.min.replace(tzinfo=timezone.utc),
+            "last_alert_time": now,
             "initialized": True
         }
-        if new_risk == "Green":
-            return  # Normal baseline startup, no alerts fired
+        return  # Baseline established on startup/source switch, zero initial alerts fired
 
     state = STATION_ALERT_STATE[st_id]
     current_risk = state["current_risk"]

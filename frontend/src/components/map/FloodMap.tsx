@@ -149,15 +149,9 @@ export const FloodMap: React.FC<FloodMapProps> = ({
     if (onRegionChange) onRegionChange(reg);
   };
 
-  // OpenTopoMap for light theme (survey atlas concept) and desaturated OSM for dark theme
-  const lightTileUrl = 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png';
-  const darkTileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-  
-  const tileUrl = theme === 'dark' ? darkTileUrl : lightTileUrl;
-  const tileSubdomains = theme === 'dark' ? 'abc' : 'abc';
-  const tileAttribution = theme === 'dark'
-    ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    : 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, SRTM | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)';
+  // Standard OSM tiles with CSS theme filters (dark tile filter / light warm sepia tint filter)
+  const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  const tileAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
   return (
     <div className="relative w-full overflow-hidden border border-survey-border dark:border-night-border rounded shadow-xs" style={{ height }}>
@@ -199,23 +193,22 @@ export const FloodMap: React.FC<FloodMapProps> = ({
         {!useOfflineFallback && (
           <TileLayer
             url={tileUrl}
-            subdomains={tileSubdomains}
+            subdomains="abc"
             attribution={tileAttribution}
             maxZoom={17}
-            className={theme === 'dark' ? 'dark-tile-filter' : ''}
+            className={theme === 'dark' ? 'dark-tile-filter' : 'light-tile-filter'}
             eventHandlers={{
               tileerror: () => setUseOfflineFallback(true)
             }}
           />
         )}
 
-        {/* Bundled GeoJSON Vector Fallback Layers */}
+        {/* Bundled GeoJSON Vector Fallback Layers (solid clean geometry) */}
         <GeoJSON
           data={KERALA_BOUNDARY_GEOJSON}
           style={{
             color: '#1F6B75',
-            weight: 2.0,
-            dashArray: '4, 4',
+            weight: 1.5,
             fillColor: '#1F6B75',
             fillOpacity: useOfflineFallback ? 0.12 : 0.04
           }}
@@ -225,8 +218,7 @@ export const FloodMap: React.FC<FloodMapProps> = ({
           data={ASSAM_BOUNDARY_GEOJSON}
           style={{
             color: '#C88A2E',
-            weight: 2.0,
-            dashArray: '4, 4',
+            weight: 1.5,
             fillColor: '#C88A2E',
             fillOpacity: useOfflineFallback ? 0.12 : 0.04
           }}
@@ -235,7 +227,7 @@ export const FloodMap: React.FC<FloodMapProps> = ({
         {stations.map(st => {
           const risk = st.current_risk_level || 'Green';
           const isSelected = st.id === selectedStationId;
-          const showTextLabel = currentZoom >= 9 || isSelected;
+          const showTextLabel = currentZoom >= 10 || isSelected;
           const icon = createCustomMarkerIcon(st, risk, isSelected, showTextLabel);
 
           // Low-lying zone contour polygon

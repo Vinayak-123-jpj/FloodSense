@@ -13,6 +13,7 @@ from backend.seed import seed_database
 @pytest.fixture(autouse=True)
 def setup_database():
     """Ensures database tables are initialized and seeded prior to test execution."""
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     seed_database()
     yield
@@ -154,5 +155,45 @@ def test_get_real_live_station_data_failure_fallback(monkeypatch):
         data = response.json()
         assert data["station_id"] == "KL-PER-01"
         assert data.get("is_cached") is True or "fetched_at" in data
+
+def test_stations_discharge_uniqueness_and_no_identical_fallbacks():
+    """Fails if two different stations return identical discharge in a snapshot (allowing None/'no data')."""
+    with TestClient(app) as client:
+        response = client.get("/api/stations")
+        assert response.status_code == 200
+        stations = response.json()
+        assert len(stations) >= 2, "Need at least 2 stations to verify uniqueness"
+
+        discharges = [
+            st["current_discharge_m3s"]
+            for st in stations
+            if st.get("current_discharge_m3s") is not None
+        ]
+
+        if len(discharges) >= 2:
+            assert len(set(discharges)) > 1, f"Found identical non-null discharge across stations: {discharges}"
+
+def test_station_thresholds_match_thresholds_json():
+    """Verifies every displayed station threshold equals data/thresholds.json single source of truth."""
+    import json, os
+    thresh_path = os.path.join(os.path.dirname(__file__), "..", "data", "thresholds.json")
+    assert os.path.exists(thresh_path), "data/thresholds.json file missing"
+
+    with open(thresh_path, "r", encoding="utf-8") as f:
+        thresholds_data = json.load(f)
+
+    with TestClient(app) as client:
+        response = client.get("/api/stations")
+        assert response.status_code == 200
+        stations = response.json()
+
+        for st in stations:
+            st_id = st["id"]
+            assert st_id in thresholds_data, f"Station {st_id} missing in thresholds.json"
+            expected = thresholds_data[st_id]
+            assert st["p90_m3s"] == expected["p90_yellow"], f"p90 mismatch for {st_id}: {st['p90_m3s']} vs {expected['p90_yellow']}"
+            assert st["p97_m3s"] == expected["p97_orange"], f"p97 mismatch for {st_id}: {st['p97_m3s']} vs {expected['p97_orange']}"
+            assert st["p99_5_m3s"] == expected["p99.5_red"], f"p99.5 mismatch for {st_id}: {st['p99_5_m3s']} vs {expected['p99.5_red']}"
+
 
 

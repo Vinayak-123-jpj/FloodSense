@@ -37,6 +37,14 @@ def test_alert_escalation_and_hysteresis():
     db.add(st)
     db.commit()
 
+    # 0. Baseline initialization on startup (Green) -> zero alerts fired
+    r0 = Reading(
+        station_id=st.id, water_level_cm=200.0, water_level_m=2.0,
+        rainfall_mm_hr=0.0, battery_pct=95.0, rssi=-60, risk_level="Green"
+    )
+    process_reading_for_alert(db, st, r0)
+    assert len(db.query(Alert).filter(Alert.station_id == st.id).all()) == 0
+
     # 1. Escalation to Orange (Tick 1) -> Should fire alert immediately
     r1 = Reading(
         station_id=st.id, water_level_cm=450.0, water_level_m=4.5,
@@ -83,4 +91,26 @@ def test_telegram_multilingual_formatting():
     msg_as = format_alert_message("Neeleswaram", "Periyar River", "Orange", 4.8, 6.0, "প্রবল বৰষুণ", "http://map.link", "as")
     assert "বানপানী সকিয়ানী" in msg_as
     assert "সাঁৱধান (Orange)" in msg_as
+
+def test_fresh_startup_produces_zero_alerts():
+    """Verifies that fresh startup or source switch produces zero initial alerts."""
+    db = SessionLocal()
+    st = Station(
+        id="TEST-AL-ZERO", name="Startup Gauge", region="Kerala", river="Periyar",
+        latitude=10.14, longitude=76.57, elevation_m=10.0,
+        warning_level_m=4.0, danger_level_m=6.0, normal_level_m=2.0
+    )
+    db.add(st)
+    db.commit()
+
+    # First prediction after startup (even if Yellow/Orange) establishes baseline with zero alerts fired
+    r_first = Reading(
+        station_id=st.id, water_level_cm=350.0, water_level_m=3.5,
+        rainfall_mm_hr=15.0, battery_pct=95.0, rssi=-60, risk_level="Yellow"
+    )
+    process_reading_for_alert(db, st, r_first)
+    alerts = db.query(Alert).filter(Alert.station_id == st.id).all()
+    assert len(alerts) == 0
+    assert STATION_ALERT_STATE[st.id]["current_risk"] == "Yellow"
+    db.close()
 

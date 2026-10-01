@@ -1,0 +1,79 @@
+{
+  "KL-PER-01": {
+    "name": "Neeleswaram",
+    "river": "Periyar River",
+    "p90_yellow": 4.3,
+    "p97_orange": 5.9,
+    "p99.5_red": 7.9
+  },
+  "KL-PER-02": {
+    "name": "Aluva",
+    "river": "Periyar River",
+    "p90_yellow": 437.5,
+    "p97_orange": 600.2,
+    "p99.5_red": 809.7
+  },
+  "KL-PAM-01": {
+    "name": "Chengannur",
+    "river": "Pamba River",
+    "p90_yellow": 167.7,
+    "p97_orange": 233.4,
+    "p99.5_red": 325.5
+  },
+  "KL-ACH-01": {
+    "name": "Thumpamon",
+    "river": "Achenkovil River",
+    "p90_yellow": 41.7,
+    "p97_orange": 60.2,
+    "p99.5_red": 87.9
+  },
+  "KL-CHA-01": {
+    "name": "Chalakudy",
+    "river": "Chalakudy River",
+    "p90_yellow": 156.4,
+    "p97_orange": 221.4,
+    "p99.5_red": 290.7
+  },
+  "KL-MUV-01": {
+    "name": "Muvattupuzha",
+    "river": "Muvattupuzha River",
+    "p90_yellow": 41.8,
+    "p97_orange": 59.7,
+    "p99.5_red": 84.5
+  },
+  "AS-BRA-01": {
+    "name": "Guwahati",
+    "river": "Brahmaputra River",
+    "p90_yellow": 20.0,
+    "p97_orange": 31.4,
+    "p99.5_red": 52.1
+  },
+  "AS-BRA-02": {
+    "name": "Dibrugarh",
+    "river": "Brahmaputra River",
+    "p90_yellow": 3.4,
+    "p97_orange": 5.0,
+    "p99.5_red": 8.2
+  },
+  "AS-KOP-01": {
+    "name": "Kampur",
+    "river": "Kopili River",
+    "p90_yellow": 693.1,
+    "p97_orange": 1155.1,
+    "p99.5_red": 1938.7
+  },
+  "AS-DHA-01": {
+    "name": "Numaligarh",
+    "river": "Dhansiri River",
+    "p90_yellow": 800.7,
+    "p97_orange": 1118.4,
+    "p99.5_red": 1671.4
+  },
+  "AS-JIA-01": {
+    "name": "Tezpur",
+    "river": "Jia Bharali River",
+    "p90_yellow": 27063.5,
+    "p97_orange": 36811.9,
+    "p99.5_red": 45261.7
+  }
+}

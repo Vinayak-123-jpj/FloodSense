@@ -148,44 +148,44 @@ export const ModelMethodPage: React.FC = () => {
             Why Not Just Use GloFAS?
           </h2>
           <p className="font-sans text-xs text-survey-slate dark:text-night-slate">
-            Copernicus GloFAS provides invaluable continental-scale hydrological reanalysis, but severe operational gaps prevent it from acting as a standalone village-level early warning system:
+            Copernicus GloFAS already provides invaluable global hydrological forecasts. FloodSense builds on top of GloFAS and Open-Meteo data to deliver a complete, operational early-warning workflow:
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 font-sans text-xs">
           <div className="rounded border border-survey-border/60 dark:border-night-border/60 bg-survey-paper dark:bg-night-bg p-4 space-y-2">
             <div className="flex items-center gap-2 font-bold text-survey-teal dark:text-night-teal font-mono">
-              <Compass className="h-4 w-4" /> 1. Spatial Resolution
+              <Compass className="h-4 w-4" /> 1. Station Risk Classes
             </div>
             <p className="text-survey-ink dark:text-night-text leading-relaxed">
-              GloFAS operates on a coarse 0.05° (~5 km) grid that cannot resolve narrow Western Ghats gorges, steep tributary confluences, or localized bund breaches. FloodSense calibrates to individual river station catchments.
+              GloFAS outputs volumetric discharge ($m^3/s$). FloodSense computes station-specific historical thresholds (p90, p97, p99.5) to output intuitive risk classes with SHAP-based driver explanations.
             </p>
           </div>
 
           <div className="rounded border border-survey-border/60 dark:border-night-border/60 bg-survey-paper dark:bg-night-bg p-4 space-y-2">
             <div className="flex items-center gap-2 font-bold text-survey-teal dark:text-night-teal font-mono">
-              <Activity className="h-4 w-4" /> 2. Update Frequency
+              <Globe className="h-4 w-4" /> 2. Local-Language Alerts
             </div>
             <p className="text-survey-ink dark:text-night-text leading-relaxed">
-              GloFAS publishes model runs once every 24 hours. Flash floods and monsoon cloudbursts in Kerala and Assam crest in 2–6 hours. FloodSense incorporates high-frequency virtual node telemetry every minute.
+              GloFAS does not send localized emergency instructions. FloodSense generates actionable alert messages in English, Malayalam, Assamese, and Hindi paired with nearest evacuation shelter links.
             </p>
           </div>
 
           <div className="rounded border border-survey-border/60 dark:border-night-border/60 bg-survey-paper dark:bg-night-bg p-4 space-y-2">
             <div className="flex items-center gap-2 font-bold text-survey-teal dark:text-night-teal font-mono">
-              <Network className="h-4 w-4" /> 3. Offline Resilience
+              <Network className="h-4 w-4" /> 3. Offline Cached Operation
             </div>
             <p className="text-survey-ink dark:text-night-text leading-relaxed">
-              During catastrophic floods, power grids and cellular towers fail. A cloud-only API becomes unreachable. FloodSense bundles local datasets, offline vector maps, and runs self-contained on edge hardware.
+              During storm outages, cloud APIs become unreachable. FloodSense bundles offline historical datasets, vector maps, and cached snapshots so the system remains fully operable without internet.
             </p>
           </div>
 
           <div className="rounded border border-survey-border/60 dark:border-night-border/60 bg-survey-paper dark:bg-night-bg p-4 space-y-2">
             <div className="flex items-center gap-2 font-bold text-survey-teal dark:text-night-teal font-mono">
-              <Globe className="h-4 w-4" /> 4. Vernacular Alerting
+              <Activity className="h-4 w-4" /> 4. Hardware-Ready Design
             </div>
             <p className="text-survey-ink dark:text-night-text leading-relaxed">
-              GloFAS outputs raw discharge arrays with no actionable local advice. FloodSense translates danger states into multi-lingual alerts (Malayalam, Assamese, Hindi, English) with designated safe shelters.
+              FloodSense includes a hardware-ready ESP32 open sensor blueprint (planned for physical deployment, simulated this round) to integrate direct river stage telemetry into local models.
             </p>
           </div>
         </div>

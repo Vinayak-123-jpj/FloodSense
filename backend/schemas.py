@@ -47,6 +47,11 @@ class StationResponse(BaseModel):
     warning_level_m: float
     danger_level_m: float
     normal_level_m: float
+    p90_m3s: Optional[float] = None
+    p97_m3s: Optional[float] = None
+    p99_5_m3s: Optional[float] = None
+    current_discharge_m3s: Optional[float] = None
+    data_source_label: Optional[str] = None
     description: Optional[str]
     current_water_level_m: Optional[float] = None
     current_risk_level: Optional[str] = "Green"

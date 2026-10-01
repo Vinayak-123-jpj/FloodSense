@@ -19,19 +19,13 @@ from backend.ml.predictor import get_model, rule_based_fallback
 CACHE_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "data", "cache")
 os.makedirs(CACHE_DIR, exist_ok=True)
 
-# Default percentile thresholds for stations if missing
-STATION_PERCENTILES = {
-    "KL-PER-01": {"p90_yellow": 160.0, "p97_orange": 310.0, "p99.5_red": 550.0},
-    "KL-PER-02": {"p90_yellow": 200.0, "p97_orange": 380.0, "p99.5_red": 620.0},
-    "KL-PAM-01": {"p90_yellow": 120.0, "p97_orange": 260.0, "p99.5_red": 480.0},
-    "KL-ACH-01": {"p90_yellow": 90.0, "p97_orange": 210.0, "p99.5_red": 390.0},
-    "KL-CHA-01": {"p90_yellow": 140.0, "p97_orange": 290.0, "p99.5_red": 510.0},
-    "KL-MUV-01": {"p90_yellow": 110.0, "p97_orange": 240.0, "p99.5_red": 440.0},
-    "AS-BRA-01": {"p90_yellow": 4500.0, "p97_orange": 7200.0, "p99.5_red": 11500.0},
-    "AS-BRA-02": {"p90_yellow": 5200.0, "p97_orange": 8100.0, "p99.5_red": 13000.0},
-    "AS-JIA-01": {"p90_yellow": 180.0, "p97_orange": 340.0, "p99.5_red": 590.0},
-    "AS-DHA-01": {"p90_yellow": 210.0, "p97_orange": 410.0, "p99.5_red": 680.0}
-}
+# Single source of truth thresholds
+THRESHOLDS_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "data", "thresholds.json")
+try:
+    with open(THRESHOLDS_PATH, "r", encoding="utf-8") as f:
+        STATION_PERCENTILES = json.load(f)
+except Exception:
+    STATION_PERCENTILES = {}
 
 RISK_MAP = {0: "Green", 1: "Yellow", 2: "Orange", 3: "Red"}
 
@@ -132,6 +126,10 @@ def fetch_real_live_station_data(station: Station, timeout: float = 3.5) -> dict
         latest_dis = float(discharges[-1]) if discharges else 0.0
         latest_precip = float(precips[-1]) if precips else 0.0
 
+        latest_fe_row = fe_df_1d.iloc[-1].to_dict() if not fe_df_1d.empty else {}
+        from backend.ml.explainability import get_top_drivers_list
+        top_drivers = get_top_drivers_list(latest_fe_row, r1d, model)
+
         result = {
             "station_id": station.id,
             "station_name": station.name,
@@ -142,6 +140,7 @@ def fetch_real_live_station_data(station: Station, timeout: float = 3.5) -> dict
             "current_observed_discharge_m3s": latest_dis,
             "current_observed_water_level_m": round(latest_dis / 45.0, 2),
             "current_observed_rain_24h_mm": latest_precip,
+            "top_risk_drivers": top_drivers,
             "forecast_horizons": {
                 "1d_risk": r1d,
                 "2d_risk": r2d,

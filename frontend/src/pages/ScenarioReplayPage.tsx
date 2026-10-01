@@ -146,21 +146,31 @@ export const ScenarioReplayPage: React.FC = () => {
       };
     });
 
-    // Recompute overall risk
-    let maxPrio = 0;
-    let overallRisk: RiskLevel = 'Green';
-    const prioMap: Record<RiskLevel, number> = { Green: 0, Yellow: 1, Orange: 2, Red: 3 };
+    // Count risk classes & find peak station dynamically from data
+    const counts: Record<RiskLevel, number> = { Red: 0, Orange: 0, Yellow: 0, Green: 0 };
+    let maxStation = scaledStations[0];
     scaledStations.forEach(st => {
-      if (prioMap[st.risk_level] > maxPrio) {
-        maxPrio = prioMap[st.risk_level];
-        overallRisk = st.risk_level;
+      counts[st.risk_level] = (counts[st.risk_level] || 0) + 1;
+      if (st.discharge_m3s > (maxStation?.discharge_m3s || 0)) {
+        maxStation = st;
       }
     });
 
-    let headline = baseFrame.headline;
+    const activeRiskParts = [];
+    if (counts.Red > 0) activeRiskParts.push(`${counts.Red} Red`);
+    if (counts.Orange > 0) activeRiskParts.push(`${counts.Orange} Orange`);
+    if (counts.Yellow > 0) activeRiskParts.push(`${counts.Yellow} Yellow`);
+    if (counts.Green > 0 && activeRiskParts.length === 0) activeRiskParts.push(`All ${counts.Green} Green`);
+
+    let headline = `${baseFrame.date}: ${activeRiskParts.join(', ')} — Peak: ${maxStation ? maxStation.name : ''} (${maxStation ? maxStation.discharge_m3s : 0} m³/s)`;
     if (rainMultiplier !== 1.0) {
-      headline += ` [${rainMultiplier.toFixed(1)}x Rain Stress]`;
+      headline += ` [${rainMultiplier.toFixed(1)}x Scenario]`;
     }
+
+    let overallRisk: RiskLevel = 'Green';
+    if (counts.Red > 0) overallRisk = 'Red';
+    else if (counts.Orange > 0) overallRisk = 'Orange';
+    else if (counts.Yellow > 0) overallRisk = 'Yellow';
 
     return {
       ...baseFrame,
@@ -401,8 +411,11 @@ export const ScenarioReplayPage: React.FC = () => {
                     <h2 className="font-serif text-lg font-bold text-survey-ink dark:text-night-text">
                       {activeSelected.name}
                     </h2>
-                    <span className="text-xs text-survey-slate dark:text-night-slate font-sans">
+                    <span className="text-xs text-survey-slate dark:text-night-slate font-sans block">
                       {activeSelected.river} • Elevation: {activeSelected.elevation_m}m
+                    </span>
+                    <span className="inline-block mt-1 px-2 py-0.5 rounded font-mono text-[10px] bg-survey-border/30 dark:bg-night-border/30 text-survey-teal dark:text-night-teal border border-survey-teal/30">
+                      COLOR SOURCE: Held-Out ML Prediction (heldout_2018_model.joblib)
                     </span>
                   </div>
                   <RiskBadge level={activeSelectedReplay.risk_level} size="md" />
@@ -414,6 +427,8 @@ export const ScenarioReplayPage: React.FC = () => {
                 station={activeSelected}
                 currentDischargeM3s={activeSelectedReplay.discharge_m3s}
                 currentWaterLevelM={activeSelectedReplay.water_level_m}
+                mode="REPLAY"
+                maxGaugeScale={Math.round((activeSelected.p99_5_m3s || 550) * 1.35)}
               />
 
               {/* 72h / 14-Day Timeline Trend */}
