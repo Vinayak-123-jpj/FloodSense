@@ -24,15 +24,13 @@ export interface HorizonBaselineComparison {
 
 export interface Station2018Detail {
   river_name?: string;
-  green_days_2018?: number;
-  yellow_days_2018?: number;
-  orange_days_2018?: number;
-  red_days_2018?: number;
-  actual_orange_red_days_2018: number;
-  predicted_orange_red_days_2018: number;
-  false_alarm_days_2018: number;
-  august_2018_lead_time_days: number;
-  august_2018_lead_time_hours: number;
+  event_description?: string;
+  actual_orange_red_days_2018?: number | string;
+  first_warning_date?: string;
+  first_threshold_crossing_date?: string;
+  strict_lead_time_days?: number | null;
+  lead_time_display?: string;
+  git_tag_pre_6d_lead?: string;
 }
 
 export interface FullMetricsSummary {

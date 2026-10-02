@@ -18,7 +18,7 @@ Monsoon flood disasters in river basins across India (such as the August 2018 Ke
 ## 3. Solution Overview
 FloodSense solves these challenges through a unified 5-layer software architecture:
 - **Virtual Sensor Layer**: `SensorNodeSimulator` emulates solar-powered ESP32 ultrasonic water level nodes with Gaussian measurement noise, battery drain/solar recharge dynamics, and packet dropouts.
-- **Data & Feature Engineering Pipeline**: Long-term daily hydrological dataset (131,490 samples from 1990 to 2025) featuring daily rolling rainfall (1d, 3d, 7d, 14d, 30d), 3d discharge rate-of-change, and 7-day Antecedent Precipitation Index (API).
+- **Data & Feature Engineering Pipeline**: Long-term daily hydrological dataset (115,502 daily rows from 1990 to 2025 across 11 stations) featuring daily rolling rainfall (1d, 3d, 7d, 14d, 30d), 3d discharge rate-of-change, and 7-day Antecedent Precipitation Index (API).
 - **Leakage-Audited Multi-Horizon ML Classifier**: LightGBM model trained on shifted future targets ($t+1\text{d}, t+2\text{d}, t+3\text{d}$) evaluated across 3 rigorous validation protocols (7-day block bootstrap 95% CIs, held-out 2018 event set, and Leave-One-RIVER-Out LORO spatial generalization).
 - **Hysteresis & Multilingual Alert Engine**: State machine with 10% threshold deadbands and 2-hour minimum suppression windows to eliminate alert flapping, delivering outbox notifications in English, Hindi, Malayalam, and Assamese.
 - **Hydrological Survey Atlas Frontend**: Desaturated OpenStreetMap Leaflet atlas with keyless tiles, 4-second vector GeoJSON boundary fallback, 2018 disaster scrubber, what-if stress test slider, and skippable guided demo tour.

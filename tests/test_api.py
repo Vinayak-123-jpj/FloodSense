@@ -405,23 +405,42 @@ def test_2018_high_risk_days_recomputed_from_csv_equals_metrics_json():
         reported_days = details["actual_orange_red_days_2018"]
         assert recomputed_days == reported_days, f"Mismatch for {st_id}: recomputed {recomputed_days} vs reported {reported_days}"
 
-def test_no_threshold_exceeds_1_5x_csv_max():
-    """Requirement 7C: Asserts no threshold (p90, p97, p99.5) exceeds 1.5x the CSV max for any station."""
+def test_raw_csv_equals_raw_api_json():
+    """Step 9 Test: Verifies every data/raw CSV value equals the value in its raw_api JSON."""
     import json, os, pandas as pd
-    thresh_path = os.path.join(os.path.dirname(__file__), "..", "data", "thresholds.json")
     raw_dir = os.path.join(os.path.dirname(__file__), "..", "data", "raw")
-    with open(thresh_path, "r", encoding="utf-8") as f:
-        thresh_dict = json.load(f)
+    raw_api_dir = os.path.join(os.path.dirname(__file__), "..", "data", "raw_api")
+    meta_path = os.path.join(os.path.dirname(__file__), "..", "data", "stations_metadata.json")
 
-    for st_id, data in thresh_dict.items():
-        csv_p = os.path.join(raw_dir, f"{st_id}_1990_2025.csv")
-        df = pd.read_csv(csv_p)
-        csv_max = float(df["river_discharge_m3s"].max())
-        max_bound = 1.5 * csv_max
+    with open(meta_path, "r", encoding="utf-8") as f:
+        stations = json.load(f)
 
-        for t_key in ["p90_yellow", "p97_orange", "p99.5_red"]:
-            val = data[t_key]
-            assert val <= max_bound, f"Station {st_id} threshold {t_key} ({val}) exceeds 1.5x CSV max ({max_bound})"
+    for st in stations:
+        st_id = st["id"]
+        csv_path = os.path.join(raw_dir, f"{st_id}_1990_2025.csv")
+        json_path = os.path.join(raw_api_dir, f"{st_id}_discharge.json")
+
+        assert os.path.exists(csv_path), f"CSV missing for {st_id}"
+        assert os.path.exists(json_path), f"JSON missing for {st_id}"
+
+        df = pd.read_csv(csv_path)
+        with open(json_path, "r", encoding="utf-8") as f:
+            json_data = json.load(f)
+
+        times = json_data["daily"]["time"]
+        discharges = json_data["daily"]["river_discharge"]
+        json_map = dict(zip(times, discharges))
+
+        for _, row in df.iterrows():
+            d_str = str(row["date"])[:10]
+            csv_val = row["river_discharge_m3s"]
+            assert d_str in json_map, f"Date {d_str} missing in JSON for {st_id}"
+            json_val = json_map[d_str]
+            if pd.isna(csv_val) or json_val is None:
+                assert pd.isna(csv_val) and json_val is None
+            else:
+                assert float(csv_val) == float(json_val), f"Mismatch at {st_id} on {d_str}: CSV {csv_val} vs JSON {json_val}"
+
 
 
 

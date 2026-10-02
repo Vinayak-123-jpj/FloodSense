@@ -1,8 +1,9 @@
 # FloodSense Development Progress
 
-## Current Status: ROUND 6B VERIFICATION AUDIT COMPLETE — RETRAIN PROVED & AUDITED
+## Current Status: ROUND 7 COMPLETE — UI ALIGNED & HONEST ML REPOSITIONING VERIFIED
 
 ### Phase Checklist
+- [x] **ROUND 7: UI Alignment & Honest ML Repositioning** (Fixed "undefined" lead-time and station table fields, added `tests/test_ui_metrics.py` schema validation test, updated sample count to 115,502 daily rows across 11 stations, replaced $m^3/s$ with m³/s, labeled 2018 tables "Kerala (primary)" and Assam separately with exact counts, retitled ML section to "Experimental ML risk layer (not the primary forecast)", added plain summary paragraph explaining persistence baseline superiority at 1d/2d/3d with technical reasons and future work list, set Open-Meteo discharge forecast as primary forecast on Landing and Live Monitor with LightGBM as secondary "experimental model" chip, built strict lead time table for Kerala stations, audited and rewrote overclaims across README, docs, submission answers, and frontend pages, 32/32 pytest pass, 0-error build pass, desktop 1440px screenshots captured)
 - [x] **Phase 0: Plan & Setup**
 - [x] **Phase 1: Backend Core & Virtual Sensor Layer**
 - [x] **Phase 2: ML Risk Engine & Data Pipeline**

@@ -18,7 +18,7 @@
 ## Technical & Data Science Disclaimers (Data Honesty)
 1. **Modeled Discharge**: River discharge ($m^3/s$) is derived from GloFAS reanalysis modeling via Open-Meteo, NOT physical gauge height meters.
 2. **Percentile Risk Proxies**: Danger levels are station-specific historical training period percentiles (p90=Yellow, p97=Orange, p99.5=Red), NOT official CWC stage thresholds.
-3. **Daily Temporal Resolution**: Training dataset consists of 144,639 daily samples (1990–2025 across 11 stations), matching GloFAS update rates.
+3. **Daily Temporal Resolution**: Training dataset consists of 115,502 daily samples (1990–2025 across 11 stations), matching GloFAS update rates.
 4. **Out-of-Training-Range Limitation**: 2018 peak discharge exceeded the 1990–2017 historical maximum at several Kerala stations (e.g. Aluva, Neeleswaram, Chalakudy), so the held-out flood is partly out of the training range; decision tree models split on static feature thresholds and cannot extrapolate beyond training set maxima.
 
 ---
@@ -38,10 +38,10 @@
 
 ### Protocol (B): Genuinely Out-of-Sample Held-Out 2018 Flood Event Set (with 95% CIs)
 - **Training**: Strictly non-2018 data (excluding 2017-12-25 to 2019-01-07 buffer).
-- **Test Set Accuracy**: **90.36%**
-- **Test Set Macro F1**: **83.57%** (95% CI: **[81.08%, 85.54%]** vs Persistence 85.01% [82.71%, 86.84%])
-- **Orange/Red High-Risk Recall**: **90.93%** (vs Persistence 86.90%)
-- **August 2018 Warning Lead Time**: Median of **2 Days (48 Hours)** prior to peak discharge deluge across Kerala river stations.
+- **Test Set Accuracy**: **83.20%**
+- **Test Set Macro F1**: **69.39%** (95% CI: **[63.48%, 73.66%]** vs Persistence 85.15% [82.0%, 87.4%])
+- **Orange/Red High-Risk Recall**: **86.27%** (vs Persistence 86.93%)
+- **August 2018 Warning Lead Time**: Strict lead times evaluated per station (e.g. Aluva & Muvattupuzha $\ge 3$ days capped; Neeleswaram, Chengannur & Chalakudy 0-day same-day warnings).
 
 ### Protocol (C): Leave-One-RIVER-Out (LORO) Spatial Generalization
 - **Rationale**: Stations on the same river (e.g. `KL-PER-01` and `KL-PER-02`) exhibit high discharge cross-correlation ($r > 0.90$). Standard Leave-One-Station-Out can be optimistic due to spatial correlation; Leave-One-RIVER-Out provides a true spatial generalization benchmark.

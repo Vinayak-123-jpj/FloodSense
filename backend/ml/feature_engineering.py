@@ -25,22 +25,37 @@ FEATURE_COLUMNS_DAILY = [
 # Backward compatibility alias
 FEATURE_COLUMNS = FEATURE_COLUMNS_DAILY
 
-def compute_station_percentiles(train_df: pd.DataFrame) -> Dict[str, Dict[str, float]]:
-    """Calculates p90 (Yellow), p97 (Orange), and p99.5 (Red) discharge percentiles per station from training data ONLY."""
+def compute_station_percentiles(train_df: pd.DataFrame = None) -> Dict[str, Dict[str, float]]:
+    """Loads thresholds from data/thresholds.json if available, else calculates from train_df."""
+    import os, json
+    thresholds_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "data", "thresholds.json"))
+    if os.path.exists(thresholds_path):
+        with open(thresholds_path, "r", encoding="utf-8") as f:
+            t_json = json.load(f)
+        res = {}
+        for st_id, info in t_json.items():
+            res[st_id] = {
+                "p90_yellow": float(info["p90_yellow"]),
+                "p97_orange": float(info["p97_orange"]),
+                "p99.5_red": float(info.get("p99.5_red", info.get("p99_5_red"))),
+            }
+        return res
+
     station_thresholds = {}
-    for st_id, group in train_df.groupby("station_id"):
-        d = group["river_discharge_m3s"].dropna()
-        if len(d) > 0:
-            p90 = float(np.percentile(d, 90))
-            p97 = float(np.percentile(d, 97))
-            p99_5 = float(np.percentile(d, 99.5))
-        else:
-            p90, p97, p99_5 = 100.0, 250.0, 500.0
-        station_thresholds[st_id] = {
-            "p90_yellow": p90,
-            "p97_orange": p97,
-            "p99.5_red": p99_5
-        }
+    if train_df is not None:
+        for st_id, group in train_df.groupby("station_id"):
+            d = group["river_discharge_m3s"].dropna()
+            if len(d) > 0:
+                p90 = float(np.percentile(d, 90))
+                p97 = float(np.percentile(d, 97))
+                p99_5 = float(np.percentile(d, 99.5))
+            else:
+                p90, p97, p99_5 = 100.0, 250.0, 500.0
+            station_thresholds[st_id] = {
+                "p90_yellow": p90,
+                "p97_orange": p97,
+                "p99.5_red": p99_5
+            }
     return station_thresholds
 
 def build_daily_features(
@@ -62,6 +77,9 @@ def build_daily_features(
     if "date" in df.columns:
         df["date"] = pd.to_datetime(df["date"])
         df = df.sort_values(["station_id", "date"]).reset_index(drop=True)
+
+    if station_thresholds is None:
+        station_thresholds = compute_station_percentiles()
 
     station_dfs = []
     for st_id, group in df.groupby("station_id"):
@@ -92,25 +110,23 @@ def build_daily_features(
         st_group["month"] = st_group["date"].dt.month
         st_group["day_of_year"] = st_group["date"].dt.dayofyear
 
-        # 5. Station-specific Risk Label at Day t (using training set percentiles if provided)
-        p_dict = station_thresholds.get(st_id, {}) if station_thresholds else {}
-        p90 = p_dict.get("p90_yellow", np.percentile(discharge, 90) if len(discharge)>0 else 100.0)
-        p97 = p_dict.get("p97_orange", np.percentile(discharge, 97) if len(discharge)>0 else 250.0)
-        p99_5 = p_dict.get("p99.5_red", np.percentile(discharge, 99.5) if len(discharge)>0 else 500.0)
+        # 5. Station-specific Risk Label at Day t (using strict discharge percentiles)
+        p_dict = station_thresholds.get(st_id, {})
+        p90 = p_dict.get("p90_yellow", 100.0)
+        p97 = p_dict.get("p97_orange", 250.0)
+        p99_5 = p_dict.get("p99.5_red", p_dict.get("p99_5_red", 500.0))
 
-        def derive_risk(d_val: float, r7d_val: float) -> int:
-            if d_val >= p99_5 or r7d_val >= 250.0:
+        def derive_risk(d_val: float) -> int:
+            if d_val >= p99_5:
                 return 3 # Red
-            elif d_val >= p97 or r7d_val >= 150.0:
+            elif d_val >= p97:
                 return 2 # Orange
-            elif d_val >= p90 or r7d_val >= 75.0:
+            elif d_val >= p90:
                 return 1 # Yellow
             else:
                 return 0 # Green
 
-        st_group["current_risk_at_t"] = [
-            derive_risk(d, r7) for d, r7 in zip(st_group["discharge_m3s"], st_group["rain_7d"])
-        ]
+        st_group["current_risk_at_t"] = [derive_risk(d) for d in st_group["discharge_m3s"]]
 
         # 6. Future Target Shift by horizon_days (No Leakage)
         st_group[f"target_risk_{horizon_days}d"] = st_group["current_risk_at_t"].shift(-horizon_days)
@@ -122,3 +138,4 @@ def build_daily_features(
     if station_dfs:
         return pd.concat(station_dfs, ignore_index=True)
     return pd.DataFrame()
+

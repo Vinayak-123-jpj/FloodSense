@@ -117,6 +117,9 @@ export const LiveMonitorPage: React.FC = () => {
         <div>
           <span className="font-mono text-xs text-survey-teal dark:text-night-teal uppercase tracking-wider block">HYDROLOGICAL NETWORK MONITORING</span>
           <h1 className="font-serif text-2xl font-bold text-survey-ink dark:text-night-text">River Station Telemetry & Risk Monitor</h1>
+          <span className="font-sans text-xs text-survey-slate dark:text-night-slate block">
+            Primary Forecast: Open-Meteo GloFAS Discharge vs Station Thresholds (p90/p97/p99.5) • Secondary Layer: Experimental LightGBM Model
+          </span>
         </div>
 
         {/* Telemetry Source Toggle & Region Filter */}

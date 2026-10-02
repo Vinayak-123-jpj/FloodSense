@@ -36,9 +36,9 @@
 ---
 
 ### Scene 5: Data Science Audit & Baseline Honesty Segment (2:15 - 2:45)
-- **Visual**: Navigate to `/model` (Model & Method Page). Show the top metric cards (Macro F1: 83.57%, High-Risk Recall: 90.93%, Lead Time: 2 Days), the multi-horizon baseline comparison table, 95% bootstrap CIs, LORO validation, and the per-station 2018 breakdown table.
+- **Visual**: Navigate to `/model` (Model & Method Page). Show the top metric cards (Macro F1: 69.39%, High-Risk Recall: 86.27%, Lead Time: Strict), the multi-horizon baseline comparison table, 95% bootstrap CIs, LORO validation, and the per-station 2018 breakdown table.
 - **Voiceover**:
-  > "Now for our Data Science Audit. In the spirit of scientific transparency: river discharge is GloFAS reanalysis modeled data, thresholds are percentile proxies, and lead times are capped at our 3-day maximum horizon. On our held-out 2018 test set, LightGBM achieves 83.57% Macro F1 at 24 hours (95% CI: [81.08%, 85.54%]) and 90.93% recall on severe Orange/Red alert days. While 1-day Macro F1 overlaps with Persistence, LightGBM yields higher high-risk recall and distinct gains at 2-day and 3-day lead horizons."
+  > "Now for our Data Science Audit. In the spirit of scientific transparency: river discharge is GloFAS reanalysis modeled data, thresholds are percentile proxies, and lead times are capped at our 3-day maximum horizon. On our held-out 2018 test set, LightGBM achieves 69.39% Macro F1 at 24 hours (95% CI: [63.48%, 73.66%]) and 86.27% recall on severe Orange/Red alert days. While 1-day Macro F1 overlaps with Persistence, LightGBM yields higher high-risk recall and distinct gains at 2-day and 3-day lead horizons."
 
 ---
 

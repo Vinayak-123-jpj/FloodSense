@@ -1,0 +1,16 @@
+==========================================================================================
+ STEP 3: INDEPENDENT DATA TRUTH VERIFICATION (data/truth/ vs data/raw/)
+==========================================================================================
+Station ID   Station Name    Rows     Max Abs Diff    Dates Equal?    Verification Status
+------------------------------------------------------------------------------------------
+KL-PER-01    Neeleswaram     10500    0.000000        Yes             PASSED (EXACT MATCH 0.0)
+KL-PER-02    Aluva           10500    0.000000        Yes             PASSED (EXACT MATCH 0.0)
+KL-PAM-01    Chengannur      10500    0.000000        Yes             PASSED (EXACT MATCH 0.0)
+KL-MUV-01    Muvattupuzha    10500    0.000000        Yes             PASSED (EXACT MATCH 0.0)
+KL-CHA-01    Chalakudy       10500    0.000000        Yes             PASSED (EXACT MATCH 0.0)
+KL-ACH-01    Thumpamon       10500    0.000000        Yes             PASSED (EXACT MATCH 0.0)
+AS-BRA-01    Guwahati        10500    0.000000        Yes             PASSED (EXACT MATCH 0.0)
+AS-BRA-02    Dibrugarh       10500    0.000000        Yes             PASSED (EXACT MATCH 0.0)
+AS-KOP-01    Kampur          10500    0.000000        Yes             PASSED (EXACT MATCH 0.0)
+AS-DHA-01    Numaligarh      10500    0.000000        Yes             PASSED (EXACT MATCH 0.0)
+AS-JIA-01    Tezpur          10500    0.000000        Yes             PASSED (EXACT MATCH 0.0)

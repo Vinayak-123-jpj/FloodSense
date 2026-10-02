@@ -33,9 +33,9 @@ export const LandingPage: React.FC = () => {
   const leadHours = metrics?.kerala_2018_median_lead_time_hours ?? 48;
 
   const h2018_1d = metrics?.heldout_2018_multi_horizon?.['1d'];
-  const macroF1 = h2018_1d?.lightgbm?.macro_f1_pct ?? 83.57;
-  const persF1 = h2018_1d?.persistence_baseline?.macro_f1_pct ?? 85.01;
-  const recall = h2018_1d?.lightgbm?.orange_red_recall_pct ?? 90.93;
+  const macroF1 = h2018_1d?.lightgbm?.macro_f1_pct ?? 69.39;
+  const persF1 = h2018_1d?.persistence_baseline?.macro_f1_pct ?? 85.15;
+  const recall = h2018_1d?.lightgbm?.orange_red_recall_pct ?? 86.27;
 
   return (
     <div className="space-y-8 pb-12">
@@ -142,18 +142,29 @@ export const LandingPage: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* MODEL FORECAST Chips */}
-                    <div className="flex items-center justify-between pt-1 border-t border-survey-border/30 dark:border-night-border/30 text-[10px]">
-                      <span className="text-survey-slate dark:text-night-slate uppercase font-semibold">MODEL FORECAST:</span>
-                      <div className="flex items-center gap-1">
-                        <span className="px-1.5 py-0.5 rounded bg-survey-border/30 dark:bg-night-border/30 text-survey-ink dark:text-night-text">
-                          D+1 ({d1Date}): <strong className="text-emerald-600 dark:text-emerald-400">Green</strong>
+                    {/* PRIMARY FORECAST (Open-Meteo Thresholds) & SECONDARY EXPERIMENTAL MODEL CHIP */}
+                    <div className="flex flex-col gap-1 pt-1 border-t border-survey-border/30 dark:border-night-border/30 text-[10px]">
+                      <div className="flex items-center justify-between">
+                        <span className="text-survey-slate dark:text-night-slate uppercase font-semibold">
+                          OPEN-METEO THRESHOLD FORECAST (PRIMARY):
                         </span>
-                        <span className="px-1.5 py-0.5 rounded bg-survey-border/30 dark:bg-night-border/30 text-survey-ink dark:text-night-text">
-                          D+2 ({d2Date}): <strong className="text-emerald-600 dark:text-emerald-400">Green</strong>
-                        </span>
-                        <span className="px-1.5 py-0.5 rounded bg-survey-border/30 dark:bg-night-border/30 text-survey-ink dark:text-night-text">
-                          D+3 ({d3Date}): <strong className="text-emerald-600 dark:text-emerald-400">Green</strong>
+                        <div className="flex items-center gap-1 font-mono">
+                          <span className="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-bold">
+                            D+1 ({d1Date}): Green
+                          </span>
+                          <span className="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-bold">
+                            D+2 ({d2Date}): Green
+                          </span>
+                          <span className="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-bold">
+                            D+3 ({d3Date}): Green
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between text-[9px] opacity-80 pt-0.5">
+                        <span className="text-survey-slate dark:text-night-slate uppercase">Secondary Layer:</span>
+                        <span className="px-1.5 py-0.5 rounded border border-survey-teal/30 dark:border-night-teal/30 text-survey-teal dark:text-night-teal font-mono">
+                          Experimental Model (D+1 F1: 69.39% vs 85.15% Persistence)
                         </span>
                       </div>
                     </div>

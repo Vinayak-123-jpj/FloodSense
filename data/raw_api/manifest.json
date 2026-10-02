@@ -1,0 +1,178 @@
+{
+  "KL-PER-01": {
+    "discharge": {
+      "url": "https://flood-api.open-meteo.com/v1/flood?latitude=10.125&longitude=76.575&daily=river_discharge&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:48:39.726493+00:00",
+      "sha256": "594ad3376dc49460457f0121daa96da9e8133e2ee5211c99bc8aaf48d1d125bc",
+      "returned_lat": 10.125,
+      "returned_lon": 76.57501
+    },
+    "rainfall": {
+      "url": "https://archive-api.open-meteo.com/v1/archive?latitude=10.125&longitude=76.575&daily=precipitation_sum&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:48:41.147358+00:00",
+      "sha256": "730db7484f9d27fcc67ffd9b5695ef95ac60e47fb34e0c0951fd256d8a54335d",
+      "returned_lat": 10.158173,
+      "returned_lon": 76.57894
+    }
+  },
+  "KL-PER-02": {
+    "discharge": {
+      "url": "https://flood-api.open-meteo.com/v1/flood?latitude=10.125&longitude=76.375&daily=river_discharge&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:48:45.944938+00:00",
+      "sha256": "c72959191a4a04139ea1a66c8c6cc3684f1fadc9067f9516dc4f0557112326cc",
+      "returned_lat": 10.125,
+      "returned_lon": 76.375
+    },
+    "rainfall": {
+      "url": "https://archive-api.open-meteo.com/v1/archive?latitude=10.125&longitude=76.375&daily=precipitation_sum&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:48:48.555393+00:00",
+      "sha256": "5622e216b8261920201433e1d455aee68a97a36db66d9e00fbd76400a12f7976",
+      "returned_lat": 10.087873,
+      "returned_lon": 76.35408
+    }
+  },
+  "KL-PAM-01": {
+    "discharge": {
+      "url": "https://flood-api.open-meteo.com/v1/flood?latitude=9.325&longitude=76.625&daily=river_discharge&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:48:49.803392+00:00",
+      "sha256": "fad028ccf2fcec42d136088f854e422aa92fa3a6db605edcb1fbe4ab2f6de4f0",
+      "returned_lat": 9.325005,
+      "returned_lon": 76.625
+    },
+    "rainfall": {
+      "url": "https://archive-api.open-meteo.com/v1/archive?latitude=9.325&longitude=76.625&daily=precipitation_sum&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:48:50.935564+00:00",
+      "sha256": "78a210d7844dbab13b0b8b2f1ac0f6fcc91b68882f1732247d247567cd9f488c",
+      "returned_lat": 9.314587,
+      "returned_lon": 76.640625
+    }
+  },
+  "KL-MUV-01": {
+    "discharge": {
+      "url": "https://flood-api.open-meteo.com/v1/flood?latitude=9.975&longitude=76.575&daily=river_discharge&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:48:52.156200+00:00",
+      "sha256": "ebd82a177f0922f33bf9bc1cc0fe70e9fa5253540127b29f9a55e0c25eb7f225",
+      "returned_lat": 9.975006,
+      "returned_lon": 76.57501
+    },
+    "rainfall": {
+      "url": "https://archive-api.open-meteo.com/v1/archive?latitude=9.975&longitude=76.575&daily=precipitation_sum&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:48:53.105504+00:00",
+      "sha256": "8e531107367cf182d13210a79e1958012def42f85c738bfd86420136d079ee0a",
+      "returned_lat": 9.947276,
+      "returned_lon": 76.614174
+    }
+  },
+  "KL-CHA-01": {
+    "discharge": {
+      "url": "https://flood-api.open-meteo.com/v1/flood?latitude=10.325&longitude=76.325&daily=river_discharge&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:48:56.637663+00:00",
+      "sha256": "1062959440b3fce47d32d8f8ab5a88280641c43b13c7a6aa72ad14495798eecd",
+      "returned_lat": 10.325005,
+      "returned_lon": 76.32501
+    },
+    "rainfall": {
+      "url": "https://archive-api.open-meteo.com/v1/archive?latitude=10.325&longitude=76.325&daily=precipitation_sum&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:49:30.120793+00:00",
+      "sha256": "2f1a535e6aa8a60a70eb1a6dde6ebcff13cadacce053590306807cf1aba667a3",
+      "returned_lat": 10.29877,
+      "returned_lon": 76.3181
+    }
+  },
+  "KL-ACH-01": {
+    "discharge": {
+      "url": "https://flood-api.open-meteo.com/v1/flood?latitude=9.275&longitude=76.725&daily=river_discharge&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:49:33.902403+00:00",
+      "sha256": "b026b848d2989c9dc51b2b28330e30b91e932d6f758c7b5a44c518c430fe8c2c",
+      "returned_lat": 9.275002,
+      "returned_lon": 76.725006
+    },
+    "rainfall": {
+      "url": "https://archive-api.open-meteo.com/v1/archive?latitude=9.275&longitude=76.725&daily=precipitation_sum&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:49:35.054039+00:00",
+      "sha256": "df3ee618976804182dffc30eba1138a59a39d8fd34ef80c67c4203019d5f3e8d",
+      "returned_lat": 9.244288,
+      "returned_lon": 76.73027
+    }
+  },
+  "AS-BRA-01": {
+    "discharge": {
+      "url": "https://flood-api.open-meteo.com/v1/flood?latitude=26.225&longitude=91.775&daily=river_discharge&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:49:36.354927+00:00",
+      "sha256": "9f83c1fa061c6cbed97cf70fdbdf700cfc885c477ca673699fe1a92105f5bb20",
+      "returned_lat": 26.225006,
+      "returned_lon": 91.775024
+    },
+    "rainfall": {
+      "url": "https://archive-api.open-meteo.com/v1/archive?latitude=26.225&longitude=91.775&daily=precipitation_sum&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:49:37.355642+00:00",
+      "sha256": "b88980a898f3621b094b1596a0fa63a4a606338000ad666f89b2059d00aac906",
+      "returned_lat": 26.25659,
+      "returned_lon": 91.77827
+    }
+  },
+  "AS-BRA-02": {
+    "discharge": {
+      "url": "https://flood-api.open-meteo.com/v1/flood?latitude=27.425&longitude=94.725&daily=river_discharge&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:49:38.724713+00:00",
+      "sha256": "593e1c5c2fbc1b31ea5f97458c326f470f0c15c22c895a61d998f89036c4c94f",
+      "returned_lat": 27.425003,
+      "returned_lon": 94.725006
+    },
+    "rainfall": {
+      "url": "https://archive-api.open-meteo.com/v1/archive?latitude=27.425&longitude=94.725&daily=precipitation_sum&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:49:39.678469+00:00",
+      "sha256": "5ec83aaf921c0ee89e955b2ec04f6c497ff6765c14a7a1c431d703cf3a820a19",
+      "returned_lat": 27.451668,
+      "returned_lon": 94.731544
+    }
+  },
+  "AS-KOP-01": {
+    "discharge": {
+      "url": "https://flood-api.open-meteo.com/v1/flood?latitude=26.175&longitude=92.575&daily=river_discharge&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:49:41.014400+00:00",
+      "sha256": "ae0d7aaaaebf083454fdfecb0ac7599b6695205f0ac206b25453e284b4cf335e",
+      "returned_lat": 26.175003,
+      "returned_lon": 92.57501
+    },
+    "rainfall": {
+      "url": "https://archive-api.open-meteo.com/v1/archive?latitude=26.175&longitude=92.575&daily=precipitation_sum&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:50:07.301746+00:00",
+      "sha256": "1bf60c2fb9f7847a49c658038a24b5ee265e86021f014872472d20fce7d734a7",
+      "returned_lat": 26.18629,
+      "returned_lon": 92.565796
+    }
+  },
+  "AS-DHA-01": {
+    "discharge": {
+      "url": "https://flood-api.open-meteo.com/v1/flood?latitude=26.575&longitude=93.725&daily=river_discharge&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:50:08.705035+00:00",
+      "sha256": "7110e6ad1450de3916ac49f8759dbdd000a5e17bed714ef79b6d3e04ee94a167",
+      "returned_lat": 26.575005,
+      "returned_lon": 93.725006
+    },
+    "rainfall": {
+      "url": "https://archive-api.open-meteo.com/v1/archive?latitude=26.575&longitude=93.725&daily=precipitation_sum&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:50:42.297455+00:00",
+      "sha256": "8cc73fa8ce4b5039a36055700ccae78511864878d74f34fa5ebc0a67b89d9571",
+      "returned_lat": 26.537785,
+      "returned_lon": 93.770676
+    }
+  },
+  "AS-JIA-01": {
+    "discharge": {
+      "url": "https://flood-api.open-meteo.com/v1/flood?latitude=26.625&longitude=92.825&daily=river_discharge&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:50:43.716230+00:00",
+      "sha256": "8c8609385c8d5a79489711d27c2355138220a0e27619ee29d232ef3d32ff504c",
+      "returned_lat": 26.625,
+      "returned_lon": 92.82501
+    },
+    "rainfall": {
+      "url": "https://archive-api.open-meteo.com/v1/archive?latitude=26.625&longitude=92.825&daily=precipitation_sum&start_date=1990-01-01&end_date=2025-09-30",
+      "fetch_time_utc": "2026-10-02T12:50:44.843879+00:00",
+      "sha256": "a9825cdf576d28dec3734f2dd61beff37e7e14843962399abfc093fbc6767fc8",
+      "returned_lat": 26.608084,
+      "returned_lon": 92.781456
+    }
+  }
+}

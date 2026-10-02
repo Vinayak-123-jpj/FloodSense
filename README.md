@@ -4,7 +4,7 @@
 [![Licence: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python: 3.11](https://img.shields.io/badge/Python-3.11-teal.svg)](backend/)
 [![React: 18](https://img.shields.io/badge/React-18-61dafb.svg)](frontend/)
-[![Held-Out 2018 Macro F1: 83.57%](https://img.shields.io/badge/HeldOut_2018_Macro_F1-83.57%25-success.svg)](reports/metrics.json)
+[![Held-Out 2018 Macro F1: 69.39%](https://img.shields.io/badge/HeldOut_2018_Macro_F1-69.39%25-success.svg)](reports/metrics.json)
 [![ESP32 Firmware CI](https://github.com/YOUR_USERNAME/floodsense/actions/workflows/firmware.yml/badge.svg)](.github/workflows/firmware.yml)
 
 **FloodSense** is a software-only flood early-warning platform and hydrological survey atlas that emulates physical IoT sensor grids to deliver 24-to-72-hour early warning predictions across river catchments in Kerala and Assam. Powered by a FastAPI backend, a leakage-audited LightGBM machine learning classifier trained on 131,490 daily GloFAS records (1990–2025), and a desaturated "Hydrological Survey Atlas" React frontend, FloodSense features hysteresis alert deduplication, multilingual Telegram warnings (English, Hindi, Malayalam & Assamese), OpenStreetMap evacuation routing, and an open-hardware ESP32 blueprint.
@@ -78,12 +78,12 @@ docker compose up --build
 
 | Prediction Horizon | Model / Benchmark | Macro F1 (95% CI) | Orange/Red Recall (95% CI) | Orange/Red Precision | False Alarm Rate (FAR) | False Alarms / Stn-Yr | Accuracy |
 |---|---|---|---|---|---|---|---|
-| **t + 1d (24h)** | **Kerala-Only LightGBM (Primary)** | **85.14% [82.6%, 87.9%]** | **94.21% [91.4%, 96.7%]** | 76.50% | 3.85% | 11.20 | 91.40% |
-| | Pooled 10-Station LightGBM | 84.35% [81.3%, 87.3%] | 90.63% [85.5%, 94.8%] | 75.80% | 4.10% | 12.00 | 90.50% |
-| | Persistence Baseline | 85.01% [82.7%, 86.8%] | 86.90% [83.5%, 89.7%] | 80.56% | 2.92% | 9.45 | 91.71% |
-| | Rainfall Threshold Rule | 48.86% [45.5%, 52.3%] | 97.38% | 32.48% | 27.28% | 91.27 | 61.94% |
+| **t + 1d (24h)** | **Kerala-Only LightGBM (Primary)** | **69.39% [63.5%, 73.7%]** | **86.27% [79.4%, 92.0%]** | 55.46% | 21.20% | 21.20 | 83.20% |
+| | Pooled 10-Station LightGBM | 63.65% [57.5%, 69.1%] | 82.35% [74.4%, 90.1%] | 48.20% | 25.10% | 25.10 | 79.80% |
+| | Persistence Baseline | 85.15% [82.0%, 87.4%] | 86.93% [80.2%, 91.7%] | 80.12% | 6.60% | 6.60 | 91.71% |
+| | Rainfall Threshold Rule | 32.47% [27.5%, 37.6%] | 97.39% [94.3%, 99.5%] | 23.69% | 96.00% | 96.00 | 61.94% |
 
-*Secondary Region (Assam — Experimental)*: The Brahmaputra basin in Assam is evaluated as a secondary, experimental extension. Due to extreme mainstem hydrological scale, spatial Leave-One-RIVER-Out (LORO) generalization on the Brahmaputra river basin achieves **59.12% Macro F1** and **94.60% High-Risk Recall**.
+*Secondary Region (Assam — Experimental)*: The Brahmaputra basin in Assam is evaluated as a secondary, experimental extension. Due to extreme mainstem hydrological scale, spatial Leave-One-RIVER-Out (LORO) generalization on the Brahmaputra river basin achieves **47.23% Macro F1** and **48.66% High-Risk Recall**.
 
 *Note on Leave-One-RIVER-Out (LORO)*: Stations located on the same river (e.g. `KL-PER-01` and `KL-PER-02`) share basin discharge dynamics ($r > 0.90$). Standard cross-validation across stations in the same basin overestimates spatial generalization. Leave-One-RIVER-Out (LORO) provides a strict out-of-basin spatial generalization benchmark.ion.
 

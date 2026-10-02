@@ -2,414 +2,414 @@
   "dataset_resolution": "DAILY (1 row per station per day)",
   "date_range": "1990-01-01 to 2025-09-30",
   "primary_region": "Kerala (Periyar, Pamba, Muvattupuzha, Chalakudy)",
-  "secondary_region": "Assam (Brahmaputra, Dhansiri, Jia Bharali, Kopili) - Secondary, Experimental",
+  "secondary_region": "Assam (Brahmaputra, Dhansiri, Jia Bharali, Kopili)",
   "random_seed": 42,
   "kerala_only_vs_pooled": {
-    "kerala_only_macro_f1": 85.14,
-    "kerala_only_recall": 94.21,
-    "kerala_only_array_sha256": "5e880689d032",
-    "pooled_macro_f1": 84.35,
-    "pooled_recall": 90.63,
-    "pooled_array_sha256": "0501d26bd511"
+    "kerala_only_macro_f1": 69.39,
+    "kerala_only_recall": 86.27,
+    "kerala_only_array_sha256": "aa619c9e538cc1ef",
+    "pooled_macro_f1": 63.65,
+    "pooled_recall": 82.35,
+    "pooled_array_sha256": "8d42245c899f8369"
   },
   "heldout_2018_multi_horizon": {
     "1d": {
       "lightgbm": {
-        "accuracy_pct": 89.42,
-        "macro_f1_pct": 85.14,
-        "false_alarm_rate_pct": 6.09,
-        "missed_event_rate_pct": 5.79,
-        "orange_red_recall_pct": 94.21,
-        "orange_red_precision_pct": 78.98,
-        "false_alarms_per_station_year": 18.2,
+        "accuracy_pct": 86.41,
+        "macro_f1_pct": 69.39,
+        "false_alarm_rate_pct": 6.25,
+        "missed_event_rate_pct": 13.73,
+        "orange_red_recall_pct": 86.27,
+        "orange_red_precision_pct": 55.46,
+        "false_alarms_per_station_year": 21.2,
         "macro_f1_ci_95": [
-          82.6,
-          87.87
+          63.48,
+          73.66
         ],
         "orange_red_recall_ci_95": [
-          91.44,
-          96.7
+          79.41,
+          92.02
         ]
       },
       "linear_logistic_regression": {
-        "accuracy_pct": 65.75,
-        "macro_f1_pct": 60.34,
-        "false_alarm_rate_pct": 20.82,
-        "missed_event_rate_pct": 9.92,
-        "orange_red_recall_pct": 90.08,
-        "orange_red_precision_pct": 50.54,
-        "false_alarms_per_station_year": 64.0,
+        "accuracy_pct": 57.81,
+        "macro_f1_pct": 39.87,
+        "false_alarm_rate_pct": 20.93,
+        "missed_event_rate_pct": 14.38,
+        "orange_red_recall_pct": 85.62,
+        "orange_red_precision_pct": 26.68,
+        "false_alarms_per_station_year": 72.0,
         "macro_f1_ci_95": [
-          55.45,
-          64.21
+          33.91,
+          45.32
         ],
         "orange_red_recall_ci_95": [
-          84.7,
-          94.74
+          75.52,
+          93.96
         ]
       },
       "persistence_baseline": {
-        "accuracy_pct": 90.68,
-        "macro_f1_pct": 86.84,
-        "false_alarm_rate_pct": 3.97,
-        "missed_event_rate_pct": 9.09,
-        "orange_red_recall_pct": 90.91,
-        "orange_red_precision_pct": 84.83,
-        "false_alarms_per_station_year": 11.8,
+        "accuracy_pct": 94.74,
+        "macro_f1_pct": 85.15,
+        "false_alarm_rate_pct": 1.96,
+        "missed_event_rate_pct": 13.07,
+        "orange_red_recall_pct": 86.93,
+        "orange_red_precision_pct": 80.12,
+        "false_alarms_per_station_year": 6.6,
         "macro_f1_ci_95": [
-          84.84,
-          88.47
+          82.04,
+          87.42
         ],
         "orange_red_recall_ci_95": [
-          87.8,
-          93.67
+          80.17,
+          91.71
         ]
       },
       "threshold_baseline": {
-        "accuracy_pct": 67.4,
-        "macro_f1_pct": 62.03,
-        "false_alarm_rate_pct": 19.06,
-        "missed_event_rate_pct": 3.86,
-        "orange_red_recall_pct": 96.14,
-        "orange_red_precision_pct": 54.02,
-        "false_alarms_per_station_year": 59.4,
+        "accuracy_pct": 47.73,
+        "macro_f1_pct": 32.47,
+        "false_alarm_rate_pct": 27.59,
+        "missed_event_rate_pct": 2.61,
+        "orange_red_recall_pct": 97.39,
+        "orange_red_precision_pct": 23.69,
+        "false_alarms_per_station_year": 96.0,
         "macro_f1_ci_95": [
-          57.83,
-          66.02
+          27.47,
+          37.56
         ],
         "orange_red_recall_ci_95": [
-          93.44,
-          98.33
+          94.35,
+          99.48
         ]
-      }
+      },
+      "prediction_sha256": "aa619c9e538cc1ef"
     },
     "2d": {
       "lightgbm": {
-        "accuracy_pct": 83.18,
-        "macro_f1_pct": 76.37,
-        "false_alarm_rate_pct": 9.25,
-        "missed_event_rate_pct": 11.57,
-        "orange_red_recall_pct": 88.43,
-        "orange_red_precision_pct": 69.63,
-        "false_alarms_per_station_year": 28.0,
+        "accuracy_pct": 79.89,
+        "macro_f1_pct": 56.47,
+        "false_alarm_rate_pct": 9.44,
+        "missed_event_rate_pct": 16.34,
+        "orange_red_recall_pct": 83.66,
+        "orange_red_precision_pct": 44.14,
+        "false_alarms_per_station_year": 32.4,
         "macro_f1_ci_95": [
-          73.07,
-          79.15
+          50.15,
+          61.58
         ],
         "orange_red_recall_ci_95": [
-          84.75,
-          92.35
+          75.82,
+          90.44
         ]
       },
       "linear_logistic_regression": {
-        "accuracy_pct": 63.29,
-        "macro_f1_pct": 56.86,
-        "false_alarm_rate_pct": 22.06,
-        "missed_event_rate_pct": 11.85,
-        "orange_red_recall_pct": 88.15,
-        "orange_red_precision_pct": 48.34,
-        "false_alarms_per_station_year": 68.4,
+        "accuracy_pct": 57.42,
+        "macro_f1_pct": 39.44,
+        "false_alarm_rate_pct": 20.5,
+        "missed_event_rate_pct": 15.69,
+        "orange_red_recall_pct": 84.31,
+        "orange_red_precision_pct": 26.82,
+        "false_alarms_per_station_year": 70.4,
         "macro_f1_ci_95": [
-          52.6,
-          60.41
+          33.41,
+          44.72
         ],
         "orange_red_recall_ci_95": [
-          83.09,
-          92.64
+          73.91,
+          92.79
         ]
       },
       "persistence_baseline": {
-        "accuracy_pct": 83.23,
-        "macro_f1_pct": 75.41,
-        "false_alarm_rate_pct": 7.41,
-        "missed_event_rate_pct": 17.08,
-        "orange_red_recall_pct": 82.92,
-        "orange_red_precision_pct": 72.88,
-        "false_alarms_per_station_year": 22.4,
+        "accuracy_pct": 90.25,
+        "macro_f1_pct": 72.54,
+        "false_alarm_rate_pct": 3.54,
+        "missed_event_rate_pct": 24.84,
+        "orange_red_recall_pct": 75.16,
+        "orange_red_precision_pct": 65.71,
+        "false_alarms_per_station_year": 12.0,
         "macro_f1_ci_95": [
-          72.1,
-          78.42
+          67.59,
+          76.03
         ],
         "orange_red_recall_ci_95": [
-          77.41,
-          88.09
+          64.57,
+          83.79
         ]
       },
       "threshold_baseline": {
-        "accuracy_pct": 65.64,
-        "macro_f1_pct": 58.93,
-        "false_alarm_rate_pct": 20.2,
-        "missed_event_rate_pct": 6.34,
-        "orange_red_recall_pct": 93.66,
-        "orange_red_precision_pct": 51.75,
-        "false_alarms_per_station_year": 63.4,
+        "accuracy_pct": 47.56,
+        "macro_f1_pct": 32.07,
+        "false_alarm_rate_pct": 27.67,
+        "missed_event_rate_pct": 2.61,
+        "orange_red_recall_pct": 97.39,
+        "orange_red_precision_pct": 23.61,
+        "false_alarms_per_station_year": 96.4,
         "macro_f1_ci_95": [
-          55.02,
-          63.02
+          27.24,
+          36.79
         ],
         "orange_red_recall_ci_95": [
-          89.94,
-          96.72
+          93.28,
+          100.0
         ]
-      }
+      },
+      "prediction_sha256": "5d89719779ace1c3"
     },
     "3d": {
       "lightgbm": {
-        "accuracy_pct": 79.67,
-        "macro_f1_pct": 70.08,
-        "false_alarm_rate_pct": 10.84,
-        "missed_event_rate_pct": 15.98,
-        "orange_red_recall_pct": 84.02,
-        "orange_red_precision_pct": 64.76,
-        "false_alarms_per_station_year": 33.2,
+        "accuracy_pct": 75.84,
+        "macro_f1_pct": 46.27,
+        "false_alarm_rate_pct": 12.65,
+        "missed_event_rate_pct": 18.95,
+        "orange_red_recall_pct": 81.05,
+        "orange_red_precision_pct": 36.15,
+        "false_alarms_per_station_year": 43.8,
         "macro_f1_ci_95": [
-          66.73,
-          72.87
+          40.82,
+          50.69
         ],
         "orange_red_recall_ci_95": [
-          79.13,
-          88.41
+          71.42,
+          89.78
         ]
       },
       "linear_logistic_regression": {
-        "accuracy_pct": 61.7,
-        "macro_f1_pct": 54.02,
-        "false_alarm_rate_pct": 22.47,
-        "missed_event_rate_pct": 13.77,
-        "orange_red_recall_pct": 86.23,
-        "orange_red_precision_pct": 47.14,
-        "false_alarms_per_station_year": 70.2,
+        "accuracy_pct": 56.16,
+        "macro_f1_pct": 37.02,
+        "false_alarm_rate_pct": 21.35,
+        "missed_event_rate_pct": 20.92,
+        "orange_red_recall_pct": 79.08,
+        "orange_red_precision_pct": 24.85,
+        "false_alarms_per_station_year": 73.2,
         "macro_f1_ci_95": [
-          49.52,
-          57.62
+          31.77,
+          41.72
         ],
         "orange_red_recall_ci_95": [
-          80.69,
-          91.29
+          69.27,
+          87.94
         ]
       },
       "persistence_baseline": {
-        "accuracy_pct": 77.64,
-        "macro_f1_pct": 66.44,
-        "false_alarm_rate_pct": 10.07,
-        "missed_event_rate_pct": 23.97,
-        "orange_red_recall_pct": 76.03,
-        "orange_red_precision_pct": 64.19,
-        "false_alarms_per_station_year": 30.8,
+        "accuracy_pct": 86.68,
+        "macro_f1_pct": 62.41,
+        "false_alarm_rate_pct": 4.82,
+        "missed_event_rate_pct": 34.64,
+        "orange_red_recall_pct": 65.36,
+        "orange_red_precision_pct": 54.95,
+        "false_alarms_per_station_year": 16.4,
         "macro_f1_ci_95": [
-          62.61,
-          70.18
+          57.34,
+          66.46
         ],
         "orange_red_recall_ci_95": [
-          68.69,
-          83.06
+          53.19,
+          76.09
         ]
       },
       "threshold_baseline": {
-        "accuracy_pct": 62.85,
-        "macro_f1_pct": 54.73,
-        "false_alarm_rate_pct": 21.65,
-        "missed_event_rate_pct": 10.19,
-        "orange_red_recall_pct": 89.81,
-        "orange_red_precision_pct": 48.8,
-        "false_alarms_per_station_year": 68.4,
+        "accuracy_pct": 47.34,
+        "macro_f1_pct": 31.41,
+        "false_alarm_rate_pct": 27.78,
+        "missed_event_rate_pct": 3.92,
+        "orange_red_recall_pct": 96.08,
+        "orange_red_precision_pct": 23.3,
+        "false_alarms_per_station_year": 96.8,
         "macro_f1_ci_95": [
-          50.98,
-          58.73
+          27.04,
+          35.8
         ],
         "orange_red_recall_ci_95": [
-          85.5,
-          94.23
+          91.77,
+          99.37
         ]
-      }
+      },
+      "prediction_sha256": "1e083c53f5ef3769"
     }
   },
   "leave_one_river_out_loro": {
     "Brahmaputra": {
-      "accuracy_pct": 85.67,
-      "macro_f1_pct": 73.4,
-      "false_alarm_rate_pct": 8.08,
-      "missed_event_rate_pct": 12.22,
-      "orange_red_recall_pct": 87.78,
-      "orange_red_precision_pct": 55.51,
-      "false_alarms_per_station_year": 964.0
+      "accuracy_pct": 88.55,
+      "macro_f1_pct": 47.23,
+      "false_alarm_rate_pct": 2.52,
+      "missed_event_rate_pct": 51.34,
+      "orange_red_recall_pct": 48.66,
+      "orange_red_precision_pct": 36.02,
+      "false_alarms_per_station_year": 257.5
     },
     "Chalakudy": {
-      "accuracy_pct": 89.75,
-      "macro_f1_pct": 82.32,
-      "false_alarm_rate_pct": 2.35,
-      "missed_event_rate_pct": 17.36,
-      "orange_red_recall_pct": 82.64,
-      "orange_red_precision_pct": 77.09,
-      "false_alarms_per_station_year": 283.0
+      "accuracy_pct": 87.68,
+      "macro_f1_pct": 64.08,
+      "false_alarm_rate_pct": 6.43,
+      "missed_event_rate_pct": 15.96,
+      "orange_red_recall_pct": 84.04,
+      "orange_red_precision_pct": 35.48,
+      "false_alarms_per_station_year": 651.0
     },
     "Dhansiri": {
-      "accuracy_pct": 87.05,
-      "macro_f1_pct": 82.13,
-      "false_alarm_rate_pct": 8.19,
-      "missed_event_rate_pct": 5.6,
-      "orange_red_recall_pct": 94.4,
-      "orange_red_precision_pct": 76.07,
-      "false_alarms_per_station_year": 864.0
+      "accuracy_pct": 70.8,
+      "macro_f1_pct": 33.87,
+      "false_alarm_rate_pct": 16.67,
+      "missed_event_rate_pct": 19.42,
+      "orange_red_recall_pct": 80.58,
+      "orange_red_precision_pct": 11.54,
+      "false_alarms_per_station_year": 1717.0
     },
     "Jia Bharali": {
-      "accuracy_pct": 86.58,
-      "macro_f1_pct": 77.0,
-      "false_alarm_rate_pct": 3.42,
-      "missed_event_rate_pct": 19.95,
-      "orange_red_recall_pct": 80.05,
-      "orange_red_precision_pct": 71.42,
-      "false_alarms_per_station_year": 411.0
+      "accuracy_pct": 85.91,
+      "macro_f1_pct": 52.58,
+      "false_alarm_rate_pct": 5.75,
+      "missed_event_rate_pct": 48.01,
+      "orange_red_recall_pct": 51.99,
+      "orange_red_precision_pct": 21.07,
+      "false_alarms_per_station_year": 588.0
     },
     "Kopili": {
-      "accuracy_pct": 89.14,
-      "macro_f1_pct": 78.01,
-      "false_alarm_rate_pct": 3.65,
-      "missed_event_rate_pct": 19.31,
-      "orange_red_recall_pct": 80.69,
-      "orange_red_precision_pct": 71.28,
-      "false_alarms_per_station_year": 436.0
+      "accuracy_pct": 82.27,
+      "macro_f1_pct": 40.69,
+      "false_alarm_rate_pct": 8.29,
+      "missed_event_rate_pct": 34.88,
+      "orange_red_recall_pct": 65.12,
+      "orange_red_precision_pct": 17.7,
+      "false_alarms_per_station_year": 851.0
     },
     "Muvattupuzha": {
-      "accuracy_pct": 90.64,
-      "macro_f1_pct": 84.11,
-      "false_alarm_rate_pct": 2.2,
-      "missed_event_rate_pct": 16.3,
-      "orange_red_recall_pct": 83.7,
-      "orange_red_precision_pct": 82.02,
-      "false_alarms_per_station_year": 260.0
+      "accuracy_pct": 85.98,
+      "macro_f1_pct": 35.41,
+      "false_alarm_rate_pct": 4.63,
+      "missed_event_rate_pct": 59.2,
+      "orange_red_recall_pct": 40.8,
+      "orange_red_precision_pct": 26.91,
+      "false_alarms_per_station_year": 470.0
     },
     "Pamba": {
-      "accuracy_pct": 90.09,
-      "macro_f1_pct": 78.27,
-      "false_alarm_rate_pct": 1.98,
-      "missed_event_rate_pct": 26.52,
-      "orange_red_recall_pct": 73.48,
-      "orange_red_precision_pct": 72.05,
-      "false_alarms_per_station_year": 244.0
+      "accuracy_pct": 91.48,
+      "macro_f1_pct": 65.89,
+      "false_alarm_rate_pct": 1.89,
+      "missed_event_rate_pct": 32.55,
+      "orange_red_recall_pct": 67.45,
+      "orange_red_precision_pct": 62.4,
+      "false_alarms_per_station_year": 191.0
     },
     "Periyar": {
-      "accuracy_pct": 87.02,
-      "macro_f1_pct": 78.28,
-      "false_alarm_rate_pct": 5.37,
-      "missed_event_rate_pct": 11.27,
-      "orange_red_recall_pct": 88.73,
-      "orange_red_precision_pct": 65.21,
-      "false_alarms_per_station_year": 640.5
+      "accuracy_pct": 80.27,
+      "macro_f1_pct": 24.11,
+      "false_alarm_rate_pct": 6.38,
+      "missed_event_rate_pct": 88.94,
+      "orange_red_recall_pct": 11.06,
+      "orange_red_precision_pct": 7.28,
+      "false_alarms_per_station_year": 643.0
     }
   },
   "station_2018_details": {
-    "AS-BRA-01": {
-      "river_name": "Brahmaputra",
-      "event_description": "July-August 2018 Assam Monsoon Flood",
-      "actual_orange_red_days_2018": 21,
-      "predicted_orange_red_days_2018": 128,
-      "false_alarm_days_2018": 107,
-      "first_warning_date": "2018-07-01",
-      "first_threshold_crossing_date": "2018-07-27",
-      "august_2018_lead_time_days": 3,
-      "august_2018_lead_time_hours": 72
-    },
-    "AS-BRA-02": {
-      "river_name": "Brahmaputra",
-      "event_description": "July-August 2018 Assam Monsoon Flood",
-      "actual_orange_red_days_2018": 12,
-      "predicted_orange_red_days_2018": 182,
-      "false_alarm_days_2018": 170,
-      "first_warning_date": "2018-07-01",
-      "first_threshold_crossing_date": "2018-08-01",
-      "august_2018_lead_time_days": 3,
-      "august_2018_lead_time_hours": 72
-    },
-    "AS-DHA-01": {
-      "river_name": "Dhansiri",
-      "event_description": "July-August 2018 Assam Monsoon Flood",
-      "actual_orange_red_days_2018": 14,
-      "predicted_orange_red_days_2018": 68,
-      "false_alarm_days_2018": 54,
-      "first_warning_date": "2018-07-08",
-      "first_threshold_crossing_date": "2018-08-01",
-      "august_2018_lead_time_days": 3,
-      "august_2018_lead_time_hours": 72
-    },
-    "AS-JIA-01": {
-      "river_name": "Jia Bharali",
-      "event_description": "July-August 2018 Assam Monsoon Flood",
-      "actual_orange_red_days_2018": 14,
-      "predicted_orange_red_days_2018": 148,
-      "false_alarm_days_2018": 134,
-      "first_warning_date": "2018-07-01",
-      "first_threshold_crossing_date": "2018-07-04",
-      "august_2018_lead_time_days": 3,
-      "august_2018_lead_time_hours": 72
-    },
-    "AS-KOP-01": {
-      "river_name": "Kopili",
-      "event_description": "July-August 2018 Assam Monsoon Flood",
-      "actual_orange_red_days_2018": 19,
-      "predicted_orange_red_days_2018": 28,
-      "false_alarm_days_2018": 10,
-      "first_warning_date": "2018-08-12",
-      "first_threshold_crossing_date": "2018-08-14",
-      "august_2018_lead_time_days": 2,
-      "august_2018_lead_time_hours": 48
-    },
-    "KL-CHA-01": {
-      "river_name": "Chalakudy",
-      "event_description": "August 2018 Kerala Deluge",
-      "actual_orange_red_days_2018": 80,
-      "predicted_orange_red_days_2018": 82,
-      "false_alarm_days_2018": 6,
-      "first_warning_date": "2018-08-10",
-      "first_threshold_crossing_date": "2018-08-14",
-      "august_2018_lead_time_days": 3,
-      "august_2018_lead_time_hours": 72
-    },
-    "KL-MUV-01": {
-      "river_name": "Muvattupuzha",
-      "event_description": "August 2018 Kerala Deluge",
-      "actual_orange_red_days_2018": 86,
-      "predicted_orange_red_days_2018": 89,
-      "false_alarm_days_2018": 6,
-      "first_warning_date": "2018-08-08",
-      "first_threshold_crossing_date": "2018-08-15",
-      "august_2018_lead_time_days": 3,
-      "august_2018_lead_time_hours": 72
-    },
-    "KL-PAM-01": {
-      "river_name": "Pamba",
-      "event_description": "August 2018 Kerala Deluge",
-      "actual_orange_red_days_2018": 43,
-      "predicted_orange_red_days_2018": 50,
-      "false_alarm_days_2018": 9,
-      "first_warning_date": "2018-08-13",
-      "first_threshold_crossing_date": "2018-08-14",
-      "august_2018_lead_time_days": 1,
-      "august_2018_lead_time_hours": 24
-    },
     "KL-PER-01": {
       "river_name": "Periyar",
       "event_description": "August 2018 Kerala Deluge",
-      "actual_orange_red_days_2018": 92,
-      "predicted_orange_red_days_2018": 104,
-      "false_alarm_days_2018": 13,
-      "first_warning_date": "2018-08-08",
-      "first_threshold_crossing_date": "2018-08-15",
-      "august_2018_lead_time_days": 3,
-      "august_2018_lead_time_hours": 72
+      "actual_orange_red_days_2018": 29,
+      "first_warning_date": "2018-08-14",
+      "first_threshold_crossing_date": "2018-08-14",
+      "strict_lead_time_days": 0,
+      "lead_time_display": "0 day",
+      "git_tag_pre_6d_lead": "3 days (24h x 3)"
     },
     "KL-PER-02": {
       "river_name": "Periyar",
       "event_description": "August 2018 Kerala Deluge",
-      "actual_orange_red_days_2018": 62,
-      "predicted_orange_red_days_2018": 75,
-      "false_alarm_days_2018": 14,
-      "first_warning_date": "2018-08-13",
+      "actual_orange_red_days_2018": 35,
+      "first_warning_date": "2018-08-08",
       "first_threshold_crossing_date": "2018-08-14",
-      "august_2018_lead_time_days": 1,
-      "august_2018_lead_time_hours": 24
+      "strict_lead_time_days": 6,
+      "lead_time_display": ">=3 days (capped)",
+      "git_tag_pre_6d_lead": "1 day (24h)"
+    },
+    "KL-PAM-01": {
+      "river_name": "Pamba",
+      "event_description": "August 2018 Kerala Deluge",
+      "actual_orange_red_days_2018": 33,
+      "first_warning_date": "2018-08-14",
+      "first_threshold_crossing_date": "2018-08-14",
+      "strict_lead_time_days": 0,
+      "lead_time_display": "0 day",
+      "git_tag_pre_6d_lead": "1 day (24h)"
+    },
+    "KL-MUV-01": {
+      "river_name": "Muvattupuzha",
+      "event_description": "August 2018 Kerala Deluge",
+      "actual_orange_red_days_2018": 24,
+      "first_warning_date": "2018-08-09",
+      "first_threshold_crossing_date": "2018-08-15",
+      "strict_lead_time_days": 6,
+      "lead_time_display": ">=3 days (capped)",
+      "git_tag_pre_6d_lead": "3 days (24h x 3)"
+    },
+    "KL-CHA-01": {
+      "river_name": "Chalakudy",
+      "event_description": "August 2018 Kerala Deluge",
+      "actual_orange_red_days_2018": 32,
+      "first_warning_date": "2018-08-14",
+      "first_threshold_crossing_date": "2018-08-14",
+      "strict_lead_time_days": 0,
+      "lead_time_display": "0 day",
+      "git_tag_pre_6d_lead": "3 days (24h x 3)"
+    },
+    "KL-ACH-01": {
+      "river_name": "Achenkovil",
+      "event_description": "Excluded (History ends 2009)",
+      "actual_orange_red_days_2018": "N/A (Short history)",
+      "first_warning_date": "N/A",
+      "first_threshold_crossing_date": "N/A",
+      "lead_time_display": "no event (short history)",
+      "lead_time_days": null
+    },
+    "AS-BRA-01": {
+      "river_name": "Brahmaputra",
+      "event_description": "July-August 2018 Assam Monsoon Flood",
+      "actual_orange_red_days_2018": 0,
+      "first_warning_date": "2018-07-04",
+      "first_threshold_crossing_date": "never crossed",
+      "strict_lead_time_days": null,
+      "lead_time_display": "no event",
+      "git_tag_pre_6d_lead": "3 days (24h x 3)"
+    },
+    "AS-BRA-02": {
+      "river_name": "Brahmaputra",
+      "event_description": "July-August 2018 Assam Monsoon Flood",
+      "actual_orange_red_days_2018": 2,
+      "first_warning_date": "2018-07-02",
+      "first_threshold_crossing_date": "2018-07-03",
+      "strict_lead_time_days": 1,
+      "lead_time_display": "1 day",
+      "git_tag_pre_6d_lead": "3 days (24h x 3)"
+    },
+    "AS-KOP-01": {
+      "river_name": "Kopili",
+      "event_description": "July-August 2018 Assam Monsoon Flood",
+      "actual_orange_red_days_2018": 4,
+      "first_warning_date": "2018-07-01",
+      "first_threshold_crossing_date": "never crossed",
+      "strict_lead_time_days": null,
+      "lead_time_display": "no event",
+      "git_tag_pre_6d_lead": "2 days (48h)"
+    },
+    "AS-DHA-01": {
+      "river_name": "Dhansiri",
+      "event_description": "July-August 2018 Assam Monsoon Flood",
+      "actual_orange_red_days_2018": 3,
+      "first_warning_date": "2018-07-07",
+      "first_threshold_crossing_date": "never crossed",
+      "strict_lead_time_days": null,
+      "lead_time_display": "no event",
+      "git_tag_pre_6d_lead": "3 days (24h x 3)"
+    },
+    "AS-JIA-01": {
+      "river_name": "Jia Bharali",
+      "event_description": "July-August 2018 Assam Monsoon Flood",
+      "actual_orange_red_days_2018": 0,
+      "first_warning_date": "2018-07-23",
+      "first_threshold_crossing_date": "never crossed",
+      "strict_lead_time_days": null,
+      "lead_time_display": "no event",
+      "git_tag_pre_6d_lead": "3 days (24h x 3)"
     }
-  },
-  "kerala_2018_median_lead_time_days": 3,
-  "kerala_2018_median_lead_time_hours": 72
+  }
 }
