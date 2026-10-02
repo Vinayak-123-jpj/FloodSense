@@ -77,8 +77,31 @@ app.include_router(simulate.router, prefix=settings.API_V1_STR)
 # Register WebSocket router at root /ws/live
 app.include_router(websocket.router)
 
+# Mount compiled React frontend SPA if dist folder exists
+import os
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from fastapi import HTTPException
+
+DIST_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend", "dist"))
+if not os.path.exists(DIST_DIR):
+    DIST_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "dist"))
+
+if os.path.exists(DIST_DIR):
+    assets_dir = os.path.join(DIST_DIR, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    async def serve_spa(full_path: str):
+        if full_path.startswith("api/") or full_path.startswith("ws/") or full_path in ["docs", "redoc", "openapi.json"]:
+            raise HTTPException(status_code=404, detail="Not Found")
+        target_file = os.path.join(DIST_DIR, full_path)
+        if os.path.exists(target_file) and os.path.isfile(target_file):
+            return FileResponse(target_file)
+        return FileResponse(os.path.join(DIST_DIR, "index.html"))
+
 if __name__ == "__main__":
-    import os
     import uvicorn
     port = int(os.getenv("PORT", 8000))
-    uvicorn.run("backend.main:app", host="0.0.0.0", port=port, reload=True)
+    uvicorn.run("backend.main:app", host="0.0.0.0", port=port, reload=False)
