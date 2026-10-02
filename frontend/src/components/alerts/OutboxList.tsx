@@ -95,8 +95,13 @@ export const OutboxList: React.FC<OutboxProps> = ({ alerts, onClear }) => {
                 </div>
                 <div className="flex items-center gap-2 font-mono text-xs">
                   <span className="text-survey-slate dark:text-night-slate">
-                    {new Date(alert.timestamp).toLocaleString()}
+                    {new Date(alert.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })} IST
                   </span>
+                  {alert.reason && alert.reason.includes('[DEMO') && (
+                    <span className="inline-flex items-center gap-1 text-[10px] bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 px-2 py-0.5 rounded border border-amber-400 font-bold">
+                      DEMO
+                    </span>
+                  )}
                   {alert.sent_to_telegram ? (
                     <span className="inline-flex items-center gap-1 text-[10px] bg-sky-100 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 px-2 py-0.5 rounded border border-sky-300">
                       <Send className="h-3 w-3" /> TELEGRAM DELIVERED

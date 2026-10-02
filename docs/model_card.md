@@ -18,7 +18,8 @@
 ## Technical & Data Science Disclaimers (Data Honesty)
 1. **Modeled Discharge**: River discharge ($m^3/s$) is derived from GloFAS reanalysis modeling via Open-Meteo, NOT physical gauge height meters.
 2. **Percentile Risk Proxies**: Danger levels are station-specific historical training period percentiles (p90=Yellow, p97=Orange, p99.5=Red), NOT official CWC stage thresholds.
-3. **Daily Temporal Resolution**: Training dataset consists of 131,490 daily samples (1990–2025 across 10 stations), matching GloFAS update rates.
+3. **Daily Temporal Resolution**: Training dataset consists of 144,639 daily samples (1990–2025 across 11 stations), matching GloFAS update rates.
+4. **Out-of-Training-Range Limitation**: 2018 peak discharge exceeded the 1990–2017 historical maximum at several Kerala stations (e.g. Aluva, Neeleswaram, Chalakudy), so the held-out flood is partly out of the training range; decision tree models split on static feature thresholds and cannot extrapolate beyond training set maxima.
 
 ---
 
@@ -26,26 +27,26 @@
 
 ### Protocol (A): Time Split with 7-Day Gap (80% Train / 20% Test)
 - **1-Day Lead ($t+1\text{d}$)**:
-  - **LightGBM Accuracy**: **87.78%** | **Macro F1**: **81.40%**
-  - **Shallow Tree Baseline**: Accuracy 86.12% | Macro F1 78.96%
-  - **Persistence Baseline**: Accuracy 90.00% | Macro F1 84.08%
-  - **Threshold Rule Benchmark**: Accuracy 63.08% | Macro F1 51.80%
-  - **Orange/Red Alert False Alarm Rate (FAR)**: **4.68%**
-  - **Orange/Red Alert Missed Event Rate (MER)**: **13.96%** (High-Risk Recall: **86.04%**)
-- **2-Day Lead ($t+2\text{d}$)**: Accuracy **81.64%** | Macro F1 **72.87%**
-- **3-Day Lead ($t+3\text{d}$)**: Accuracy **77.23%** | Macro F1 **66.01%**
+  - **LightGBM Accuracy**: **88.02%** | **Macro F1**: **81.01%** [79.99%, 82.06%]
+  - **Logistic Regression**: Accuracy 85.37% | Macro F1 58.29%
+  - **Persistence Baseline**: Accuracy 90.22% | Macro F1 83.84%
+  - **Threshold Rule Benchmark**: Accuracy 62.31% | Macro F1 50.02%
+  - **Orange/Red Alert False Alarm Rate (FAR)**: **4.48%**
+  - **Orange/Red Alert Missed Event Rate (MER)**: **14.55%** (High-Risk Recall: **85.45%**)
+- **2-Day Lead ($t+2\text{d}$)**: Accuracy **81.91%** | Macro F1 **72.50%**
+- **3-Day Lead ($t+3\text{d}$)**: Accuracy **77.77%** | Macro F1 **65.79%**
 
 ### Protocol (B): Genuinely Out-of-Sample Held-Out 2018 Flood Event Set (with 95% CIs)
 - **Training**: Strictly non-2018 data (excluding 2017-12-25 to 2019-01-07 buffer).
-- **Test Set Accuracy**: **90.63%**
-- **Test Set Macro F1**: **84.71%** (95% CI: **[80.26%, 88.24%]** vs Persistence 85.58% [81.31%, 89.83%])
-- **Orange/Red High-Risk Recall**: **91.40%** (vs Persistence 87.21%)
+- **Test Set Accuracy**: **90.36%**
+- **Test Set Macro F1**: **83.57%** (95% CI: **[81.08%, 85.54%]** vs Persistence 85.01% [82.71%, 86.84%])
+- **Orange/Red High-Risk Recall**: **90.93%** (vs Persistence 86.90%)
 - **August 2018 Warning Lead Time**: Median of **2 Days (48 Hours)** prior to peak discharge deluge across Kerala river stations.
 
 ### Protocol (C): Leave-One-RIVER-Out (LORO) Spatial Generalization
 - **Rationale**: Stations on the same river (e.g. `KL-PER-01` and `KL-PER-02`) exhibit high discharge cross-correlation ($r > 0.90$). Standard Leave-One-Station-Out can be optimistic due to spatial correlation; Leave-One-RIVER-Out provides a true spatial generalization benchmark.
 - **Held-Out River Basin (Periyar Basin)**:
-  - **Accuracy**: **89.85%** | **Macro F1**: **82.10%** | **Orange/Red Recall**: **89.50%**
+  - **Accuracy**: **88.75%** | **Macro F1**: **79.57%** | **Orange/Red Recall**: **85.44%**
 
 ---
 

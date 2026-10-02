@@ -83,6 +83,19 @@ def fetch_real_live_station_data(station: Station, timeout: float = 3.5) -> dict
         f_data = f_resp.json().get("daily", {})
         w_data = w_resp.json().get("daily", {})
 
+        # Assert grid cell equality between live fetch and stored history
+        ret_lat = f_resp.json().get("latitude")
+        ret_lon = f_resp.json().get("longitude")
+        st_info = STATION_PERCENTILES.get(station.id, {})
+        expected_grid_lat = st_info.get("grid_cell_lat")
+        expected_grid_lon = st_info.get("grid_cell_lon")
+
+        if ret_lat is not None and ret_lon is not None and expected_grid_lat is not None and expected_grid_lon is not None:
+            if abs(ret_lat - expected_grid_lat) > 0.01 or abs(ret_lon - expected_grid_lon) > 0.01:
+                raise ValueError(
+                    f"Grid cell mismatch for {station.id}: API returned ({ret_lat}, {ret_lon}), history expects ({expected_grid_lat}, {expected_grid_lon})"
+                )
+
         dates = f_data.get("time", [])
         discharges = f_data.get("river_discharge", [])
         precips = w_data.get("precipitation_sum", [])
@@ -126,9 +139,15 @@ def fetch_real_live_station_data(station: Station, timeout: float = 3.5) -> dict
         latest_dis = float(discharges[-1]) if discharges else 0.0
         latest_precip = float(precips[-1]) if precips else 0.0
 
+        hist_max = STATION_PERCENTILES.get(station.id, {}).get("historical_max_m3s", 100000.0)
+        if latest_dis < 0 or (hist_max > 0 and latest_dis > 1.5 * hist_max):
+            r1d = "Data check failed"
+            r2d = "Data check failed"
+            r3d = "Data check failed"
+
         latest_fe_row = fe_df_1d.iloc[-1].to_dict() if not fe_df_1d.empty else {}
         from backend.ml.explainability import get_top_drivers_list
-        top_drivers = get_top_drivers_list(latest_fe_row, r1d, model)
+        top_drivers = get_top_drivers_list(latest_fe_row, r1d, model, station_thresholds=STATION_PERCENTILES.get(station.id, {}))
 
         result = {
             "station_id": station.id,
@@ -147,8 +166,13 @@ def fetch_real_live_station_data(station: Station, timeout: float = 3.5) -> dict
                 "3d_risk": r3d
             },
             "recent_daily_series": [
-                {"date": str(d)[:10], "discharge_m3s": float(dis), "rain_mm": float(pr)}
-                for d, dis, pr in zip(dates[-7:], discharges[-7:], precips[-7:])
+                {
+                    "date": str(d)[:10],
+                    "discharge_m3s": float(dis),
+                    "rain_mm": float(pr),
+                    "is_forecast": idx >= (len(dates[-10:]) - 3)
+                }
+                for idx, (d, dis, pr) in enumerate(zip(dates[-10:], discharges[-10:], precips[-10:]))
             ]
         }
 

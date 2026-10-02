@@ -128,5 +128,12 @@ export const api = {
   getRealLiveStationData: async (id: string): Promise<any> => {
     const res = await axios.get(`${API_BASE}/stations/${id}/real_live`);
     return res.data;
+  },
+
+  postDemoAlert: async (station_id: string, risk_level: string, language: string): Promise<any> => {
+    const res = await axios.post(`${API_BASE}/alerts/demo`, null, {
+      params: { station_id, risk_level, language }
+    });
+    return res.data;
   }
 };

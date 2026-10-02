@@ -177,28 +177,57 @@ export const LiveMonitorPage: React.FC = () => {
             height="580px"
           />
 
-          {/* Live Telemetry Ticker Strip */}
-          <div className="rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card p-3 font-mono text-xs">
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <div className="flex items-center gap-2 text-survey-teal dark:text-night-teal font-semibold">
-                <Radio className="h-4 w-4 animate-pulse" /> TELEMETRY STREAM
-              </div>
-              <SourceBadge mode={sourceMode} isCached={isCachedSnapshot} fetchedAt={fetchedAt} />
-            </div>
-            <div className="h-20 overflow-y-auto space-y-1 text-survey-slate dark:text-night-slate scrollbar-thin">
-              {liveLog.length === 0 ? (
-                <div className="italic">
-                  {sourceMode === 'REAL'
-                    ? 'Connected to Open-Meteo GloFAS discharge reanalysis & forecast stream...'
-                    : 'Listening for virtual ESP32 sensor broadcasts...'}
+          {/* Live Telemetry / Data Freshness Panel */}
+          {sourceMode === 'REAL' ? (
+            <div className="rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card p-4 font-mono text-xs shadow-xs space-y-3">
+              <div className="flex items-center justify-between border-b border-survey-border/60 dark:border-night-border/60 pb-2">
+                <div className="flex items-center gap-2 text-survey-teal dark:text-night-teal font-semibold">
+                  <Database className="h-4 w-4 text-sky-500" /> OPEN-METEO DATA FRESHNESS & CACHE CONTROL
                 </div>
-              ) : (
-                liveLog.map((log, idx) => (
-                  <div key={idx} className="hover:text-survey-ink dark:hover:text-night-text">{log}</div>
-                ))
-              )}
+                <SourceBadge mode={sourceMode} isCached={isCachedSnapshot} fetchedAt={fetchedAt} />
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 font-sans text-xs">
+                <div>
+                  <span className="block font-mono text-[10px] uppercase text-survey-slate dark:text-night-slate">Primary Source</span>
+                  <span className="font-semibold text-survey-ink dark:text-night-text">Open-Meteo GloFAS 0.05°</span>
+                </div>
+                <div>
+                  <span className="block font-mono text-[10px] uppercase text-survey-slate dark:text-night-slate">Fetched At (IST)</span>
+                  <span className="font-semibold text-survey-ink dark:text-night-text">
+                    {fetchedAt ? new Date(fetchedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' IST' : 'Live'}
+                  </span>
+                </div>
+                <div>
+                  <span className="block font-mono text-[10px] uppercase text-survey-slate dark:text-night-slate">Next Auto-Refresh</span>
+                  <span className="font-semibold text-survey-ink dark:text-night-text">In 30 Minutes</span>
+                </div>
+                <div>
+                  <span className="block font-mono text-[10px] uppercase text-survey-slate dark:text-night-slate">Cache Status</span>
+                  <span className={`font-semibold ${isCachedSnapshot ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                    {isCachedSnapshot ? 'Cached Snapshot (Offline)' : 'Live API (Fresh)'}
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card p-3 font-mono text-xs shadow-xs">
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <div className="flex items-center gap-2 text-survey-teal dark:text-night-teal font-semibold">
+                  <Radio className="h-4 w-4 animate-pulse text-amber-500" /> VIRTUAL ESP32 TELEMETRY BROADCAST
+                </div>
+                <SourceBadge mode={sourceMode} isCached={isCachedSnapshot} fetchedAt={fetchedAt} />
+              </div>
+              <div className="h-20 overflow-y-auto space-y-1 text-survey-slate dark:text-night-slate scrollbar-thin">
+                {liveLog.length === 0 ? (
+                  <div className="italic">Listening for virtual ESP32 sensor broadcasts over WebSocket...</div>
+                ) : (
+                  liveLog.map((log, idx) => (
+                    <div key={idx} className="hover:text-survey-ink dark:hover:text-night-text">{log}</div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right Column: Station Detail View */}
@@ -257,6 +286,7 @@ export const LiveMonitorPage: React.FC = () => {
                 station={selectedStation}
                 readings={readings}
                 forecastPoints={forecastPoints}
+                realDailySeries={sourceMode === 'REAL' ? realLiveData?.recent_daily_series : undefined}
               />
             </>
           ) : (

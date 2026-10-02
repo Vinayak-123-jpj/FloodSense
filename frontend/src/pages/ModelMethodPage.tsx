@@ -135,6 +135,7 @@ export const ModelMethodPage: React.FC = () => {
           <li><strong>Percentile Risk Proxies:</strong> Danger thresholds are station-specific historical training period discharge percentiles (p90=Yellow, p97=Orange, p99.5=Red), NOT official CWC stage levels.</li>
           <li><strong>Max Horizon Cap:</strong> Prediction lead times are strictly capped at the 3-day (t+3d) maximum horizon. GloFAS discharge is updated daily.</li>
           <li><strong>Station Independence & Spatial Correlation:</strong> Stations located along the same river basin (e.g. Aluva and Neeleswaram on the Periyar) exhibit high discharge correlation (r &gt; 0.90). Standard Leave-One-Station-Out (LOSO) is therefore optimistic; Leave-One-RIVER-Out (LORO) provides our strict spatial generalization benchmark.</li>
+          <li><strong>Out-of-Training-Range Limitation:</strong> 2018 peak discharge exceeded the 1990–2017 historical maximum at several Kerala stations (e.g. Aluva, Neeleswaram, Chalakudy), so the held-out flood is partly out of the training range; decision tree models split on static feature thresholds and cannot extrapolate beyond training set maxima.</li>
         </ul>
       </section>
 

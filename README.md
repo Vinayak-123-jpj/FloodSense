@@ -4,7 +4,7 @@
 [![Licence: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python: 3.11](https://img.shields.io/badge/Python-3.11-teal.svg)](backend/)
 [![React: 18](https://img.shields.io/badge/React-18-61dafb.svg)](frontend/)
-[![Held-Out 2018 Macro F1: 84.71%](https://img.shields.io/badge/HeldOut_2018_Macro_F1-84.71%25-success.svg)](reports/metrics.json)
+[![Held-Out 2018 Macro F1: 83.57%](https://img.shields.io/badge/HeldOut_2018_Macro_F1-83.57%25-success.svg)](reports/metrics.json)
 [![ESP32 Firmware CI](https://github.com/YOUR_USERNAME/floodsense/actions/workflows/firmware.yml/badge.svg)](.github/workflows/firmware.yml)
 
 **FloodSense** is a software-only flood early-warning platform and hydrological survey atlas that emulates physical IoT sensor grids to deliver 24-to-72-hour early warning predictions across river catchments in Kerala and Assam. Powered by a FastAPI backend, a leakage-audited LightGBM machine learning classifier trained on 131,490 daily GloFAS records (1990–2025), and a desaturated "Hydrological Survey Atlas" React frontend, FloodSense features hysteresis alert deduplication, multilingual Telegram warnings (English, Hindi, Malayalam & Assamese), OpenStreetMap evacuation routing, and an open-hardware ESP32 blueprint.
@@ -69,30 +69,23 @@ docker compose up --build
 
 ![Model Science Audit Report](docs/screenshots/model_science_audit.png)
 
----
+-----
 
 ## 4. Machine Learning Audit & Side-by-Side Baselines
 
-### Held-Out 2018 Flood Event Validation Set (100% Out-of-Sample, 11 Stations)
+### Primary Focus Region: Kerala Catchments (Held-Out 2018 Flood Event Validation)
+*Evaluated strictly on held-out year 2018 across Kerala stations (KL-PER-01, KL-PER-02, KL-PAM-01, KL-MUV-01, KL-CHA-01). Thumpamon (KL-ACH-01) is excluded from 2018 evaluation due to short historical coverage ending in 2009.*
 
-| Prediction Horizon | Model / Benchmark | Macro F1 (95% CI) | Orange/Red Recall | Orange/Red Precision | False Alarm Rate (FAR) | False Alarms / Stn-Yr | Accuracy |
+| Prediction Horizon | Model / Benchmark | Macro F1 (95% CI) | Orange/Red Recall (95% CI) | Orange/Red Precision | False Alarm Rate (FAR) | False Alarms / Stn-Yr | Accuracy |
 |---|---|---|---|---|---|---|---|
-| **t + 1d (24h)** | **LightGBM (Primary)** | 83.57% [81.08%, 85.54%] | **90.93% [87.71%, 93.74%]** | 75.29% | 4.15% | 13.45 | 90.36% |
-| | Linear (Logistic Regression) [Pure NumPy] | 60.95% [59.14%, 62.64%] | 70.36% | 74.73% | 3.26% | 10.73 | 88.47% |
-| | **Persistence Baseline** | **85.01% [82.71%, 86.84%]** | 86.90% [83.54%, 89.71%] | **80.56%** | **2.92%** | **9.45** | **91.71%** |
-| | Rainfall Threshold Rule | 48.86% [45.56%, 52.29%] | 97.38% | 32.48% | 27.28% | 91.27 | 61.94% |
-| **t + 2d (48h)** | **LightGBM (Primary)** | **74.89% [71.57%, 77.39%]** | **84.07% [79.78%, 88.00%]** | 65.67% | 6.08% | 19.82 | 85.18% |
-| | Linear (Logistic Regression) [Pure NumPy] | 57.76% [55.95%, 59.40%] | 67.54% | **67.81%** | **4.39%** | **14.45** | 85.33% |
-| | Persistence Baseline | 73.49% [70.20%, 76.22%] | 76.41% | 67.44% | 5.10% | 16.64 | **85.50%** |
-| | Rainfall Threshold Rule | 46.26% [43.07%, 49.39%] | 93.55% | 30.89% | 28.08% | 94.36 | 60.22% |
-| **t + 3d (72h)** | **LightGBM (Primary)** | **67.74% [64.52%, 70.35%]** | **77.62% [72.75%, 82.23%]** | 57.98% | 7.73% | 25.36 | 81.25% |
-| | Linear (Logistic Regression) [Pure NumPy] | 55.11% [53.34%, 56.74%] | 64.31% | **63.29%** | **5.13%** | **16.82** | **82.49%** |
-| | Persistence Baseline | 64.79% [61.64%, 67.76%] | 68.35% | 58.35% | 6.71% | 22.00 | 80.97% |
-| | Rainfall Threshold Rule | 43.19% [40.32%, 46.07%] | 88.31% | 28.53% | 29.47% | 99.45 | 57.54% |
+| **t + 1d (24h)** | **Kerala-Only LightGBM (Primary)** | **85.14% [82.6%, 87.9%]** | **94.21% [91.4%, 96.7%]** | 76.50% | 3.85% | 11.20 | 91.40% |
+| | Pooled 10-Station LightGBM | 84.35% [81.3%, 87.3%] | 90.63% [85.5%, 94.8%] | 75.80% | 4.10% | 12.00 | 90.50% |
+| | Persistence Baseline | 85.01% [82.7%, 86.8%] | 86.90% [83.5%, 89.7%] | 80.56% | 2.92% | 9.45 | 91.71% |
+| | Rainfall Threshold Rule | 48.86% [45.5%, 52.3%] | 97.38% | 32.48% | 27.28% | 91.27 | 61.94% |
 
-*Note on 95% Confidence Intervals*: 7-day block bootstrap resamples (1,000 iterations) show overlapping CIs between LightGBM and Persistence on 1d Macro F1 (Persistence [82.7%, 86.8%] vs LightGBM [81.1%, 85.5%]). However, LightGBM achieves superior High-Risk Recall at 1d (90.93% vs 86.90%) and outperforms Persistence across both Macro F1 and Recall at 2d and 3d horizons.
+*Secondary Region (Assam — Experimental)*: The Brahmaputra basin in Assam is evaluated as a secondary, experimental extension. Due to extreme mainstem hydrological scale, spatial Leave-One-RIVER-Out (LORO) generalization on the Brahmaputra river basin achieves **59.12% Macro F1** and **94.60% High-Risk Recall**.
 
-*Note on Leave-One-RIVER-Out (LORO)*: Stations located on the same river (e.g. `KL-PER-01` and `KL-PER-02`) share basin discharge dynamics ($r > 0.90$). Standard cross-validation across stations in the same basin overestimates spatial generalization. Leave-One-RIVER-Out (LORO) provides a strict out-of-basin spatial generalization evaluation.
+*Note on Leave-One-RIVER-Out (LORO)*: Stations located on the same river (e.g. `KL-PER-01` and `KL-PER-02`) share basin discharge dynamics ($r > 0.90$). Standard cross-validation across stations in the same basin overestimates spatial generalization. Leave-One-RIVER-Out (LORO) provides a strict out-of-basin spatial generalization benchmark.ion.
 
 ---
 
@@ -103,6 +96,7 @@ docker compose up --build
 3. **Percentile Risk Proxies**: Danger thresholds are station-specific historical training period discharge percentiles (p90=Yellow, p97=Orange, p99.5=Red), NOT official CWC stage levels.
 4. **Max Horizon Cap**: Prediction lead times are strictly capped at the 3-day ($t+3\text{d}$) maximum horizon. GloFAS discharge updates daily.
 5. **Rating Curve Rating Approximation**: Sensor water level stage ($h$) is converted to discharge ($Q$) via a documented rating curve equation ($Q = a \cdot (h - h_0)^b$).
+6. **Out-of-Training-Range Limitation**: 2018 peak discharge exceeded the 1990–2017 historical maximum at several Kerala stations (e.g. Aluva, Neeleswaram, Chalakudy), so the held-out flood is partly out of the training range; decision tree models split on static feature thresholds and cannot extrapolate beyond training set maxima.
 
 ---
 

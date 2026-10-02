@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Tooltip as LeafletTooltip, Polygon, GeoJSON, useMap, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Tooltip as LeafletTooltip, GeoJSON, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import { Station, RiskLevel } from '../../types';
 import { useTheme } from '../../theme/ThemeContext';
@@ -230,62 +230,39 @@ export const FloodMap: React.FC<FloodMapProps> = ({
           const showTextLabel = currentZoom >= 10 || isSelected;
           const icon = createCustomMarkerIcon(st, risk, isSelected, showTextLabel);
 
-          // Low-lying zone contour polygon
-          const delta = 0.035;
-          const polygonCoords: [number, number][] = [
-            [st.latitude + delta, st.longitude - delta],
-            [st.latitude + delta * 1.2, st.longitude + delta * 0.8],
-            [st.latitude - delta * 0.9, st.longitude + delta * 1.1],
-            [st.latitude - delta * 1.1, st.longitude - delta * 0.7]
-          ];
-
-          const polygonColor = risk === 'Red' ? '#DC2626' : risk === 'Orange' ? '#EA580C' : '#1F6B75';
-
           return (
-            <React.Fragment key={st.id}>
-              <Polygon
-                positions={polygonCoords}
-                pathOptions={{
-                  color: polygonColor,
-                  fillColor: polygonColor,
-                  fillOpacity: risk === 'Red' ? 0.35 : 0.15,
-                  weight: 1.5,
-                  dashArray: '4, 4'
-                }}
-              />
-
-              <Marker
-                position={[st.latitude, st.longitude]}
-                icon={icon}
-                eventHandlers={{
-                  click: () => onSelectStation(st)
-                }}
-              >
+            <Marker
+              key={st.id}
+              position={[st.latitude, st.longitude]}
+              icon={icon}
+              eventHandlers={{
+                click: () => onSelectStation(st)
+              }}
+            >
                 <LeafletTooltip direction="top" offset={[0, -25]} opacity={0.95}>
                   <div className="font-mono text-xs">
                     <strong className="block text-slate-900">{st.name} ({st.river})</strong>
                     <div>Risk Level: <span className="font-bold">{risk}</span></div>
-                    <div>Water Level: {(st.current_water_level_m || st.normal_level_m).toFixed(2)}m</div>
-                    <div className="text-[10px] text-slate-500">Telemetry: Live Active</div>
+                    <div>Discharge: {(st.current_discharge_m3s !== undefined && st.current_discharge_m3s !== null ? st.current_discharge_m3s : 0).toFixed(1)} m³/s</div>
                   </div>
                 </LeafletTooltip>
 
                 <Popup className="custom-leaflet-popup">
-                  <div className="p-1 font-sans text-xs">
-                    <div className="font-serif text-sm font-bold text-slate-900 mb-1">{st.name}</div>
-                    <div className="text-slate-600 mb-2">{st.river} ({st.region})</div>
+                  <div className="p-1 font-sans text-xs dark:text-slate-100 text-slate-900">
+                    <div className="font-serif text-sm font-bold dark:text-white text-slate-900 mb-0.5">{st.name}</div>
+                    <div className="dark:text-slate-400 text-slate-600 mb-2">{st.river} ({st.region})</div>
                     <div className="mb-2">
                       <RiskBadge level={risk} size="sm" />
                     </div>
-                    <div className="font-mono text-[11px] text-slate-700 space-y-0.5">
-                      <div>Water Level: <strong>{(st.current_water_level_m || st.normal_level_m).toFixed(2)}m</strong></div>
-                      <div>Warning Level: {st.warning_level_m}m</div>
-                      <div>Danger Level: {st.danger_level_m}m</div>
+                    <div className="font-mono text-[11px] space-y-1 dark:text-slate-200 text-slate-700">
+                      <div>Current Discharge: <strong>{(st.current_discharge_m3s !== undefined && st.current_discharge_m3s !== null ? st.current_discharge_m3s : 0).toFixed(1)} m³/s</strong></div>
+                      <div className="text-[10px] text-yellow-600 dark:text-yellow-400">p90 Threshold: {st.p90_m3s ? st.p90_m3s.toFixed(1) : 'N/A'} m³/s</div>
+                      <div className="text-[10px] text-amber-600 dark:text-amber-400">p97 Threshold: {st.p97_m3s ? st.p97_m3s.toFixed(1) : 'N/A'} m³/s</div>
+                      <div className="text-[10px] text-red-600 dark:text-red-400">p99.5 Threshold: {st.p99_5_m3s ? st.p99_5_m3s.toFixed(1) : 'N/A'} m³/s</div>
                     </div>
                   </div>
                 </Popup>
               </Marker>
-            </React.Fragment>
           );
         })}
       </MapContainer>

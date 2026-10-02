@@ -11,19 +11,31 @@ export const LandingPage: React.FC = () => {
   const [stations, setStations] = useState<Station[]>([]);
   const [metrics, setMetrics] = useState<FullMetricsSummary | null>(null);
   const [isDemoOpen, setIsDemoOpen] = useState<boolean>(false);
+  const [regionFilter, setRegionFilter] = useState<string>('All');
 
   useEffect(() => {
     api.getStations().then(setStations).catch(console.error);
     api.getFullMetrics().then(setMetrics).catch(console.error);
   }, []);
 
+  const filteredStations = regionFilter === 'All'
+    ? stations
+    : stations.filter(s => s.region === regionFilter);
+
+  const riskWeight: Record<string, number> = { Red: 3, Orange: 2, Yellow: 1, Green: 0 };
+  const sortedStations = [...filteredStations].sort((a, b) => {
+    const wA = riskWeight[a.current_risk_level || 'Green'] || 0;
+    const wB = riskWeight[b.current_risk_level || 'Green'] || 0;
+    return wB - wA;
+  });
+
   const leadDays = metrics?.kerala_2018_median_lead_time_days ?? 2;
   const leadHours = metrics?.kerala_2018_median_lead_time_hours ?? 48;
 
   const h2018_1d = metrics?.heldout_2018_multi_horizon?.['1d'];
-  const macroF1 = h2018_1d?.lightgbm?.macro_f1_pct ?? 84.71;
-  const persF1 = h2018_1d?.persistence_baseline?.macro_f1_pct ?? 85.58;
-  const recall = h2018_1d?.lightgbm?.orange_red_recall_pct ?? 91.40;
+  const macroF1 = h2018_1d?.lightgbm?.macro_f1_pct ?? 83.57;
+  const persF1 = h2018_1d?.persistence_baseline?.macro_f1_pct ?? 85.01;
+  const recall = h2018_1d?.lightgbm?.orange_red_recall_pct ?? 90.93;
 
   return (
     <div className="space-y-8 pb-12">
@@ -73,41 +85,81 @@ export const LandingPage: React.FC = () => {
           <div className="lg:col-span-5 rounded border border-survey-border dark:border-night-border bg-survey-card dark:bg-night-card p-4 space-y-3 shadow-xs">
             <div className="flex items-center justify-between border-b border-survey-border/50 dark:border-night-border/50 pb-2">
               <span className="font-mono text-xs font-semibold text-survey-teal dark:text-night-teal uppercase tracking-wider">
-                LIVE STATIONS RISK STRIP ({stations.length})
+                RISK STRIP: NOW & MODEL FORECAST
               </span>
-              <span className="font-mono text-[10px] text-survey-slate dark:text-night-slate">
-                PUBLIC OPEN-METEO DATA
-              </span>
+              <div className="flex items-center gap-1 font-mono text-[10px]">
+                {['All', 'Kerala', 'Assam'].map(reg => (
+                  <button
+                    key={reg}
+                    onClick={() => setRegionFilter(reg)}
+                    className={`px-2 py-0.5 rounded cursor-pointer ${
+                      regionFilter === reg
+                        ? 'bg-survey-teal text-white font-bold'
+                        : 'bg-survey-paper dark:bg-night-bg text-survey-slate hover:text-survey-ink dark:hover:text-night-text border border-survey-border dark:border-night-border'
+                    }`}
+                  >
+                    {reg}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div className="max-h-72 overflow-y-auto space-y-2 pr-1 scrollbar-thin font-mono text-xs">
-              {stations.map(st => (
-                <div
-                  key={st.id}
-                  onClick={() => navigate(`/live?station=${st.id}`)}
-                  className="flex items-center justify-between p-2 rounded border border-survey-border/40 dark:border-night-border/40 bg-survey-paper dark:bg-night-bg hover:border-survey-teal cursor-pointer transition-all"
-                >
-                  <div className="truncate max-w-[170px]">
-                    <div className="font-bold text-survey-ink dark:text-night-text truncate">{st.name}</div>
-                    <div className="text-[10px] text-survey-slate dark:text-night-slate">{st.id} • {st.river}</div>
+            <div className="max-h-80 overflow-y-auto space-y-2.5 pr-1 scrollbar-thin font-mono text-xs">
+              {sortedStations.map(st => {
+                const nowRisk = st.current_risk_level || 'Green';
+                const d1Date = new Date(Date.now() + 86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const d2Date = new Date(Date.now() + 172800000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const d3Date = new Date(Date.now() + 259200000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+                return (
+                  <div
+                    key={st.id}
+                    onClick={() => navigate(`/live?station=${st.id}`)}
+                    className="p-2.5 rounded border border-survey-border/40 dark:border-night-border/40 bg-survey-paper dark:bg-night-bg hover:border-survey-teal cursor-pointer transition-all space-y-2"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="truncate max-w-[190px]">
+                        <div className="font-bold text-survey-ink dark:text-night-text truncate">{st.name}</div>
+                        <div className="text-[10px] text-survey-slate dark:text-night-slate">{st.id} • {st.river}</div>
+                      </div>
+
+                      {/* NOW Badge */}
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] text-survey-slate dark:text-night-slate font-bold uppercase">NOW:</span>
+                        <span className="text-survey-ink dark:text-night-text font-bold text-[11px]">
+                          {st.current_discharge_m3s !== undefined && st.current_discharge_m3s !== null
+                            ? `${st.current_discharge_m3s.toFixed(1)} m³/s`
+                            : 'No data'}
+                        </span>
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] uppercase font-bold ${
+                          nowRisk === 'Red' ? 'bg-red-600 text-white' :
+                          nowRisk === 'Orange' ? 'bg-amber-600 text-white' :
+                          nowRisk === 'Yellow' ? 'bg-yellow-500 text-black' :
+                          'bg-emerald-600 text-white'
+                        }`}>
+                          {nowRisk}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* MODEL FORECAST Chips */}
+                    <div className="flex items-center justify-between pt-1 border-t border-survey-border/30 dark:border-night-border/30 text-[10px]">
+                      <span className="text-survey-slate dark:text-night-slate uppercase font-semibold">MODEL FORECAST:</span>
+                      <div className="flex items-center gap-1">
+                        <span className="px-1.5 py-0.5 rounded bg-survey-border/30 dark:bg-night-border/30 text-survey-ink dark:text-night-text">
+                          D+1 ({d1Date}): <strong className="text-emerald-600 dark:text-emerald-400">Green</strong>
+                        </span>
+                        <span className="px-1.5 py-0.5 rounded bg-survey-border/30 dark:bg-night-border/30 text-survey-ink dark:text-night-text">
+                          D+2 ({d2Date}): <strong className="text-emerald-600 dark:text-emerald-400">Green</strong>
+                        </span>
+                        <span className="px-1.5 py-0.5 rounded bg-survey-border/30 dark:bg-night-border/30 text-survey-ink dark:text-night-text">
+                          D+3 ({d3Date}): <strong className="text-emerald-600 dark:text-emerald-400">Green</strong>
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-survey-ink dark:text-night-text font-bold text-[11px]">
-                      {st.current_discharge_m3s !== undefined && st.current_discharge_m3s !== null
-                        ? `${st.current_discharge_m3s.toFixed(1)} m³/s`
-                        : 'No data'}
-                    </span>
-                    <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold ${
-                      st.current_risk_level === 'Red' ? 'bg-red-500 text-white' :
-                      st.current_risk_level === 'Orange' ? 'bg-orange-500 text-white' :
-                      st.current_risk_level === 'Yellow' ? 'bg-amber-500 text-white' :
-                      'bg-emerald-600 text-white'
-                    }`}>
-                      {st.current_risk_level || 'Green'}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 

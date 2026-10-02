@@ -55,3 +55,62 @@ def clear_alerts(db: Session = Depends(get_db)):
     db.query(Alert).delete()
     db.commit()
     return {"status": "success", "message": "Alert outbox logs cleared successfully."}
+
+@router.post("/demo", summary="Trigger a DEMO flood warning alert for testing/preview")
+def create_demo_alert(
+    station_id: str = Query("KL-PER-01"),
+    risk_level: str = Query("Orange"),
+    language: str = Query("en"),
+    db: Session = Depends(get_db)
+):
+    """Creates a clearly marked DEMO alert for native language previews (Hindi, Malayalam, Assamese)."""
+    from datetime import datetime, timezone
+    from backend.alerts.evacuation import generate_evacuation_route_link
+    from backend.alerts.telegram_bot import (
+        ENGLISH_ACTION_MAP, HINDI_ACTION_MAP, MALAYALAM_ACTION_MAP, ASSAMESE_ACTION_MAP
+    )
+
+    station = db.query(Station).filter(Station.id == station_id).first()
+    if not station:
+        station = db.query(Station).first()
+    
+    st_id = station.id if station else station_id
+    st_name = station.name if station else station_id
+    st_lat = station.latitude if station else 10.1416
+    st_lon = station.longitude if station else 76.5781
+    p97 = station.warning_level_m * 45.0 if station else 310.0
+
+    evac_url, _ = generate_evacuation_route_link(st_lat, st_lon)
+    now = datetime.now(timezone.utc)
+
+    action_map = {
+        "en": ENGLISH_ACTION_MAP,
+        "hi": HINDI_ACTION_MAP,
+        "ml": MALAYALAM_ACTION_MAP,
+        "as": ASSAMESE_ACTION_MAP
+    }
+    actions = action_map.get(language, ENGLISH_ACTION_MAP)
+    action_str = actions.get(risk_level, "Prepare for evacuation.")
+
+    demo_reason = (
+        f"[DEMO ALERT] Target: D+1 Model Forecast. "
+        f"Predicted discharge 425.0 m³/s crossed p97 threshold ({p97:.1f} m³/s). "
+        f"Top Drivers: 7-day cumulative rain 165.0 mm; 3-day discharge rate of change +85.0 m³/s."
+    )
+
+    alert = Alert(
+        station_id=st_id,
+        timestamp=now,
+        risk_level=risk_level,
+        previous_risk_level="Green",
+        reason=demo_reason,
+        action_recommended=action_str,
+        evacuation_route_url=evac_url,
+        language=language,
+        sent_to_telegram=False,
+        outbox_logged=True
+    )
+    db.add(alert)
+    db.commit()
+
+    return {"status": "success", "message": f"DEMO Alert created for {st_name} ({language.upper()})", "alert_id": alert.id}

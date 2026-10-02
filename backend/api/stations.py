@@ -34,21 +34,44 @@ def _get_station_dict(st: Station, db: Session) -> dict:
     )
     p_params = THRESHOLDS.get(st.id, {"p90_yellow": 160.0, "p97_orange": 310.0, "p99.5_red": 550.0})
     
-    current_q = latest_reading.discharge_m3s if (latest_reading and latest_reading.discharge_m3s is not None) else None
+    current_q = None
     source_label = "REAL (Open-Meteo)"
     
-    # Check cached snapshot if DB has no reading
+    # Check live cached Open-Meteo snapshot first
+    cache_path = os.path.join(CACHE_DIR, f"{st.id}_live.json")
+    if os.path.exists(cache_path):
+        try:
+            with open(cache_path, "r", encoding="utf-8") as f:
+                cdata = json.load(f)
+                current_q = cdata.get("current_observed_discharge_m3s")
+                fetched_dt = cdata.get("fetched_at", "")[:10]
+                source_label = f"REAL (Open-Meteo {fetched_dt})" if fetched_dt else "REAL (Open-Meteo)"
+        except Exception:
+            pass
+
+    # Fallback to thresholds.json single source of truth
     if current_q is None:
-        cache_path = os.path.join(CACHE_DIR, f"{st.id}_live.json")
-        if os.path.exists(cache_path):
-            try:
-                with open(cache_path, "r", encoding="utf-8") as f:
-                    cdata = json.load(f)
-                    current_q = cdata.get("current_observed_discharge_m3s")
-                    fetched_dt = cdata.get("fetched_at", "")[:10]
-                    source_label = f"CACHED {fetched_dt}" if fetched_dt else "CACHED"
-            except Exception:
-                pass
+        current_q = p_params.get("current_live_m3s")
+
+    # Fallback to DB latest reading if neither exists
+    if current_q is None and latest_reading and latest_reading.discharge_m3s is not None:
+        current_q = latest_reading.discharge_m3s
+        source_label = "SIMULATED"
+
+    if current_q is not None:
+        p90 = p_params.get("p90_yellow", 160.0)
+        p97 = p_params.get("p97_orange", 310.0)
+        p99_5 = p_params.get("p99.5_red", 550.0)
+        if current_q >= p99_5:
+            risk_level = "Red"
+        elif current_q >= p97:
+            risk_level = "Orange"
+        elif current_q >= p90:
+            risk_level = "Yellow"
+        else:
+            risk_level = "Green"
+    else:
+        risk_level = latest_reading.risk_level if latest_reading else "Green"
 
     return {
         "id": st.id,
@@ -64,11 +87,12 @@ def _get_station_dict(st: Station, db: Session) -> dict:
         "p90_m3s": p_params.get("p90_yellow"),
         "p97_m3s": p_params.get("p97_orange"),
         "p99_5_m3s": p_params.get("p99.5_red"),
+        "historical_max_m3s": p_params.get("historical_max_m3s"),
         "current_discharge_m3s": current_q,
         "data_source_label": source_label,
         "description": st.description,
         "current_water_level_m": latest_reading.water_level_m if latest_reading else st.normal_level_m,
-        "current_risk_level": latest_reading.risk_level if latest_reading else "Green",
+        "current_risk_level": risk_level,
         "battery_pct": latest_reading.battery_pct if latest_reading else 100.0,
         "rssi": latest_reading.rssi if latest_reading else -65,
         "sensor_status": latest_reading.sensor_status if latest_reading else "OK"

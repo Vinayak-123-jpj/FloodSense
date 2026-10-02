@@ -50,6 +50,7 @@ class StationResponse(BaseModel):
     p90_m3s: Optional[float] = None
     p97_m3s: Optional[float] = None
     p99_5_m3s: Optional[float] = None
+    historical_max_m3s: Optional[float] = None
     current_discharge_m3s: Optional[float] = None
     data_source_label: Optional[str] = None
     description: Optional[str]

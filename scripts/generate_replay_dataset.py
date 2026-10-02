@@ -15,20 +15,21 @@ FRONTEND_DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend", "p
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(FRONTEND_DATA_DIR, exist_ok=True)
 
-# Station percentile thresholds (exact historical training period 1990-2017 m³/s percentiles)
-STATION_PERCENTILES = {
-    "KL-PER-01": {"p90_yellow": 4.3,     "p97_orange": 5.9,     "p99.5_red": 7.9,     "a": 12.0, "b": 2.1, "h0": 1.2},
-    "KL-PER-02": {"p90_yellow": 437.5,   "p97_orange": 600.2,   "p99.5_red": 809.7,   "a": 14.0, "b": 2.2, "h0": 1.0},
-    "KL-PAM-01": {"p90_yellow": 167.7,   "p97_orange": 233.4,   "p99.5_red": 325.5,   "a": 10.0, "b": 2.0, "h0": 1.5},
-    "KL-ACH-01": {"p90_yellow": 41.7,    "p97_orange": 60.2,    "p99.5_red": 87.9,    "a": 8.0,  "b": 2.0, "h0": 1.3},
-    "KL-CHA-01": {"p90_yellow": 156.4,   "p97_orange": 221.4,   "p99.5_red": 290.7,   "a": 11.0, "b": 2.1, "h0": 1.2},
-    "KL-MUV-01": {"p90_yellow": 41.8,    "p97_orange": 59.7,    "p99.5_red": 84.5,    "a": 9.0,  "b": 2.0, "h0": 1.1},
-    "AS-BRA-01": {"p90_yellow": 20.0,    "p97_orange": 31.4,    "p99.5_red": 52.1,    "a": 50.0, "b": 2.3, "h0": 40.0},
-    "AS-BRA-02": {"p90_yellow": 3.4,     "p97_orange": 5.0,     "p99.5_red": 8.2,     "a": 55.0, "b": 2.3, "h0": 95.0},
-    "AS-KOP-01": {"p90_yellow": 693.1,   "p97_orange": 1155.1,  "p99.5_red": 1938.7,  "a": 10.0, "b": 2.0, "h0": 52.0},
-    "AS-DHA-01": {"p90_yellow": 800.7,   "p97_orange": 1118.4,  "p99.5_red": 1671.4,  "a": 11.0, "b": 2.0, "h0": 70.0},
-    "AS-JIA-01": {"p90_yellow": 27063.5, "p97_orange": 36811.9,  "p99.5_red": 45261.7, "a": 10.0, "b": 2.0, "h0": 70.0}
-}
+# Load single source of truth thresholds
+thresh_path = os.path.join(DATA_DIR, "thresholds.json")
+with open(thresh_path, "r", encoding="utf-8") as f:
+    RAW_THRESHOLDS = json.load(f)
+
+STATION_PERCENTILES = {}
+for st_id, info in RAW_THRESHOLDS.items():
+    STATION_PERCENTILES[st_id] = {
+        "p90_yellow": info["p90_yellow"],
+        "p97_orange": info["p97_orange"],
+        "p99.5_red": info["p99.5_red"],
+        "a": 12.0 if "KL" in st_id else 50.0,
+        "b": 2.1 if "KL" in st_id else 2.3,
+        "h0": 1.2 if "KL" in st_id else 40.0
+    }
 
 STATION_INFO = {
     "KL-PER-01": {"name": "Neeleswaram", "river": "Periyar River", "lat": 10.1416, "lng": 76.5781},

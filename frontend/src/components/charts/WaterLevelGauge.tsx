@@ -92,6 +92,11 @@ export const WaterLevelGauge: React.FC<GaugeProps> = ({
             {displayDischarge.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
           </span>
           <span className="font-mono text-sm text-survey-slate dark:text-night-slate ml-1">m³/s</span>
+          {station.historical_max_m3s && displayDischarge > station.historical_max_m3s && (
+            <span className="ml-2 inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 border border-red-300 dark:border-red-800">
+              above historical maximum
+            </span>
+          )}
           <span className="block font-sans text-[11px] text-survey-slate dark:text-night-slate mt-0.5">
             GloFAS Modelled Discharge
           </span>

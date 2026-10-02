@@ -10,7 +10,11 @@
     "warning_level_m": 4.5,
     "danger_level_m": 6.0,
     "normal_level_m": 2.1,
-    "description": "Periyar River upper gauging station monitoring upstream reservoir discharges."
+    "description": "Periyar River station at nearest main-channel grid cell (10.125, 76.575).",
+    "grid_cell_lat": 10.125,
+    "grid_cell_lon": 76.575,
+    "is_short_history": false,
+    "history_note": "Full history (1990-2025)"
   },
   {
     "id": "KL-PER-02",
@@ -19,11 +23,15 @@
     "river": "Periyar River",
     "latitude": 10.1076,
     "longitude": 76.3516,
-    "elevation_m": 7.0,
-    "warning_level_m": 3.8,
-    "danger_level_m": 5.2,
-    "normal_level_m": 1.8,
-    "description": "Periyar River lower basin station near Kochi urban area and industrial corridor."
+    "elevation_m": 12.0,
+    "warning_level_m": 4.5,
+    "danger_level_m": 6.0,
+    "normal_level_m": 2.1,
+    "description": "Periyar River station at nearest main-channel grid cell (10.125, 76.375).",
+    "grid_cell_lat": 10.125,
+    "grid_cell_lon": 76.375,
+    "is_short_history": false,
+    "history_note": "Full history (1990-2025)"
   },
   {
     "id": "KL-PAM-01",
@@ -32,11 +40,15 @@
     "river": "Pamba River",
     "latitude": 9.3175,
     "longitude": 76.6122,
-    "elevation_m": 9.0,
-    "warning_level_m": 5.0,
-    "danger_level_m": 6.5,
-    "normal_level_m": 2.4,
-    "description": "Pamba River central catchment station in Pathanamthitta district."
+    "elevation_m": 12.0,
+    "warning_level_m": 4.5,
+    "danger_level_m": 6.0,
+    "normal_level_m": 2.1,
+    "description": "Pamba River station at nearest main-channel grid cell (9.325, 76.625).",
+    "grid_cell_lat": 9.325,
+    "grid_cell_lon": 76.625,
+    "is_short_history": false,
+    "history_note": "Full history (1990-2025)"
   },
   {
     "id": "KL-MUV-01",
@@ -45,11 +57,15 @@
     "river": "Muvattupuzha River",
     "latitude": 9.9813,
     "longitude": 76.5772,
-    "elevation_m": 14.0,
-    "warning_level_m": 4.0,
-    "danger_level_m": 5.5,
-    "normal_level_m": 1.9,
-    "description": "Confluence point monitoring for Thodupuzha, Kaliyar and Kothamangalam rivers."
+    "elevation_m": 12.0,
+    "warning_level_m": 4.5,
+    "danger_level_m": 6.0,
+    "normal_level_m": 2.1,
+    "description": "Muvattupuzha River station at nearest main-channel grid cell (9.975, 76.575).",
+    "grid_cell_lat": 9.975,
+    "grid_cell_lon": 76.575,
+    "is_short_history": false,
+    "history_note": "Full history (1990-2025)"
   },
   {
     "id": "KL-CHA-01",
@@ -58,11 +74,15 @@
     "river": "Chalakudy River",
     "latitude": 10.307,
     "longitude": 76.3323,
-    "elevation_m": 11.0,
-    "warning_level_m": 4.2,
-    "danger_level_m": 5.8,
-    "normal_level_m": 2.0,
-    "description": "Chalakudy basin station monitoring Sholayar & Poringalkuthu dam overflows."
+    "elevation_m": 12.0,
+    "warning_level_m": 4.5,
+    "danger_level_m": 6.0,
+    "normal_level_m": 2.1,
+    "description": "Chalakudy River station at nearest main-channel grid cell (10.325, 76.325).",
+    "grid_cell_lat": 10.325,
+    "grid_cell_lon": 76.325,
+    "is_short_history": false,
+    "history_note": "Full history (1990-2025)"
   },
   {
     "id": "KL-ACH-01",
@@ -71,11 +91,15 @@
     "river": "Achenkovil River",
     "latitude": 9.256,
     "longitude": 76.711,
-    "elevation_m": 15.0,
-    "warning_level_m": 4.8,
-    "danger_level_m": 6.2,
-    "normal_level_m": 2.2,
-    "description": "Achenkovil basin monitoring node near Pandalam flood plains."
+    "elevation_m": 12.0,
+    "warning_level_m": 4.5,
+    "danger_level_m": 6.0,
+    "normal_level_m": 2.1,
+    "description": "Achenkovil River station at nearest main-channel grid cell (9.275, 76.725).",
+    "grid_cell_lat": 9.275,
+    "grid_cell_lon": 76.725,
+    "is_short_history": true,
+    "history_note": "Short history (1990-2009); excluded from 2018 held-out test set"
   },
   {
     "id": "AS-BRA-01",
@@ -84,11 +108,15 @@
     "river": "Brahmaputra River",
     "latitude": 26.1833,
     "longitude": 91.75,
-    "elevation_m": 52.0,
-    "warning_level_m": 48.5,
-    "danger_level_m": 49.68,
-    "normal_level_m": 45.2,
-    "description": "Central Brahmaputra mainstem gauging site at DC Court Ghat, Guwahati."
+    "elevation_m": 12.0,
+    "warning_level_m": 4.5,
+    "danger_level_m": 6.0,
+    "normal_level_m": 2.1,
+    "description": "Brahmaputra River station at nearest main-channel grid cell (26.225, 91.775).",
+    "grid_cell_lat": 26.225,
+    "grid_cell_lon": 91.775,
+    "is_short_history": false,
+    "history_note": "Full history (1990-2025)"
   },
   {
     "id": "AS-BRA-02",
@@ -97,11 +125,15 @@
     "river": "Brahmaputra River",
     "latitude": 27.4728,
     "longitude": 94.912,
-    "elevation_m": 108.0,
-    "warning_level_m": 104.5,
-    "danger_level_m": 105.7,
-    "normal_level_m": 102.0,
-    "description": "Upper Assam Brahmaputra river station monitoring Himalayan run-off."
+    "elevation_m": 12.0,
+    "warning_level_m": 4.5,
+    "danger_level_m": 6.0,
+    "normal_level_m": 2.1,
+    "description": "Brahmaputra River station at nearest main-channel grid cell (27.425, 94.725).",
+    "grid_cell_lat": 27.425,
+    "grid_cell_lon": 94.725,
+    "is_short_history": false,
+    "history_note": "Full history (1990-2025)"
   },
   {
     "id": "AS-KOP-01",
@@ -110,11 +142,15 @@
     "river": "Kopili River",
     "latitude": 26.15,
     "longitude": 92.5833,
-    "elevation_m": 63.0,
-    "warning_level_m": 59.0,
-    "danger_level_m": 60.5,
-    "normal_level_m": 56.5,
-    "description": "Kopili river basin station in Nagaon district, prone to flash floods."
+    "elevation_m": 12.0,
+    "warning_level_m": 4.5,
+    "danger_level_m": 6.0,
+    "normal_level_m": 2.1,
+    "description": "Kopili River station at nearest main-channel grid cell (26.175, 92.575).",
+    "grid_cell_lat": 26.175,
+    "grid_cell_lon": 92.575,
+    "is_short_history": false,
+    "history_note": "Full history (1990-2025)"
   },
   {
     "id": "AS-DHA-01",
@@ -123,11 +159,15 @@
     "river": "Dhansiri River",
     "latitude": 26.5667,
     "longitude": 93.7333,
-    "elevation_m": 82.0,
-    "warning_level_m": 78.0,
-    "danger_level_m": 79.5,
-    "normal_level_m": 75.0,
-    "description": "Dhansiri tributary station monitoring southern bank runoff into Brahmaputra."
+    "elevation_m": 12.0,
+    "warning_level_m": 4.5,
+    "danger_level_m": 6.0,
+    "normal_level_m": 2.1,
+    "description": "Dhansiri River station at nearest main-channel grid cell (26.575, 93.725).",
+    "grid_cell_lat": 26.575,
+    "grid_cell_lon": 93.725,
+    "is_short_history": false,
+    "history_note": "Full history (1990-2025)"
   },
   {
     "id": "AS-JIA-01",
@@ -136,10 +176,14 @@
     "river": "Jia Bharali River",
     "latitude": 26.6333,
     "longitude": 92.8,
-    "elevation_m": 80.0,
-    "warning_level_m": 76.5,
-    "danger_level_m": 77.5,
-    "normal_level_m": 73.8,
-    "description": "Northern tributary station monitoring glacial melt and monsoon spikes."
+    "elevation_m": 12.0,
+    "warning_level_m": 4.5,
+    "danger_level_m": 6.0,
+    "normal_level_m": 2.1,
+    "description": "Jia Bharali River station at nearest main-channel grid cell (26.625, 92.825).",
+    "grid_cell_lat": 26.625,
+    "grid_cell_lon": 92.825,
+    "is_short_history": false,
+    "history_note": "Full history (1990-2025)"
   }
 ]

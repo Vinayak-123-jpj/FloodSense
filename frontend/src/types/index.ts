@@ -17,6 +17,7 @@ export interface Station {
   p90_m3s?: number;
   p97_m3s?: number;
   p99_5_m3s?: number;
+  historical_max_m3s?: number;
   current_risk_level?: RiskLevel;
   battery_pct?: number;
   rssi?: number;

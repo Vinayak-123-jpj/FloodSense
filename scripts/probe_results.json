@@ -1,0 +1,201 @@
+{
+  "best": {
+    "AS-BRA-01": {
+      "req_lat": 26.1833,
+      "req_lon": 91.5,
+      "grid_lat": 26.175,
+      "grid_lon": 91.525,
+      "mean": 14535.4,
+      "median": 10470.3,
+      "max": 68076.0
+    },
+    "AS-BRA-02": {
+      "req_lat": 27.3228,
+      "req_lon": 94.662,
+      "grid_lat": 27.325,
+      "grid_lon": 94.675,
+      "mean": 7354.1,
+      "median": 5175.1,
+      "max": 38635.7
+    },
+    "AS-JIA-01": {
+      "req_lat": 26.5833,
+      "req_lon": 92.55,
+      "grid_lat": 26.575,
+      "grid_lon": 92.575,
+      "mean": 13086.8,
+      "median": 9637.3,
+      "max": 58343.5
+    }
+  },
+  "tables": {
+    "AS-BRA-01": [
+      {
+        "req_lat": 26.1833,
+        "req_lon": 91.5,
+        "grid_lat": 26.175,
+        "grid_lon": 91.525,
+        "mean": 14535.4,
+        "median": 10470.3,
+        "max": 68076.0
+      },
+      {
+        "req_lat": 26.1833,
+        "req_lon": 91.55,
+        "grid_lat": 26.175,
+        "grid_lon": 91.575,
+        "mean": 14533.0,
+        "median": 10470.3,
+        "max": 68076.0
+      },
+      {
+        "req_lat": 26.1833,
+        "req_lon": 91.6,
+        "grid_lat": 26.175,
+        "grid_lon": 91.625,
+        "mean": 14531.9,
+        "median": 10446.2,
+        "max": 68076.0
+      },
+      {
+        "req_lat": 26.1833,
+        "req_lon": 91.7,
+        "grid_lat": 26.175,
+        "grid_lon": 91.675,
+        "mean": 14530.9,
+        "median": 10446.2,
+        "max": 68076.0
+      },
+      {
+        "req_lat": 26.2333,
+        "req_lon": 91.75,
+        "grid_lat": 26.225,
+        "grid_lon": 91.775,
+        "mean": 14515.5,
+        "median": 10446.2,
+        "max": 68076.0
+      },
+      {
+        "req_lat": 26.2333,
+        "req_lon": 91.8,
+        "grid_lat": 26.225,
+        "grid_lon": 91.825,
+        "mean": 14438.1,
+        "median": 10422.2,
+        "max": 67451.8
+      }
+    ],
+    "AS-BRA-02": [
+      {
+        "req_lat": 27.3228,
+        "req_lon": 94.662,
+        "grid_lat": 27.325,
+        "grid_lon": 94.675,
+        "mean": 7354.1,
+        "median": 5175.1,
+        "max": 38635.7
+      },
+      {
+        "req_lat": 27.3728,
+        "req_lon": 94.712,
+        "grid_lat": 27.375,
+        "grid_lon": 94.725,
+        "mean": 7352.0,
+        "median": 5175.1,
+        "max": 38635.7
+      },
+      {
+        "req_lat": 27.4228,
+        "req_lon": 94.712,
+        "grid_lat": 27.425,
+        "grid_lon": 94.725,
+        "mean": 7346.4,
+        "median": 5163.2,
+        "max": 38635.7
+      },
+      {
+        "req_lat": 27.4728,
+        "req_lon": 94.712,
+        "grid_lat": 27.475,
+        "grid_lon": 94.725,
+        "mean": 7344.2,
+        "median": 5163.2,
+        "max": 38635.7
+      },
+      {
+        "req_lat": 27.4728,
+        "req_lon": 94.762,
+        "grid_lat": 27.475,
+        "grid_lon": 94.775,
+        "mean": 7341.4,
+        "median": 5163.2,
+        "max": 38546.8
+      },
+      {
+        "req_lat": 27.5228,
+        "req_lon": 94.812,
+        "grid_lat": 27.525,
+        "grid_lon": 94.825,
+        "mean": 7340.4,
+        "median": 5163.2,
+        "max": 38546.8
+      }
+    ],
+    "AS-JIA-01": [
+      {
+        "req_lat": 26.5833,
+        "req_lon": 92.55,
+        "grid_lat": 26.575,
+        "grid_lon": 92.575,
+        "mean": 13086.8,
+        "median": 9637.3,
+        "max": 58343.5
+      },
+      {
+        "req_lat": 26.5833,
+        "req_lon": 92.6,
+        "grid_lat": 26.575,
+        "grid_lon": 92.625,
+        "mean": 13085.1,
+        "median": 9637.3,
+        "max": 58343.5
+      },
+      {
+        "req_lat": 26.6333,
+        "req_lon": 92.7,
+        "grid_lat": 26.625,
+        "grid_lon": 92.675,
+        "mean": 13079.0,
+        "median": 9637.3,
+        "max": 58343.5
+      },
+      {
+        "req_lat": 26.5833,
+        "req_lon": 92.75,
+        "grid_lat": 26.575,
+        "grid_lon": 92.775,
+        "mean": 13067.8,
+        "median": 9615.1,
+        "max": 58343.5
+      },
+      {
+        "req_lat": 26.6333,
+        "req_lon": 92.8,
+        "grid_lat": 26.625,
+        "grid_lon": 92.825,
+        "mean": 13065.8,
+        "median": 9615.1,
+        "max": 58343.5
+      },
+      {
+        "req_lat": 26.6333,
+        "req_lon": 92.9,
+        "grid_lat": 26.625,
+        "grid_lon": 92.875,
+        "mean": 11469.6,
+        "median": 8316.6,
+        "max": 52843.5
+      }
+    ]
+  }
+}
