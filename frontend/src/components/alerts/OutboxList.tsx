@@ -97,9 +97,9 @@ export const OutboxList: React.FC<OutboxProps> = ({ alerts, onClear }) => {
                   <span className="text-survey-slate dark:text-night-slate">
                     {new Date(alert.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })} IST
                   </span>
-                  {alert.reason && alert.reason.includes('[DEMO') && (
+                  {(alert.is_demo || (alert.reason && alert.reason.includes('[DEMO'))) && (
                     <span className="inline-flex items-center gap-1 text-[10px] bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 px-2 py-0.5 rounded border border-amber-400 font-bold">
-                      DEMO
+                      ⚡ DEMO ALERT
                     </span>
                   )}
                   {alert.sent_to_telegram ? (

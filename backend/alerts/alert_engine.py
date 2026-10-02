@@ -111,7 +111,8 @@ def process_reading_for_alert(db: Session, station: Station, reading: Reading):
             evacuation_route_url=evac_url,
             language="en",
             sent_to_telegram=False,
-            outbox_logged=True
+            outbox_logged=True,
+            is_demo=False
         )
         db.add(alert_en)
 
@@ -126,41 +127,42 @@ def process_reading_for_alert(db: Session, station: Station, reading: Reading):
             evacuation_route_url=evac_url,
             language="hi",
             sent_to_telegram=False,
-            outbox_logged=True
+            outbox_logged=True,
+            is_demo=False
         )
         db.add(alert_hi)
 
-        # 3. Create Malayalam Alert Record (for Kerala stations)
-        if is_kerala:
-            alert_ml = Alert(
-                station_id=station.id,
-                timestamp=now,
-                risk_level=effective_risk,
-                previous_risk_level=current_risk,
-                reason=reason_text,
-                action_recommended=malayalam_action,
-                evacuation_route_url=evac_url,
-                language="ml",
-                sent_to_telegram=False,
-                outbox_logged=True
-            )
-            db.add(alert_ml)
+        # 3. Create Malayalam Alert Record
+        alert_ml = Alert(
+            station_id=station.id,
+            timestamp=now,
+            risk_level=effective_risk,
+            previous_risk_level=current_risk,
+            reason=reason_text,
+            action_recommended=malayalam_action,
+            evacuation_route_url=evac_url,
+            language="ml",
+            sent_to_telegram=False,
+            outbox_logged=True,
+            is_demo=False
+        )
+        db.add(alert_ml)
 
-        # 4. Create Assamese Alert Record (for Assam stations)
-        if is_assam:
-            alert_as = Alert(
-                station_id=station.id,
-                timestamp=now,
-                risk_level=effective_risk,
-                previous_risk_level=current_risk,
-                reason=reason_text,
-                action_recommended=assamese_action,
-                evacuation_route_url=evac_url,
-                language="as",
-                sent_to_telegram=False,
-                outbox_logged=True
-            )
-            db.add(alert_as)
+        # 4. Create Assamese Alert Record
+        alert_as = Alert(
+            station_id=station.id,
+            timestamp=now,
+            risk_level=effective_risk,
+            previous_risk_level=current_risk,
+            reason=reason_text,
+            action_recommended=assamese_action,
+            evacuation_route_url=evac_url,
+            language="as",
+            sent_to_telegram=False,
+            outbox_logged=True,
+            is_demo=False
+        )
+        db.add(alert_as)
 
         db.commit()
 

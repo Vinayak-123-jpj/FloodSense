@@ -94,6 +94,7 @@ class AlertResponse(BaseModel):
     language: str
     sent_to_telegram: bool
     outbox_logged: bool
+    is_demo: bool = False
 
     model_config = ConfigDict(from_attributes=True)
 

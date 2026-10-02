@@ -62,9 +62,10 @@ class Alert(Base):
     reason = Column(Text, nullable=False)
     action_recommended = Column(Text, nullable=False)
     evacuation_route_url = Column(Text, nullable=True)
-    language = Column(String, nullable=False, default="en") # en, hi
+    language = Column(String, nullable=False, default="en") # en, hi, ml, as
     sent_to_telegram = Column(Boolean, default=False)
     outbox_logged = Column(Boolean, default=True)
+    is_demo = Column(Boolean, default=False)
 
     station = relationship("Station", back_populates="alerts")
 

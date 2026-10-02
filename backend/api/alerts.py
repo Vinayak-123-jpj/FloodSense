@@ -41,7 +41,8 @@ def get_alerts(
             "evacuation_route_url": a.evacuation_route_url,
             "language": a.language,
             "sent_to_telegram": a.sent_to_telegram,
-            "outbox_logged": a.outbox_logged
+            "outbox_logged": a.outbox_logged,
+            "is_demo": getattr(a, "is_demo", False)
         }
         result.append(AlertResponse(**res_dict))
 
@@ -63,7 +64,7 @@ def create_demo_alert(
     language: str = Query("en"),
     db: Session = Depends(get_db)
 ):
-    """Creates a clearly marked DEMO alert for native language previews (Hindi, Malayalam, Assamese)."""
+    """Creates clearly marked DEMO alerts across all supported languages (English, Hindi, Malayalam, Assamese) for preview."""
     from datetime import datetime, timezone
     from backend.alerts.evacuation import generate_evacuation_route_link
     from backend.alerts.telegram_bot import (
@@ -83,34 +84,44 @@ def create_demo_alert(
     evac_url, _ = generate_evacuation_route_link(st_lat, st_lon)
     now = datetime.now(timezone.utc)
 
-    action_map = {
-        "en": ENGLISH_ACTION_MAP,
-        "hi": HINDI_ACTION_MAP,
-        "ml": MALAYALAM_ACTION_MAP,
-        "as": ASSAMESE_ACTION_MAP
-    }
-    actions = action_map.get(language, ENGLISH_ACTION_MAP)
-    action_str = actions.get(risk_level, "Prepare for evacuation.")
-
     demo_reason = (
         f"[DEMO ALERT] Target: D+1 Model Forecast. "
         f"Predicted discharge 425.0 m³/s crossed p97 threshold ({p97:.1f} m³/s). "
         f"Top Drivers: 7-day cumulative rain 165.0 mm; 3-day discharge rate of change +85.0 m³/s."
     )
 
-    alert = Alert(
-        station_id=st_id,
-        timestamp=now,
-        risk_level=risk_level,
-        previous_risk_level="Green",
-        reason=demo_reason,
-        action_recommended=action_str,
-        evacuation_route_url=evac_url,
-        language=language,
-        sent_to_telegram=False,
-        outbox_logged=True
-    )
-    db.add(alert)
+    lang_actions = {
+        "en": ENGLISH_ACTION_MAP.get(risk_level, "Prepare for evacuation."),
+        "hi": HINDI_ACTION_MAP.get(risk_level, "सुरक्षित स्थान पर जाएं।"),
+        "ml": MALAYALAM_ACTION_MAP.get(risk_level, "സുരക്ഷിത സ്ഥാനത്തേക്ക് മാറുക."),
+        "as": ASSAMESE_ACTION_MAP.get(risk_level, "সুৰক্ষিত স্থানলৈ যাওক।")
+    }
+
+    created_ids = []
+    # Create DEMO alerts for all 4 supported languages so language toggle previews work seamlessly
+    for lang_code, action_str in lang_actions.items():
+        alert = Alert(
+            station_id=st_id,
+            timestamp=now,
+            risk_level=risk_level,
+            previous_risk_level="Green",
+            reason=demo_reason,
+            action_recommended=action_str,
+            evacuation_route_url=evac_url,
+            language=lang_code,
+            sent_to_telegram=False,
+            outbox_logged=True,
+            is_demo=True
+        )
+        db.add(alert)
+        db.flush()
+        created_ids.append(alert.id)
+
     db.commit()
 
-    return {"status": "success", "message": f"DEMO Alert created for {st_name} ({language.upper()})", "alert_id": alert.id}
+    return {
+        "status": "success",
+        "message": f"DEMO Alert created for {st_name} across all 4 languages (EN, HI, ML, AS)",
+        "alert_id": created_ids[0],
+        "created_ids": created_ids
+    }

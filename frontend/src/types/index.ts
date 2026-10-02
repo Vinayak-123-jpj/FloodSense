@@ -67,9 +67,10 @@ export interface AlertItem {
   reason: string;
   action_recommended: string;
   evacuation_route_url?: string;
-  language: 'en' | 'hi';
+  language: 'en' | 'hi' | 'ml' | 'as';
   sent_to_telegram: boolean;
   outbox_logged: boolean;
+  is_demo?: boolean;
 }
 
 export interface SimulationStatus {

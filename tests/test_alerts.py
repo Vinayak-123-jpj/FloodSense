@@ -114,3 +114,55 @@ def test_fresh_startup_produces_zero_alerts():
     assert STATION_ALERT_STATE[st.id]["current_risk"] == "Yellow"
     db.close()
 
+
+def test_demo_alert_flow_and_four_language_toggle():
+    """Verifies DEMO alert creation API, is_demo flag, [DEMO ALERT] tag, and 4-language outbox entries."""
+    from fastapi.testclient import TestClient
+    from backend.main import app
+
+    with TestClient(app) as client:
+        # Trigger DEMO alert
+        res = client.post("/api/alerts/demo?station_id=KL-PER-01&risk_level=Orange&language=hi")
+        assert res.status_code == 200
+        data = res.json()
+        assert data["status"] == "success"
+        assert "created_ids" in data
+        assert len(data["created_ids"]) == 4
+
+        # Fetch outbox entries
+        alerts_res = client.get("/api/alerts")
+        assert alerts_res.status_code == 200
+        all_alerts = alerts_res.json()
+        assert len(all_alerts) >= 4
+
+        # Verify languages en, hi, ml, as are present
+        langs = {a["language"] for a in all_alerts}
+        assert {"en", "hi", "ml", "as"}.issubset(langs)
+
+        # Verify is_demo flag and reason prefix
+        demo_items = [a for a in all_alerts if a["is_demo"]]
+        assert len(demo_items) >= 4
+        for item in demo_items:
+            assert item["is_demo"] is True
+            assert "[DEMO ALERT]" in item["reason"]
+
+
+def test_clear_alerts_endpoint():
+    """Verifies that clear alerts endpoint wipes outbox entries and clears hysteresis state."""
+    from fastapi.testclient import TestClient
+    from backend.main import app
+
+    with TestClient(app) as client:
+        # Trigger demo alert to populate outbox
+        client.post("/api/alerts/demo?station_id=KL-PER-01&risk_level=Red")
+        assert len(client.get("/api/alerts").json()) > 0
+
+        # Clear outbox
+        clear_res = client.post("/api/alerts/clear")
+        assert clear_res.status_code == 200
+        assert clear_res.json()["status"] == "success"
+
+        # Verify outbox is empty
+        assert len(client.get("/api/alerts").json()) == 0
+
+
