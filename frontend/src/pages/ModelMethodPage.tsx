@@ -350,7 +350,6 @@ export const ModelMethodPage: React.FC = () => {
                 <th className="p-3">First Warning Date</th>
                 <th className="p-3">First Crossing Date</th>
                 <th className="p-3">Strict Lead Time</th>
-                <th className="p-3">Pre-6D Tag Lead</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-survey-border/40 dark:divide-night-border/40 font-mono">
@@ -368,9 +367,6 @@ export const ModelMethodPage: React.FC = () => {
                     <td className="p-3">{details.first_threshold_crossing_date || 'N/A'}</td>
                     <td className="p-3 text-emerald-600 dark:text-emerald-400 font-bold">
                       {details.lead_time_display || 'N/A'}
-                    </td>
-                    <td className="p-3 text-survey-slate dark:text-night-slate opacity-75">
-                      {details.git_tag_pre_6d_lead || 'N/A'}
                     </td>
                   </tr>
                 );

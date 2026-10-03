@@ -27,6 +27,11 @@ export const RiskBadge: React.FC<BadgeProps> = ({ level, size = 'md' }) => {
       bg: 'bg-red-100 dark:bg-red-950/40 text-red-800 dark:text-red-300 border-red-300 dark:border-red-800',
       shape: '⬢', // Octagon
       label: 'DANGER (RED)'
+    },
+    'no 2018 data': {
+      bg: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-700',
+      shape: '○',
+      label: 'NO 2018 DATA'
     }
   };
 

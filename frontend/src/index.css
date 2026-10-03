@@ -19,7 +19,7 @@
 }
 
 .light-tile-filter,
-.light .leaflet-tile-pane {
+html:not(.dark) .leaflet-tile-pane {
   filter: sepia(0.20) saturate(0.80) contrast(0.95) !important;
 }
 

@@ -29,8 +29,15 @@ export const LandingPage: React.FC = () => {
     return wB - wA;
   });
 
-  const leadDays = metrics?.kerala_2018_median_lead_time_days ?? 2;
-  const leadHours = metrics?.kerala_2018_median_lead_time_hours ?? 48;
+  const keralaEvalLeadTimes = ['KL-PER-01', 'KL-PER-02', 'KL-PAM-01', 'KL-MUV-01', 'KL-CHA-01']
+    .map(id => metrics?.station_2018_details?.[id]?.strict_lead_time_days)
+    .filter((val): val is number => typeof val === 'number')
+    .sort((a, b) => a - b);
+
+  const leadDays = keralaEvalLeadTimes.length > 0
+    ? keralaEvalLeadTimes[Math.floor(keralaEvalLeadTimes.length / 2)]
+    : 0;
+  const leadHours = leadDays * 24;
 
   const h2018_1d = metrics?.heldout_2018_multi_horizon?.['1d'];
   const macroF1 = h2018_1d?.lightgbm?.macro_f1_pct ?? 69.39;
@@ -164,7 +171,7 @@ export const LandingPage: React.FC = () => {
                       <div className="flex items-center justify-between text-[9px] opacity-80 pt-0.5">
                         <span className="text-survey-slate dark:text-night-slate uppercase">Secondary Layer:</span>
                         <span className="px-1.5 py-0.5 rounded border border-survey-teal/30 dark:border-night-teal/30 text-survey-teal dark:text-night-teal font-mono">
-                          Experimental Model (D+1 F1: 69.39% vs 85.15% Persistence)
+                          Experimental Model (D+1 F1: {macroF1}% vs {persF1}% Persistence)
                         </span>
                       </div>
                     </div>

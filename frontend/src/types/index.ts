@@ -1,4 +1,4 @@
-export type RiskLevel = 'Green' | 'Yellow' | 'Orange' | 'Red';
+export type RiskLevel = 'Green' | 'Yellow' | 'Orange' | 'Red' | 'no 2018 data';
 
 export interface Station {
   id: string;

@@ -79,15 +79,44 @@ def create_demo_alert(
     st_name = station.name if station else station_id
     st_lat = station.latitude if station else 10.1416
     st_lon = station.longitude if station else 76.5781
-    p97 = station.warning_level_m * 45.0 if station else 310.0
+    import os
+    import json
+    thresholds_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "data", "thresholds.json"))
+    t_data = None
+    if os.path.exists(thresholds_path):
+        try:
+            with open(thresholds_path, "r", encoding="utf-8") as f:
+                t_data = json.load(f).get(st_id)
+        except Exception:
+            pass
+
+    if t_data:
+        p90 = float(t_data.get("p90_yellow", 100.0))
+        p97 = float(t_data.get("p97_orange", 150.0))
+        p99_5 = float(t_data.get("p99.5_red", t_data.get("p99_5_red", 200.0)))
+    else:
+        p90, p97, p99_5 = 100.0, 150.0, 200.0
+
+    if risk_level == "Red":
+        thresh_name = "p99.5"
+        thresh_val = p99_5
+        pred_discharge = round(1.15 * thresh_val, 1)
+    elif risk_level == "Yellow":
+        thresh_name = "p90"
+        thresh_val = p90
+        pred_discharge = round(1.05 * thresh_val, 1)
+    else:
+        thresh_name = "p97"
+        thresh_val = p97
+        pred_discharge = round(1.15 * thresh_val, 1)
 
     evac_url, _ = generate_evacuation_route_link(st_lat, st_lon)
     now = datetime.now(timezone.utc)
 
     demo_reason = (
         f"[DEMO ALERT] Target: D+1 Model Forecast. "
-        f"Predicted discharge 425.0 m³/s crossed p97 threshold ({p97:.1f} m³/s). "
-        f"Top Drivers: 7-day cumulative rain 165.0 mm; 3-day discharge rate of change +85.0 m³/s."
+        f"Predicted discharge {pred_discharge:.1f} m³/s crossed {thresh_name} threshold ({thresh_val:.1f} m³/s). "
+        f"Top Drivers (illustrative): 7-day cumulative rain 165.0 mm (illustrative); 3-day discharge rate of change +85.0 m³/s (illustrative)."
     )
 
     lang_actions = {

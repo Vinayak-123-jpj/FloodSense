@@ -133,10 +133,14 @@ export const ScenarioReplayPage: React.FC = () => {
       const p = st.percentiles;
 
       let risk: RiskLevel = 'Green';
-      const redThresh = p['p99.5_red'] || p.p99_5_red || 550;
-      if (effQ >= redThresh) risk = 'Red';
-      else if (effQ >= p.p97_orange) risk = 'Orange';
-      else if (effQ >= p.p90_yellow) risk = 'Yellow';
+      if (st.id === 'KL-ACH-01' || (replayData?.scenario === 'kerala_2018' && st.id === 'KL-ACH-01')) {
+        risk = 'no 2018 data';
+      } else {
+        const redThresh = p['p99.5_red'] || p.p99_5_red || 550;
+        if (effQ >= redThresh) risk = 'Red';
+        else if (effQ >= p.p97_orange) risk = 'Orange';
+        else if (effQ >= p.p90_yellow) risk = 'Yellow';
+      }
 
       return {
         ...st,
@@ -146,13 +150,17 @@ export const ScenarioReplayPage: React.FC = () => {
       };
     });
 
-    // Count risk classes & find peak station dynamically from data
-    const counts: Record<RiskLevel, number> = { Red: 0, Orange: 0, Yellow: 0, Green: 0 };
-    let maxStation = scaledStations[0];
+    // Count risk classes & find peak station dynamically from valid 2018 data
+    const counts: Record<string, number> = { Red: 0, Orange: 0, Yellow: 0, Green: 0, 'no 2018 data': 0 };
+    let maxStation: ReplayStationData | null = null;
     scaledStations.forEach(st => {
-      counts[st.risk_level] = (counts[st.risk_level] || 0) + 1;
-      if (st.discharge_m3s > (maxStation?.discharge_m3s || 0)) {
-        maxStation = st;
+      if (st.risk_level === 'no 2018 data') {
+        counts['no 2018 data'] = (counts['no 2018 data'] || 0) + 1;
+      } else {
+        counts[st.risk_level] = (counts[st.risk_level] || 0) + 1;
+        if (!maxStation || st.discharge_m3s > maxStation.discharge_m3s) {
+          maxStation = st as ReplayStationData;
+        }
       }
     });
 
@@ -162,7 +170,8 @@ export const ScenarioReplayPage: React.FC = () => {
     if (counts.Yellow > 0) activeRiskParts.push(`${counts.Yellow} Yellow`);
     if (counts.Green > 0 && activeRiskParts.length === 0) activeRiskParts.push(`All ${counts.Green} Green`);
 
-    let headline = `${baseFrame.date}: ${activeRiskParts.join(', ')} — Peak: ${maxStation ? maxStation.name : ''} (${maxStation ? maxStation.discharge_m3s : 0} m³/s)`;
+    const peakSt = maxStation as ReplayStationData | null;
+    let headline = `${baseFrame.date}: ${activeRiskParts.join(', ')} — Peak: ${peakSt ? peakSt.name : ''} (${peakSt ? peakSt.discharge_m3s : 0} m³/s)`;
     if (rainMultiplier !== 1.0) {
       headline += ` [${rainMultiplier.toFixed(1)}x Scenario]`;
     }

@@ -22,14 +22,16 @@ const createCustomMarkerIcon = (station: Station, risk: RiskLevel = 'Green', isS
     Green: '#2E7D32',
     Yellow: '#D97706',
     Orange: '#EA580C',
-    Red: '#DC2626'
+    Red: '#DC2626',
+    'no 2018 data': '#64748B'
   };
 
   const shapeMap: Record<RiskLevel, string> = {
     Green: '●',
     Yellow: '▲',
     Orange: '◆',
-    Red: '⬢'
+    Red: '⬢',
+    'no 2018 data': '○'
   };
 
   const color = colorMap[risk] || '#2E7D32';
